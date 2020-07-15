@@ -31,6 +31,7 @@ def randomQuadPose(x_range, y_range, z_range, yaw_range, pitch_range, roll_range
 def QuadPose(quad_pose):
     x, y, z, roll, pitch, yaw = quad_pose
     q = Rotation.from_euler('ZYX', [yaw, pitch, roll])  # capital letters denote intrinsic rotation (lower case would be extrinsic)
+    
     q = q.as_quat()
     t_o_b = Vector3r(x,y,z)
     q_o_b = Quaternionr(q[0], q[1], q[2], q[3])

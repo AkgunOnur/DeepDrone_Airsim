@@ -13,8 +13,29 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import lr_scheduler
 import math
-from scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation as R
 
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.drop_layer = nn.Dropout(p=0.0)
+        self.fc1 = nn.Linear(41, 64)
+        self.fc2 = nn.Linear(64, 32)
+        self.fc3 = nn.Linear(32, 16)
+        self.fc4 = nn.Linear(16, 8)
+        self.fc5 = nn.Linear(8, 4)
+
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = self.drop_layer(x)
+        x = F.relu(self.fc2(x))
+        x = self.drop_layer(x)
+        x = F.relu(self.fc3(x))
+        x = self.drop_layer(x)
+        x = F.relu(self.fc4(x))
+        x = self.drop_layer(x)
+        x = self.fc5(x)
+        return x
 
 def cartesian_to_spherical(state, waypoint_world):
     x_gate, y_gate, z_gate, yaw_gate = waypoint_world
@@ -30,7 +51,7 @@ def cartesian_to_spherical(state, waypoint_world):
     return r, phi, theta
     
 def spherical_to_cartesian(state, waypoint_body):
-    r, phi, theta = waypoint_body 
+    r, phi, theta, _ = waypoint_body.ravel()
     x = r*sin(theta)*cos(phi)
     y = r*sin(theta)*sin(phi)
     z = r*cos(theta)
@@ -41,20 +62,30 @@ def spherical_to_cartesian(state, waypoint_body):
     return x_gate, y_gate, z_gate
 
 
+
 def world_to_body(state, waypoint_world):
-    R = Rotation.from_euler('ZYX', [state[5], state[4], state[3]])
-    waypoint_body = np.dot(R.T, waypoint_world.reshape(-1,1))
+    psi, theta, phi = state[5], state[4], state[3]
+    rot = R.from_euler('zyx', [[psi, theta, phi]], degrees=False).as_dcm()
+    # R = np.array([[cos(theta)*cos(psi), sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi)],
+    #               [cos(theta)*sin(psi), sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi)],
+    #               [-sin(theta), sin(phi)*cos(theta), cos(phi)*cos(theta)]])
+    waypoint_body = np.dot(rot.T, waypoint_world.reshape(-1,1))
     
     return waypoint_body.ravel()
 
 
 def body_to_world(state, waypoint_body):
-    R = Rotation.from_euler('ZYX', [state[5], state[4], state[3]])
-    waypoint_world = np.dot(R, waypoint_body.reshape(-1,1))
+    psi, theta, phi = state[5], state[4], state[3]
+    rot = R.from_euler('zyx', [[psi, theta, phi]], degrees=False).as_dcm()
+    # R = np.array([[cos(theta)*cos(psi), sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi)],
+    #               [cos(theta)*sin(psi), sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi)],
+    #               [-sin(theta), sin(phi)*cos(theta), cos(phi)*cos(theta)]])
+    waypoint_world = np.dot(rot, waypoint_body.reshape(-1,1))
     
     return waypoint_world.ravel()
 
-def Quadrotor():
+
+class Quadrotor:
     
     def __init__(self, state0, coeff_pos=1.0, coeff_vel=0.0, coeff_angle = 0.25, coeff_control = 0.0):
         
@@ -67,6 +98,22 @@ def Quadrotor():
         self.coeff_control = coeff_control
         self.Controllers = ["Backstepping_1", "Backstepping_2", "Backstepping_3", "Backstepping_4"]
         self.count_dict = {"Backstepping_1": 0, "Backstepping_2": 0, "Backstepping_3": 0, "Backstepping_4": 0}
+
+    def predict(self, X, model, device, method="MAX"):
+        softmax = nn.Softmax(dim=1)
+        inputs = torch.from_numpy(X).to(device)
+        outputs = model(inputs.float())
+     
+        if method=="MAX":
+            _, pred = torch.max(outputs, 1)
+            return pred[0]
+        elif method=="DICE":
+            probs = softmax(outputs).cpu().detach().numpy()[0]
+            pred_index = np.random.choice([0, 1, 2, 3], 1, p=probs)[0]
+            return pred_index
+        elif method=="MIX":
+            probs = softmax(outputs).cpu().detach().numpy()[0]     
+            return probs
         
     
     def model_parameters(self):
@@ -83,12 +130,13 @@ def Quadrotor():
 
         return g, m, Ixx, Iyy, Izz, I1, I2, I3, Jr, l, b, d
 
-    def model_dynamics(self, t, state, U):
+
+    def model_dynamics(self, t, state):
         g, m, Ixx, Iyy, Izz, I1, I2, I3, Jr, l, b, d = self.model_parameters()
         #states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
 
         x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot = state
-        U1, U2, U3, U4 = U
+        U1, U2, U3, U4 = self.U
 
         if (d*U1 - 2*d*U3 - b*U4) < 0:
             omega1 = - np.sqrt(- d*U1 + 2*d*U3 + b*U4) / (2*np.sqrt(b*d))
@@ -122,17 +170,20 @@ def Quadrotor():
         state_dot[4] = theta_dot
         state_dot[5] = psi_dot
 
-        state_dot[6] = (cos(phi)*sin(theta)*cos(psi) + sin(phi)*sin(psi))*U[0]/m
-        state_dot[7] = (cos(phi)*sin(theta)*sin(psi) - sin(phi)*cos(psi))*U[0]/m
-        state_dot[8] = -g + cos(phi)*cos(theta)*U[0]/m    
-        state_dot[9] = theta_dot*psi_dot*I1 - Jr / Ixx * theta_dot * omega  + l/Ixx*U[1]
-        state_dot[10] = phi_dot*psi_dot*I2 + Jr / Iyy * phi_dot * omega + l/Iyy*U[2]
-        state_dot[11] = phi_dot*theta_dot*I3 + 1/Izz*U[3]
+        state_dot[6] = (cos(phi)*sin(theta)*cos(psi) + sin(phi)*sin(psi))*U1/m
+        state_dot[7] = (cos(phi)*sin(theta)*sin(psi) - sin(phi)*cos(psi))*U1/m
+        state_dot[8] = -g + cos(phi)*cos(theta)*U1/m    
+        state_dot[9] = theta_dot*psi_dot*I1 - Jr / Ixx * theta_dot * omega  + l/Ixx*U2
+        state_dot[10] = phi_dot*psi_dot*I2 + Jr / Iyy * phi_dot * omega + l/Iyy*U3
+        state_dot[11] = phi_dot*theta_dot*I3 + 1/Izz*U4
 
         return state_dot
 
+
+    
+
     def backstepping(self, A1, A2, A3, A4, A5, A6, U_list, ref_traj, states):
-        g, m, Ixx, Iyy, Izz, I1, I2, I3, Jr, l, b, d = model_parameters()
+        g, m, Ixx, Iyy, Izz, I1, I2, I3, Jr, l, b, d = self.model_parameters()
 
         U1, U2, U3, U4 = U_list
 
@@ -229,36 +280,48 @@ def Quadrotor():
 
         return U
 
-    def get_control_input(self, cont, U0, current_traj, state):
-        #single_shot = ["Back"] # just a check flight to test the coefficients
+    def get_control_input(self, cont, current_traj, state):
+        U0 = self.U 
         if (cont == self.Controllers[0]): #Backstepping_1
             A1, A2, A3 = 15*diag([1,1]), 10*diag([1,1]), 15*diag([1,1]) 
             A4, A5, A6 = 10*diag([1,1]), 15*diag([1,1]), 10*diag([1,1]) 
-            U = backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
         elif (cont == self.Controllers[1]): #Backstepping_2
             A1, A2, A3 = 10*diag([1,1]), 5*diag([1,1]), 10*diag([1,1]) 
             A4, A5, A6 = 5*diag([1,1]), 10*diag([1,1]), 5*diag([1,1])
-            U = backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
         elif (cont == self.Controllers[2]): #Backstepping_3
             A1, A2, A3 = 5*diag([1,1]), 3*diag([1,1]), 10*diag([1,1]) 
             A4, A5, A6 = 7*diag([1,1]), 1*diag([1,1]), 1*diag([1,1])  
-            U = backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
         elif (cont == self.Controllers[3]): #Backstepping_4
             A1, A2, A3 = 2*diag([1,1]), 5*diag([1,1]), 2*diag([1,1]) 
             A4, A5, A6 = 5*diag([1,1]), 2*diag([1,1]), 5*diag([1,1]) 
-            U = backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
         return U
-    
-    def simulate(self, Tf, dtau, N, current_traj, prev_traj, std_list, scaler=None, model=None, device=None, method="MAX"):
-    #     states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
 
-        state = np.copy(self.state)
-        U0 = np.copy(self.U)
+    def bring_quad_to_des(self, des_traj, dtau, cont="Backstepping_1"):
+        #des_traj = [x,y,z,yaw]
+        x,y,z,yaw = des_traj
+
+        ref_traj = [x, y, z, 0, 0, 0, 
+                    0, 0, 0, 0, 0,
+                    0, 0, yaw, 0, 0]
+        U = self.get_control_input(cont, ref_traj, self.state)
+        sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
+        self.state = sol.y[:,-1]
+
+
+
+    
+    def simulate(self, Tf, dtau, i, current_traj, prev_traj, std_list, scaler=None, model=None, device=None, method="MAX"):
+    #     states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
         r_std, phi_std, theta_std, psi_std = std_list
+        N = 1 / dtau
 
         t_current = Tf / N * i
         time_rate = float(t_current / Tf)
-        Upr_abs_sum = np.sum(np.abs(U0))
+        Upr_abs_sum = np.sum(np.abs(self.U))
 
 #         feature_names = ['x0', 'y0', 'z0', 'x_dot0','y_dot0','z_dot0', 'phi0','theta0','yaw0', 'phi_dot0','theta_dot0','yaw_dot0', 
 #                  'xf', 'yf', 'zf', 'x_dotf','y_dotf','z_dotf','x_ddotf','y_ddotf','z_ddotf',
@@ -268,72 +331,73 @@ def Quadrotor():
 
 
         ## ADD NOISE ##
-        state[6] = normal(state[6], r_std / 3.0)
-        state[7] = normal(state[7], r_std / 3.0)
-        state[8] = normal(state[8], r_std / 3.0)
-        state[9] = normal(state[9], phi_std)
-        state[10] = normal(state[10], theta_std)
-        state[11] = normal(state[11], psi_std)
+        self.state[6] = normal(self.state[6], 0*r_std / 3.0)
+        self.state[7] = normal(self.state[7], 0*r_std / 3.0)
+        self.state[8] = normal(self.state[8], 0*r_std / 3.0)
+        self.state[9] = normal(self.state[9], 0*phi_std)
+        self.state[10] = normal(self.state[10], 0*theta_std)
+        self.state[11] = normal(self.state[11], 0*psi_std)
 
-        X_test = np.array([state[0], state[1], state[2], state[6], state[7], state[8], state[3], state[4], state[5], state[9], state[10], state[11],
+        X_test = np.array([self.state[0], self.state[1], self.state[2], self.state[6], self.state[7], self.state[8], self.state[3], self.state[4], self.state[5], self.state[9], self.state[10], self.state[11],
                     current_traj[0], current_traj[1], current_traj[2], current_traj[3], current_traj[4], current_traj[5], current_traj[6], current_traj[7], current_traj[8],
-                    state[0]-current_traj[0], state[1]-current_traj[1], state[2]-current_traj[2], time_rate, t_current, Tf, 
+                    self.state[0]-current_traj[0], self.state[1]-current_traj[1], self.state[2]-current_traj[2], time_rate, t_current, Tf, 
                     prev_traj[0], prev_traj[1], prev_traj[2], prev_traj[3], prev_traj[4], prev_traj[5], prev_traj[6], prev_traj[7], prev_traj[8], 
                     Upr_abs_sum, r_std, phi_std, theta_std, psi_std]).reshape(1,-1)
 
-#             X_test = scaler.transform(X_test)
+        X_test = scaler.transform(X_test)
 
+        #print ("X_test: ", X_test)
+        # if method == "MAX":
+        #     pred = self.predict(X_test, model, device, method)
+        #     cont = self.Controllers[pred]
+        #     U = self.get_control_input(cont, current_traj, self.state)
+        #     self.count_dict[cont] += 1
 
-        if method == "MAX":
-            pred = self.predict(X_test, model, device, method)
-            cont = self.Controllers[pred]
-            U = self.get_control_input(cont, U0, current_traj, state)
-            count_dict[cont] += 1
+        # elif method == "DICE":
+        #     pred = self.predict(X_test, model, device, method)
+        #     cont = self.Controllers[pred]
+        #     U = self.get_control_input(cont, current_traj, self.state)
+        #     self.count_dict[cont] += 1
 
-        elif method == "DICE":
-            pred = self.predict(X_test, model, device, method)
-            cont = self.Controllers[pred]
-            U = self.get_control_input(cont, U0, current_traj, state)
-            count_dict[cont] += 1
+        # elif method == "MIX":
+        #     probs = self.predict(X_test, model, device, method)
+        #     U = 0
+        #     for k in range(4):
+        #         cont = self.Controllers[k]
+        #         cont_prob = probs[k]
+        #         U_single = self.get_control_input(cont, current_traj, self.state)
+        #         U = U + (cont_prob * U_single)
+        # else:
+        #     #This time a controller info comes in method variable
+        #     U = self.get_control_input(cont, current_traj, self.state)
 
-        elif method == "MIX":
-            probs = self.predict(X_test, model, device, method)
-            U = 0
-            for k in range(4):
-                cont = self.Controllers[k]
-                cont_prob = probs[k]
-                U_single = self.get_control_input(cont, U0, current_traj, state)
-                U = U + (cont_prob * U_single)
-        else:
-            #This time a controller info comes in method variable
-            U = self.get_control_input(method, U0, current_traj, state)
+        U = self.get_control_input("Backstepping_4", current_traj, self.state)
 
-        sol = integrate.solve_ivp(fun=model_dynamics, t_span=(0, dtau), y0=state, args = (U,))
-        state = sol.y[:,-1]
-        self.state = state
+        sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
+        self.state = sol.y[:,-1]
         self.U = U
 
-        if (np.abs(state[3]) > pi/2)  | (np.abs(state[4]) > pi/2):
+        if (np.abs(self.state[3]) > pi/2)  | (np.abs(self.state[4]) > pi/2):
             self.costValue = 1e6
         else:
-            position_tracking_error = np.power((current_traj[0]-state[0]),2) + np.power((current_traj[1]-state[1]),2) + np.power((current_traj[2]-state[2]),2)
-            velocity_tracking_error = np.power((current_traj[3]-state[6]),2) + np.power((current_traj[4]-state[7]),2) + np.power((current_traj[5]-state[8]),2)
-            angular_error = state[3]**2 + state[4]**2 + np.power((current_traj[13]-state[5]),2)
-            cont_input = U[0]**2 + U[1]**2 + U[2]**2 + U[3]**2
-            self.costValue = self.costValue + 
-                            (self.coeff_pos*position_tracking_error + 
-                             self.coeff_vel*velocity_tracking_error +
-                             self.coeff_angle*angular_error +
-                             self.coeff_control*cont_input)
+            position_tracking_error = np.power((current_traj[0]-self.state[0]),2) + np.power((current_traj[1]-self.state[1]),2) + np.power((current_traj[2]-self.state[2]),2)
+            velocity_tracking_error = np.power((current_traj[3]-self.state[6]),2) + np.power((current_traj[4]-self.state[7]),2) + np.power((current_traj[5]-self.state[8]),2)
+            angular_error = self.state[3]**2 + self.state[4]**2 + np.power((current_traj[13]-self.state[5]),2)
+            cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
+            self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
+                self.coeff_vel*velocity_tracking_error + 
+                self.coeff_angle*angular_error + 
+                self.coeff_control*cont_input)
 
 
-        print ("Cost Value: ", self.costValue)
-        if (method == "MAX" or method == "DICE" or method == "DT" or method == "FOREST"):
-            print ("How many times Backstepping_1 is called?: ", count_dict["Backstepping_1"])
-            print ("How many times Backstepping_2 is called?: ", count_dict["Backstepping_2"])
-            print ("How many times Backstepping_3 is called?: ", count_dict["Backstepping_3"])
-            print ("How many times Backstepping_4 is called?: ", count_dict["Backstepping_4"])
-        print ("Final state, x: {0:.3}, y: {1:.3}, z: {2:.3}, phi: {3:.3}, theta: {4:.3}, psi: {5:.3}, vx: {6:.3}, vy: {7:.3}, vz: {8:.3}, p: {9:.3}, q: {10:.3}, r: {11:.3}".format(state[0],state[1],state[2],state[3],state[4],state[5], state[6],state[7],state[8], state[9],state[10],state[11]))
+        # print ("Cost Value: ", self.costValue)
+        # if (method == "MAX" or method == "DICE" or method == "DT" or method == "FOREST"):
+        #     print ("How many times Backstepping_1 is called?: ", self.count_dict["Backstepping_1"])
+        #     print ("How many times Backstepping_2 is called?: ", self.count_dict["Backstepping_2"])
+        #     print ("How many times Backstepping_3 is called?: ", self.count_dict["Backstepping_3"])
+        #     print ("How many times Backstepping_4 is called?: ", self.count_dict["Backstepping_4"])
+        # print ("Final state, x: {0:.3}, y: {1:.3}, z: {2:.3}, phi: {3:.3}, theta: {4:.3}, psi: {5:.3}, vx: {6:.3}, vy: {7:.3}, vz: {8:.3}, p: {9:.3}, q: {10:.3}, r: {11:.3}"
+        #     .format(self.state[0],self.state[1],self.state[2],self.state[3],self.state[4],self.state[5], self.state[6],self.state[7],self.state[8], self.state[9],self.state[10],self.state[11]))
         
         
-        return self.state, self.costValue
+        return self.costValue

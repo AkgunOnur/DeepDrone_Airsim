@@ -2,7 +2,7 @@ import time
 from pose_sampler import *
 
 num_samples = 10000
-dataset_path = '/home/kca/Desktop/all_files/airsim_dataset/' #'/home/rb/all_files/airsim_datasets/soccer_test'
+dataset_path = '/home/merkez/Downloads/DeepDrone_Airsim/datagen/' #'/home/rb/all_files/airsim_datasets/soccer_test'
 
 # check if output folder exists
 if not os.path.isdir(dataset_path):

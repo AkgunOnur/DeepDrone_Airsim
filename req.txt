@@ -1,0 +1,9 @@
+airsimdroneracingvae==1.0.0
+tensorflow==2.0.0-beta1
+msgpack-rpc-python==0.4.1
+numpy==1.16.4
+matplotlib==2.1.1
+scikit-learn==0.20.4
+scipy==1.2.2
+pandas==0.24.2
+

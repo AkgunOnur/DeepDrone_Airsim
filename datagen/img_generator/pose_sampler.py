@@ -10,13 +10,18 @@ import airsimdroneracingvae as airsim
 from airsimdroneracingvae.types import Pose, Vector3r, Quaternionr
 import airsimdroneracingvae.types
 import airsimdroneracingvae.utils
+from geom_utils import QuadPose
 import time
 import pickle
 
 import torch
 from torchvision import models, transforms
 from torchvision.transforms.functional import normalize, resize, to_tensor
-from scipy.spatial.transform import Rotation
+from PIL import Image
+from scipy.spatial.transform import Rotation as R
+from sklearn.externals.joblib import dump, load
+from sklearn.preprocessing import StandardScaler
+
 
 # import utils
 curr_dir = os.path.dirname(os.path.abspath(__file__))
@@ -24,15 +29,20 @@ import_path = os.path.join(curr_dir, '..', '..')
 sys.path.insert(0, import_path)
 import racing_utils
 
-from models.Dronet import ResNet,BasicBlock
-from models.Lstmf import LstmNet
+#sys.path.append("/home/regen/Downloads/DeepDrone_Airsim/")
+#from models.Dronet import ResNet,BasicBlock
+#from models.Lstmf import LstmNet
+#from models import lstmf, Drone
+import Dronet
+import lstmf
 from quadrotor import *
+from mytraj import MyTraj
 
 METHOD_LIST = ["MAX", "MIX", "DICE"]#, "DT", "FOREST", "Backstepping_1", "Backstepping_2", "Backstepping_3", "Backstepping_4"]
 
 
 GATE_YAW_RANGE = [-np.pi, np.pi]  # world theta gate
-# GATE_YAW_RANGE = [-1, 1]  # world theta gate -- this range is btw -pi and +pi
+#GATE_YAW_RANGE = [-1, 1]  # world theta gate -- this range is btw -pi and +pi
 UAV_X_RANGE = [-30, 30] # world x quad
 UAV_Y_RANGE = [-30, 30] # world y quad
 UAV_Z_RANGE = [-2, -3] # world z quad
@@ -73,16 +83,24 @@ class PoseSampler:
         #Drone parameters
         self.quad = None
         self.dtau = 1e-3
+        self.Tf = 0.
         self.quadrotor_freq = int(1. / self.dtau)
         self.method = "MAX"
-        self.device torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = "cpu"
         self.model = Net()
-        self.model = model.to(device)
+        self.model = self.model.to(self.device)
         self.model.load_state_dict(torch.load('best_model.pt'))
         self.model.eval()
+        
 
+        with open('dataset.pkl', 'r') as f:  # Python 3: open(..., 'wb')
+            X_train, X_val, X_test, y_train, y_val, y_test = pickle.load(f)
 
-        #---- Model İmport
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        self.scaler = scaler
+        #---- Model import
         
         input_size = 4
         output_size = 4
@@ -90,17 +108,17 @@ class PoseSampler:
         lstmR_num_layers = 1
 
         # Dronet
-        self.Dronet =  ResNet(BasicBlock, [1,1,1,1], num_classes = 4)
-        self.Dronet.to(device)
+        self.Dronet =  Dronet.ResNet(Dronet.BasicBlock, [1,1,1,1], num_classes = 4)
+        self.Dronet.to(self.device)
         print("Dronet Model:", self.Dronet)
-        self.Dronet.load_state_dict(torch.load('/home/kca/Desktop/all_files/Airsim_Deepdrone/weights/Dronet.pth'))   
+        self.Dronet.load_state_dict(torch.load('/home/merkez/Downloads/DeepDrone_Airsim/weights/Dronet.pth'))   
         self.Dronet.eval()
 
         # LstmR
-        self.lstmR = LstmNet(input_size, output_size, lstmR_hidden_size, lstmR_num_layers)
-        self.lstmR.to(device)
+        self.lstmR = lstmf.LstmNet(input_size, output_size, lstmR_hidden_size, lstmR_num_layers)
+        self.lstmR.to(self.device)
         print("lstmR Model:", self.lstmR)
-        self.lstmR.load_state_dict(torch.load('/home/kca/Desktop/all_files/Airsim_Deepdrone/weights/16_hidden_lstm_R_PG.pth'))   
+        self.lstmR.load_state_dict(torch.load('/home/merkez/Downloads/DeepDrone_Airsim/weights/16_hidden_lstm_R_PG.pth'))   
         self.lstmR.eval() 
         
         # Transformation
@@ -110,30 +128,36 @@ class PoseSampler:
                 transforms.ToTensor()]
         )
        
-        
-    def get_trajectory(self, waypoint_body_noisy, yaw_diff):
+        #self.pose_prediction = []
+
+    def get_trajectory(self, waypoint_body_noisy):
         #We have waypoint_body_noisy values, which are 
         #r_noisy, phi_noisy, theta_noisy, psi_noisy
         #We need to convert them into the cartesian form in world frame.
-        r = waypoint_body_noisy[0]
-        Tf = r*0.5
-        waypoint_world = spherical_to_cartesian(quad.state, waypoint_body_noisy)
+        yaw_diff = waypoint_body_noisy[3][0]
+        r = waypoint_body_noisy[0][0]
+        self.Tf = r*0.5
+        waypoint_world = spherical_to_cartesian(self.quad.state, waypoint_body_noisy)
+
+        print ("spherical_to_cartesian, x_gate= {0:.3}, y_gate= {1:.3}, z_gate= {2:.3}".format(waypoint_world[0], waypoint_world[1], waypoint_world[2]))
 
 
-        pos0 = [quad.state[0], quad.state[1], quad.state[2]]
-        vel0 = [quad.state[6], quad.state[7], quad.state[8]]
+        pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
+        vel0 = [self.quad.state[6], self.quad.state[7], self.quad.state[8]]
         acc0 = [0., 0., 0.]
         posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
-        gate_yaw = quad.state[5] + yaw_diff # yaw_gate = drone_yaw + yaw_diff
+        gate_yaw = self.quad.state[5] + yaw_diff # yaw_gate = drone_yaw + yaw_diff
         yawf = gate_yaw - np.pi/2
         velf = [0., 0., 0.]
         accf = [0., 0., 0.]
 
         traj = MyTraj(gravity = -9.81)
-        trajectory = traj.givemetraj(pos0, vel0, acc0, posf, velf, accf, Tf)
+        trajectory = traj.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
 
-        N = int(Tf/dtau)
-        t = linspace(0,Tf,num = N)
+
+
+        N = int(self.Tf/self.dtau)
+        t = linspace(0,self.Tf,num = N)
 
         xd, yd, zd, psid = zeros(t.shape), zeros(t.shape), zeros(t.shape), zeros(t.shape)
         xd_dot, yd_dot, zd_dot, psid_dot = zeros(t.shape), zeros(t.shape), zeros(t.shape), zeros(t.shape)
@@ -151,7 +175,7 @@ class PoseSampler:
             xd_dot[i], yd_dot[i], zd_dot[i] = vel_des[0], vel_des[1], vel_des[2]
             xd_ddot[i], yd_ddot[i], zd_ddot[i] = acc_des[0], acc_des[1], acc_des[2]
             psid[i] = yawf
-            ts += dtau
+            ts += self.dtau
 
 
         ref_traj = np.c_[xd, yd, zd, xd_dot, yd_dot, zd_dot, 
@@ -173,57 +197,100 @@ class PoseSampler:
         b: UAV body frame
         g: gate frame
         '''
-        
+        pose_prediction = np.zeros((9999,4),dtype=np.float32)
+        prediction_std = np.zeros((4,1),dtype=np.float32)
         #for i in range(len(self.state)):
         # Gate pose from txt file. It is temporary solution
         pose_quad, phi_base = racing_utils.geom_utils.randomQuadPose(UAV_X_RANGE, UAV_Y_RANGE, UAV_Z_RANGE, UAV_YAW_RANGE, UAV_PITCH_RANGE, UAV_ROLL_RANGE)
 
         # Determine pose for the gate, It isn't random.
-        gate_p_o_b = racing_utils.geom_utils.randomGatePose(pose_quad, phi_base, r_range, cam_fov, correction)
-
+        p_o_g, r, theta, psi, phi_rel= racing_utils.geom_utils.randomGatePose(pose_quad, phi_base, R_RANGE, CAM_FOV, correction)
+        #print ("pose_quad: ", pose_quad.orientation.w_val)
+        #print ("type: ", pose_quad.type())
         # Generate the Gate in given pose
-        self.client.simSetObjectPose(self.tgt_name, gate_p_o_b, True)
+        
+        if self.with_gate:
+            self.client.simSetObjectPose(self.tgt_name, p_o_g, True)
 
         # Generate quadrotor according to given pose
         self.client.simSetVehiclePose(pose_quad, True)
         time.sleep(0.001)
         
-        r = R.from_quat([pose_quad.q0, pose_quad.q1, pose_quad.q2, pose_quad.q3])
+        r = R.from_quat([pose_quad.orientation.x_val, pose_quad.orientation.y_val, pose_quad.orientation.z_val,pose_quad.orientation.w_val])
         yaw, pitch, roll = r.as_euler('zyx', degrees=False)
-        yaw
-        state0 = [pose_quad.x, pose_quad.y, pose_quad.z, roll, pitch, yaw, 0., 0., 0., 0., 0., 0.,]
+
+        state0 = [pose_quad.position.x_val, pose_quad.position.y_val, pose_quad.position.z_val,
+                  roll, pitch, yaw, 0., 0., 0., 0., 0., 0.,]
         self.quad = Quadrotor(state0)
+
+        #des_traj = [x_desired, y_desired, z_desired, yaw_desired]
+        des_traj = [pose_quad.position.x_val, pose_quad.position.y_val, pose_quad.position.z_val, 0.]
+        self.quad.bring_quad_to_des(des_traj, self.dtau)
+        quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], 
+                     self.quad.state[3], self.quad.state[4], self.quad.state[5]]
+        self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+
         
         while True:   
           
             # Take image to calculate
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
-            
+            #self.writeImgToFile(image_response)
+            img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array)
+            img_rgb = img1d.reshape(image_response.height, image_response.width, 3)
+            #print(img_rgb)
+            image = Image.fromarray(img_rgb)
              # Transfrom the Image
-            image = self.transformation(image_response)
-
+            image = self.transformation(image)
+                
             # Determine Gate location with Neural Networks
-            pose_gate_body = Dronet(image_response)
-            pose_gate_cov = Lstm_R(pose_gate[:-12])
+            with torch.no_grad():
+
+                pose_gate_body = self.Dronet(image)
+                
+                for i,num in enumerate(pose_gate_body.reshape(-1,1)):
+                    #print(num, i , self.curr_idx)
+                    pose_prediction[self.curr_idx][i] = num.item()
+                
+                
+
+                if self.curr_idx >= 11:
+                    #print(pose_prediction[self.curr_idx-11:self.curr_idx+1].shape)
+                    #self.pose_prediction = torch.from_numpy(np.asarray(self.pose_prediction.to('cpu'))).to(device)
+                    pose_gate_cov = self.lstmR(torch.from_numpy(pose_prediction[self.curr_idx-11:self.curr_idx+1].reshape(1,12,4)).to(self.device))
+                    #print(pose_gate_cov)
+                    
+                    for i, p_g_c in enumerate(pose_gate_cov.reshape(-1,1)):
+
+                        prediction_std[i] = p_g_c.item()
             
-            # Gate ground truth values will be implemented
-            if abs(pose_gate[0]) < 0.5:
-                break
+                    # Gate ground truth values will be implemented
+                    pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
 
-            # Trajectory generate
-            ref_traj = get_trajectory(self, pose_gate_body, yaw_diff) # Self olarak trajectory yollacayacak, quad_sim 'in içine
+                    print ("measured distance, r={0:.1}, phi={1:.1}, theta={2:.1}, psi={3:.1},".format(pose_gate_body[0][0], pose_gate_body[1][0], pose_gate_body[2][0], pose_gate_body[3][0]))
 
-            # Call for Controller
-            for i in range(self.quadrotor_freq):  #Kontrolcü frekansı kadar itera edecek
-                state, costValue = quad.simulate(Tf, dtau, N, current_traj, prev_traj, std_list, scaler=self.scaler, model=self.model, device=self.device, method=self.method)
-                Rot = Rotation.from_euler('ZYX', [state[5], state[4], state[3]])  # capital letters denote intrinsic rotation (lower case would be extrinsic)
-                q = Rot.as_quat()
-                pose_quad = QuadPose([state[0], state[1], state[2], q[0], q[0], q[2], q[3]])
-                self.client.simSetVehiclePose(pose_quad, True)
-                time.sleep(self.dtau)
+                    #print(pose_gate_body, pose_gate_body.shape)
 
-           
-    
+                    if abs(pose_gate_body[0]) < 0.5:
+                        break
+
+                    # Trajectory generate
+                    ref_traj = self.get_trajectory(pose_gate_body) # Self olarak trajectory yollacayacak, quad_sim 'in icine
+
+                    # Call for Controller
+                    for i in range(self.quadrotor_freq):  #Kontrolcu frekansi kadar itera edecek
+                        prev_i = np.maximum(0, i-1)
+                        current_traj = ref_traj[i]
+                        prev_traj = ref_traj[prev_i]
+                        #print ("prediction_std: ", prediction_std)
+                        costValue = self.quad.simulate(self.Tf, self.dtau, i, current_traj, prev_traj, prediction_std, scaler=self.scaler, model=self.model, device=self.device, method=self.method)
+                        quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], self.quad.state[3], self.quad.state[4], self.quad.state[5]]
+                        self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                        time.sleep(self.dtau)
+
+                    print ("Drone position, x= {0:.3}, y= {1:.3}, z= {2:.3}".format(self.quad.state[0], self.quad.state[1], self.quad.state[2]))
+
+            
             # Generate quadrotor according to given pose
             
             self.curr_idx += 1

@@ -39,6 +39,7 @@ def QuadPose(quad_pose):
 def randomSample(value_range):
     return (value_range[1] - value_range[0])*np.random.random() + value_range[0]
 
+
 def randomGatePose(p_o_b, phi_base, r_range, cam_fov, correction):
     gate_ok = False
     while not gate_ok:
@@ -59,8 +60,8 @@ def randomGatePose(p_o_b, phi_base, r_range, cam_fov, correction):
         t_b_g = convert_t_body_2_world(t_b_g_body, p_o_b.orientation)
 
         # get the gate coord in world coordinates from origin
-        #t_o_g = p_o_b.position + t_b_g
-        
+        t_o_g = p_o_b.position + t_b_g
+
         # check if gate is at least half outside the ground
         if t_o_g.z_val >= 0.0:
             continue
