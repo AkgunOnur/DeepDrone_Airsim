@@ -111,7 +111,7 @@ class PoseSampler:
         self.Dronet =  Dronet.ResNet(Dronet.BasicBlock, [1,1,1,1], num_classes = 4)
         self.Dronet.to(self.device)
         print("Dronet Model:", self.Dronet)
-        self.Dronet.load_state_dict(torch.load('/home/merkez/Downloads/DeepDrone_Airsim/weights/Dronet.pth'))   
+        self.Dronet.load_state_dict(torch.load('/home/merkez/Downloads/DeepDrone_Airsim/weights/Dronet_yeni.pth'))   
         self.Dronet.eval()
 
         # LstmR
@@ -129,8 +129,8 @@ class PoseSampler:
         )
 
         self.drone_init = Pose(Vector3r(-25.,-10.,-3.), Quaternionr(0., 0., -0.70710678, 0.70710678))
-        self.gates = [Pose(Vector3r(-25.,-15.,-3.), Quaternionr(0., 0., 0., 1.)),
-                      Pose(Vector3r(-24.,-17.,-3.), Quaternionr(0., 0., 0., 1.))]
+        self.gates = [Pose(Vector3r(-25.,-15.,-3.), Quaternionr(0., 0., 0., 1.))]
+                      #Pose(Vector3r(-24.,-17.,-3.), Quaternionr(0., 0., 0., 1.))]
        
         #self.pose_prediction = []
 
@@ -156,6 +156,7 @@ class PoseSampler:
         posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
         gate_yaw = self.quad.state[5] + yaw_diff # yaw_gate = drone_yaw + yaw_diff
         yawf = gate_yaw - np.pi/2
+        yawf = - np.pi/2
         velf = [0., 0., 0.]
         accf = [0., 0., 0.]
 
@@ -280,6 +281,7 @@ class PoseSampler:
             
                     # Gate ground truth values will be implemented
                     pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
+                    prediction_std = np.clip(prediction_std, 0, prediction_std)
 
                     #print ("measured distance, r={0:.1}, phi={1:.1}, theta={2:.1}, psi={3:.1},".format(pose_gate_body[0][0], pose_gate_body[1][0], pose_gate_body[2][0], pose_gate_body[3][0]))
                     print("Gate ground truth, x={0:.3}, y={1:.3}, z={2:.3}".format(gate.position.x_val, gate.position.y_val, gate.position.z_val))
@@ -290,7 +292,7 @@ class PoseSampler:
                         break
 
                     # Trajectory generate
-                    ref_traj = self.get_trajectory(gate, ground_truth = True) # Self olarak trajectory yollacayacak, quad_sim 'in icine
+                    ref_traj = self.get_trajectory(pose_gate_body, ground_truth = False) # Self olarak trajectory yollacayacak, quad_sim 'in icine
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
 
                     print("Measured gate, x={0:.3}, y={1:.3}, z={2:.3}".format(waypoint_world[0], waypoint_world[1], waypoint_world[2]))
