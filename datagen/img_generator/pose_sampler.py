@@ -127,18 +127,26 @@ class PoseSampler:
                 #transforms.ColorJitter(hue=.05, saturation=.05),
                 transforms.ToTensor()]
         )
+
+        self.drone_init = Pose(Vector3r(-25.,-10.,-3.), Quaternionr(0., 0., -0.70710678, 0.70710678))
+        self.gates = [Pose(Vector3r(-25.,-15.,-3.), Quaternionr(0., 0., 0., 1.)),
+                      Pose(Vector3r(-24.,-17.,-3.), Quaternionr(0., 0., 0., 1.))]
        
         #self.pose_prediction = []
 
-    def get_trajectory(self, waypoint_body_noisy):
+    def get_trajectory(self, waypoint_body, ground_truth=False):
         #We have waypoint_body_noisy values, which are 
         #r_noisy, phi_noisy, theta_noisy, psi_noisy
         #We need to convert them into the cartesian form in world frame.
-        yaw_diff = waypoint_body_noisy[3][0]
-        r = waypoint_body_noisy[0][0]
-        self.Tf = r*0.5
-        waypoint_world = spherical_to_cartesian(self.quad.state, waypoint_body_noisy)
-
+        if ground_truth:
+            waypoint_world = [waypoint_body.position.x_val, waypoint_body.position.y_val, waypoint_body.position.z_val]
+            yaw_diff = 0.
+            self.Tf = 5.
+        else:
+            yaw_diff = waypoint_body[3][0]
+            r = waypoint_body[0][0]
+            self.Tf = r*0.5
+            waypoint_world = spherical_to_cartesian(self.quad.state, waypoint_body)
         print ("spherical_to_cartesian, x_gate= {0:.3}, y_gate= {1:.3}, z_gate= {2:.3}".format(waypoint_world[0], waypoint_world[1], waypoint_world[2]))
 
 
@@ -201,37 +209,43 @@ class PoseSampler:
         prediction_std = np.zeros((4,1),dtype=np.float32)
         #for i in range(len(self.state)):
         # Gate pose from txt file. It is temporary solution
-        pose_quad, phi_base = racing_utils.geom_utils.randomQuadPose(UAV_X_RANGE, UAV_Y_RANGE, UAV_Z_RANGE, UAV_YAW_RANGE, UAV_PITCH_RANGE, UAV_ROLL_RANGE)
+        #pose_quad, phi_base = racing_utils.geom_utils.randomQuadPose(UAV_X_RANGE, UAV_Y_RANGE, UAV_Z_RANGE, UAV_YAW_RANGE, UAV_PITCH_RANGE, UAV_ROLL_RANGE)
 
         # Determine pose for the gate, It isn't random.
-        p_o_g, r, theta, psi, phi_rel= racing_utils.geom_utils.randomGatePose(pose_quad, phi_base, R_RANGE, CAM_FOV, correction)
+        #p_o_g, r, theta, psi, phi_rel= racing_utils.geom_utils.randomGatePose(pose_quad, phi_base, R_RANGE, CAM_FOV, correction)
         #print ("pose_quad: ", pose_quad.orientation.w_val)
         #print ("type: ", pose_quad.type())
         # Generate the Gate in given pose
         
         if self.with_gate:
-            self.client.simSetObjectPose(self.tgt_name, p_o_g, True)
+            for i, gate in enumerate(self.gates):
+                print ("gate: ", gate)
+                gate_name = "gate_" + str(i)
+                self.tgt_name = self.client.simSpawnObject(gate_name, "RedGate16x16", Pose(position_val=Vector3r(0,0,15)), 0.75)
+                self.client.simSetObjectPose(self.tgt_name, gate, True)
 
         # Generate quadrotor according to given pose
-        self.client.simSetVehiclePose(pose_quad, True)
+        self.client.simSetVehiclePose(self.drone_init, True)
         time.sleep(0.001)
         
-        r = R.from_quat([pose_quad.orientation.x_val, pose_quad.orientation.y_val, pose_quad.orientation.z_val,pose_quad.orientation.w_val])
+        r = R.from_quat([self.drone_init.orientation.x_val, self.drone_init.orientation.y_val, self.drone_init.orientation.z_val, self.drone_init.orientation.w_val])
         yaw, pitch, roll = r.as_euler('zyx', degrees=False)
 
-        state0 = [pose_quad.position.x_val, pose_quad.position.y_val, pose_quad.position.z_val,
+        state0 = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val,
                   roll, pitch, yaw, 0., 0., 0., 0., 0., 0.,]
         self.quad = Quadrotor(state0)
 
         #des_traj = [x_desired, y_desired, z_desired, yaw_desired]
-        des_traj = [pose_quad.position.x_val, pose_quad.position.y_val, pose_quad.position.z_val, 0.]
-        self.quad.bring_quad_to_des(des_traj, self.dtau)
-        quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], 
-                     self.quad.state[3], self.quad.state[4], self.quad.state[5]]
-        self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+        # des_traj = [pose_quad.position.x_val, pose_quad.position.y_val, pose_quad.position.z_val, 0.]
+        # self.quad.bring_quad_to_des(des_traj, self.dtau)
+        # quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], 
+        #              self.quad.state[3], self.quad.state[4], self.quad.state[5]]
+        # self.client.simSetVehiclePose(QuadPose(quad_pose), True)
 
         
+        gate_index = 0
         while True:   
+            gate = self.gates[gate_index]
           
             # Take image to calculate
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
@@ -267,26 +281,41 @@ class PoseSampler:
                     # Gate ground truth values will be implemented
                     pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
 
-                    print ("measured distance, r={0:.1}, phi={1:.1}, theta={2:.1}, psi={3:.1},".format(pose_gate_body[0][0], pose_gate_body[1][0], pose_gate_body[2][0], pose_gate_body[3][0]))
-
+                    #print ("measured distance, r={0:.1}, phi={1:.1}, theta={2:.1}, psi={3:.1},".format(pose_gate_body[0][0], pose_gate_body[1][0], pose_gate_body[2][0], pose_gate_body[3][0]))
+                    print("Gate ground truth, x={0:.3}, y={1:.3}, z={2:.3}".format(gate.position.x_val, gate.position.y_val, gate.position.z_val))
                     #print(pose_gate_body, pose_gate_body.shape)
 
-                    if abs(pose_gate_body[0]) < 0.5:
+                    if abs(pose_gate_body[0][0]) < 0.5:
+                        print ("Drone final position, x= {0:.3}, y= {1:.3}, z= {2:.3}".format(self.quad.state[0], self.quad.state[1], self.quad.state[2]))
                         break
 
                     # Trajectory generate
-                    ref_traj = self.get_trajectory(pose_gate_body) # Self olarak trajectory yollacayacak, quad_sim 'in icine
+                    ref_traj = self.get_trajectory(gate, ground_truth = True) # Self olarak trajectory yollacayacak, quad_sim 'in icine
+                    waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
+
+                    print("Measured gate, x={0:.3}, y={1:.3}, z={2:.3}".format(waypoint_world[0], waypoint_world[1], waypoint_world[2]))
+
+
+                    # des_traj = [waypoint_world[0], waypoint_world[1], waypoint_world[2], 0.]
+                    # self.quad.bring_quad_to_des(des_traj, self.dtau)
+                    # quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], 
+                    #              self.quad.state[3], self.quad.state[4], self.quad.state[5]]
+                    # self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+
+                    N_length = np.minimum(len(ref_traj), self.quadrotor_freq)
+                    prediction_std = prediction_std.ravel()
 
                     # Call for Controller
-                    for i in range(self.quadrotor_freq):  #Kontrolcu frekansi kadar itera edecek
+                    for i in range(N_length):  #Kontrolcu frekansi kadar itera edecek
                         prev_i = np.maximum(0, i-1)
                         current_traj = ref_traj[i]
                         prev_traj = ref_traj[prev_i]
-                        #print ("prediction_std: ", prediction_std)
-                        costValue = self.quad.simulate(self.Tf, self.dtau, i, current_traj, prev_traj, prediction_std, scaler=self.scaler, model=self.model, device=self.device, method=self.method)
+                        self.quad.simulate(self.Tf, self.dtau, i, current_traj, prev_traj, prediction_std, scaler=self.scaler, model=self.model, device=self.device, method=self.method)
                         quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], self.quad.state[3], self.quad.state[4], self.quad.state[5]]
+                        
+                        
                         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
-                        time.sleep(self.dtau)
+                        #time.sleep(self.dtau)
 
                     print ("Drone position, x= {0:.3}, y= {1:.3}, z= {2:.3}".format(self.quad.state[0], self.quad.state[1], self.quad.state[2]))
 

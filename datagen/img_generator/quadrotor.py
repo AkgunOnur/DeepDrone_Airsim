@@ -138,29 +138,29 @@ class Quadrotor:
         x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot = state
         U1, U2, U3, U4 = self.U
 
-        if (d*U1 - 2*d*U3 - b*U4) < 0:
-            omega1 = - np.sqrt(- d*U1 + 2*d*U3 + b*U4) / (2*np.sqrt(b*d))
-        else:
-            omega1 = - np.sqrt(d*U1 - 2*d*U3 - b*U4) / (2*np.sqrt(b*d))
+        # if (d*U1 - 2*d*U3 - b*U4) < 0:
+        #     omega1 = - np.sqrt(- d*U1 + 2*d*U3 + b*U4) / (2*np.sqrt(b*d))
+        # else:
+        #     omega1 = - np.sqrt(d*U1 - 2*d*U3 - b*U4) / (2*np.sqrt(b*d))
 
-        if (d*U1 - 2*d*U2 + b*U4) < 0:
-            omega2 = -np.sqrt(-d*U1 + 2*d*U2 - b*U4) / (2*np.sqrt(b*d))
-        else:
-            omega2 = -np.sqrt(d*U1 - 2*d*U2 + b*U4) / (2*np.sqrt(b*d))
-
-
-        if (d*U1 + 2*d*U3 - b*U4) < 0:
-            omega3 = -np.sqrt(-d*U1 - 2*d*U3 + b*U4) / (2*np.sqrt(b*d))
-        else:
-            omega3 = -np.sqrt(d*U1 + 2*d*U3 - b*U4) / (2*np.sqrt(b*d))
-
-        if (d*U1 + 2*d*U2 + b*U4) < 0:
-            omega4 = -np.sqrt(-d*U1 - 2*d*U2 - b*U4) / (2*np.sqrt(b*d))
-        else:
-            omega4 = -np.sqrt(d*U1 + 2*d*U2 + b*U4) / (2*np.sqrt(b*d))
+        # if (d*U1 - 2*d*U2 + b*U4) < 0:
+        #     omega2 = -np.sqrt(-d*U1 + 2*d*U2 - b*U4) / (2*np.sqrt(b*d))
+        # else:
+        #     omega2 = -np.sqrt(d*U1 - 2*d*U2 + b*U4) / (2*np.sqrt(b*d))
 
 
-        omega = (omega2 + omega4 - omega1 - omega3)
+        # if (d*U1 + 2*d*U3 - b*U4) < 0:
+        #     omega3 = -np.sqrt(-d*U1 - 2*d*U3 + b*U4) / (2*np.sqrt(b*d))
+        # else:
+        #     omega3 = -np.sqrt(d*U1 + 2*d*U3 - b*U4) / (2*np.sqrt(b*d))
+
+        # if (d*U1 + 2*d*U2 + b*U4) < 0:
+        #     omega4 = -np.sqrt(-d*U1 - 2*d*U2 - b*U4) / (2*np.sqrt(b*d))
+        # else:
+        #     omega4 = -np.sqrt(d*U1 + 2*d*U2 + b*U4) / (2*np.sqrt(b*d))
+
+
+        omega = 0.
 
         state_dot = np.zeros(12)
         state_dot[0] = x_dot
@@ -182,16 +182,16 @@ class Quadrotor:
 
     
 
-    def backstepping(self, A1, A2, A3, A4, A5, A6, U_list, ref_traj, states):
+    def backstepping(self, A1, A2, A3, A4, A5, A6, U_list, ref_traj):
         g, m, Ixx, Iyy, Izz, I1, I2, I3, Jr, l, b, d = self.model_parameters()
 
         U1, U2, U3, U4 = U_list
 
-        #states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
-        x, y, z = states[0], states[1], states[2]
-        phi, theta, psi = states[3], states[4], states[5]
-        x_dot, y_dot, z_dot = states[6], states[7], states[8]
-        phi_dot, theta_dot, psi_dot = states[9], states[10], states[11]
+        #self.state: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
+        x, y, z = self.state[0], self.state[1], self.state[2]
+        phi, theta, psi = self.state[3], self.state[4], self.state[5]
+        x_dot, y_dot, z_dot = self.state[6], self.state[7], self.state[8]
+        phi_dot, theta_dot, psi_dot = self.state[9], self.state[10], self.state[11]
 
     #     ref_traj = [xd[i], yd[i], zd[i], xd_dot[i], yd_dot[i], zd_dot[i], 
     #                 xd_ddot[i], yd_ddot[i], zd_ddot[i], xd_dddot[i], yd_dddot[i],
@@ -271,7 +271,7 @@ class Quadrotor:
 
         U1, U2, U3, U4 = l2[1], l1[0], l1[1], l2[0]
 
-        U1 = np.clip(U1, 1.0, 1e2)
+        U1 = np.clip(U1, 1e-3, 1e3)
         U2 = np.clip(U2, -1e3, 1e3)
         U3 = np.clip(U3, -1e3, 1e3)
         U4 = np.clip(U4, -1e2, 1e2)
@@ -280,34 +280,34 @@ class Quadrotor:
 
         return U
 
-    def get_control_input(self, cont, current_traj, state):
+    def get_control_input(self, cont, current_traj):
         U0 = self.U 
         if (cont == self.Controllers[0]): #Backstepping_1
             A1, A2, A3 = 15*diag([1,1]), 10*diag([1,1]), 15*diag([1,1]) 
             A4, A5, A6 = 10*diag([1,1]), 15*diag([1,1]), 10*diag([1,1]) 
-            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj) 
         elif (cont == self.Controllers[1]): #Backstepping_2
             A1, A2, A3 = 10*diag([1,1]), 5*diag([1,1]), 10*diag([1,1]) 
             A4, A5, A6 = 5*diag([1,1]), 10*diag([1,1]), 5*diag([1,1])
-            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state) 
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj) 
         elif (cont == self.Controllers[2]): #Backstepping_3
             A1, A2, A3 = 5*diag([1,1]), 3*diag([1,1]), 10*diag([1,1]) 
             A4, A5, A6 = 7*diag([1,1]), 1*diag([1,1]), 1*diag([1,1])  
-            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj)
         elif (cont == self.Controllers[3]): #Backstepping_4
             A1, A2, A3 = 2*diag([1,1]), 5*diag([1,1]), 2*diag([1,1]) 
             A4, A5, A6 = 5*diag([1,1]), 2*diag([1,1]), 5*diag([1,1]) 
-            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj, state)
+            U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj)
         return U
 
-    def bring_quad_to_des(self, des_traj, dtau, cont="Backstepping_1"):
+    def bring_quad_to_des(self, des_traj, dtau, cont="Backstepping_4"):
         #des_traj = [x,y,z,yaw]
         x,y,z,yaw = des_traj
 
         ref_traj = [x, y, z, 0, 0, 0, 
                     0, 0, 0, 0, 0,
                     0, 0, yaw, 0, 0]
-        U = self.get_control_input(cont, ref_traj, self.state)
+        self.U = self.get_control_input(cont, ref_traj)
         sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
         self.state = sol.y[:,-1]
 
@@ -331,12 +331,12 @@ class Quadrotor:
 
 
         ## ADD NOISE ##
-        self.state[6] = normal(self.state[6], 0*r_std / 3.0)
-        self.state[7] = normal(self.state[7], 0*r_std / 3.0)
-        self.state[8] = normal(self.state[8], 0*r_std / 3.0)
-        self.state[9] = normal(self.state[9], 0*phi_std)
-        self.state[10] = normal(self.state[10], 0*theta_std)
-        self.state[11] = normal(self.state[11], 0*psi_std)
+        self.state[6] = normal(self.state[6], r_std / 3.0)
+        self.state[7] = normal(self.state[7], r_std / 3.0)
+        self.state[8] = normal(self.state[8], r_std / 3.0)
+        self.state[9] = normal(self.state[9], phi_std)
+        self.state[10] = normal(self.state[10], theta_std)
+        self.state[11] = normal(self.state[11], psi_std)
 
         X_test = np.array([self.state[0], self.state[1], self.state[2], self.state[6], self.state[7], self.state[8], self.state[3], self.state[4], self.state[5], self.state[9], self.state[10], self.state[11],
                     current_traj[0], current_traj[1], current_traj[2], current_traj[3], current_traj[4], current_traj[5], current_traj[6], current_traj[7], current_traj[8],
@@ -347,31 +347,31 @@ class Quadrotor:
         X_test = scaler.transform(X_test)
 
         #print ("X_test: ", X_test)
-        # if method == "MAX":
-        #     pred = self.predict(X_test, model, device, method)
-        #     cont = self.Controllers[pred]
-        #     U = self.get_control_input(cont, current_traj, self.state)
-        #     self.count_dict[cont] += 1
+        if method == "MAX":
+            pred = self.predict(X_test, model, device, method)
+            cont = self.Controllers[pred]
+            U = self.get_control_input(cont, current_traj)
+            self.count_dict[cont] += 1
 
-        # elif method == "DICE":
-        #     pred = self.predict(X_test, model, device, method)
-        #     cont = self.Controllers[pred]
-        #     U = self.get_control_input(cont, current_traj, self.state)
-        #     self.count_dict[cont] += 1
+        elif method == "DICE":
+            pred = self.predict(X_test, model, device, method)
+            cont = self.Controllers[pred]
+            U = self.get_control_input(cont, current_traj)
+            self.count_dict[cont] += 1
 
-        # elif method == "MIX":
-        #     probs = self.predict(X_test, model, device, method)
-        #     U = 0
-        #     for k in range(4):
-        #         cont = self.Controllers[k]
-        #         cont_prob = probs[k]
-        #         U_single = self.get_control_input(cont, current_traj, self.state)
-        #         U = U + (cont_prob * U_single)
-        # else:
-        #     #This time a controller info comes in method variable
-        #     U = self.get_control_input(cont, current_traj, self.state)
+        elif method == "MIX":
+            probs = self.predict(X_test, model, device, method)
+            U = 0
+            for k in range(4):
+                cont = self.Controllers[k]
+                cont_prob = probs[k]
+                U_single = self.get_control_input(cont, current_traj)
+                U = U + (cont_prob * U_single)
+        else:
+            #This time a controller info comes in method variable
+            U = self.get_control_input(cont, current_traj, self.state)
 
-        U = self.get_control_input("Backstepping_4", current_traj, self.state)
+        # U = self.get_control_input("Backstepping_4", current_traj)
 
         sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
         self.state = sol.y[:,-1]
@@ -390,14 +390,12 @@ class Quadrotor:
                 self.coeff_control*cont_input)
 
 
-        # print ("Cost Value: ", self.costValue)
-        # if (method == "MAX" or method == "DICE" or method == "DT" or method == "FOREST"):
-        #     print ("How many times Backstepping_1 is called?: ", self.count_dict["Backstepping_1"])
-        #     print ("How many times Backstepping_2 is called?: ", self.count_dict["Backstepping_2"])
-        #     print ("How many times Backstepping_3 is called?: ", self.count_dict["Backstepping_3"])
-        #     print ("How many times Backstepping_4 is called?: ", self.count_dict["Backstepping_4"])
-        # print ("Final state, x: {0:.3}, y: {1:.3}, z: {2:.3}, phi: {3:.3}, theta: {4:.3}, psi: {5:.3}, vx: {6:.3}, vy: {7:.3}, vz: {8:.3}, p: {9:.3}, q: {10:.3}, r: {11:.3}"
-        #     .format(self.state[0],self.state[1],self.state[2],self.state[3],self.state[4],self.state[5], self.state[6],self.state[7],self.state[8], self.state[9],self.state[10],self.state[11]))
+        print ("Cost Value: ", self.costValue)
+        if (method == "MAX" or method == "DICE" or method == "DT" or method == "FOREST"):
+            print ("How many times Backstepping_1 is called?: ", self.count_dict["Backstepping_1"])
+            print ("How many times Backstepping_2 is called?: ", self.count_dict["Backstepping_2"])
+            print ("How many times Backstepping_3 is called?: ", self.count_dict["Backstepping_3"])
+            print ("How many times Backstepping_4 is called?: ", self.count_dict["Backstepping_4"])
+        print ("Final state, x: {0:.3}, y: {1:.3}, z: {2:.3}, phi: {3:.3}, theta: {4:.3}, psi: {5:.3}, vx: {6:.3}, vy: {7:.3}, vz: {8:.3}, p: {9:.3}, q: {10:.3}, r: {11:.3}"
+            .format(self.state[0],self.state[1],self.state[2],self.state[3],self.state[4],self.state[5], self.state[6],self.state[7],self.state[8], self.state[9],self.state[10],self.state[11]))
         
-        
-        return self.costValue

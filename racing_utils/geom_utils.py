@@ -78,6 +78,7 @@ def randomGatePose(p_o_b, phi_base, r_range, cam_fov, correction):
 
         return p_o_g, r, theta, psi, phi_rel
 
+
 def debugRelativeOrientation(p_o_b, p_o_g, phi_rel):
     phi_quad_ref = get_yaw_base(p_o_b)
     phi_gate = phi_quad_ref + phi_rel
