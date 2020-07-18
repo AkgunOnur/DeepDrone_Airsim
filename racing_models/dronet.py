@@ -7,7 +7,7 @@ class Dronet(Model):
         super(Dronet, self).__init__()
         self.include_top = include_top
         self.create_model(num_outputs)
-        print("KAC OUTPU VARRR",num_outputs)
+
     def call(self, img):
         # Input
         x1 = self.conv0(img)

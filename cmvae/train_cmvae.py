@@ -9,11 +9,11 @@ sys.path.insert(0, import_path)
 import racing_models.cmvae
 import racing_utils
 
-# DEFINE TRAINING META PARAMETERS 
-data_dir = '/home/dogukanyy/catkin_ws/src/sim2real_drone_racing/learning/deep_drone_racing_learner/data/Collecting/NewValTest' #'/home/dogukanyy/Downloads/AirSim_Data/soccer_close_1k' 
-output_dir = '/home/dogukanyy/catkin_ws/src/AirSim-Drone-Racing-VAE-Imitation/model_outputs/cmvae_con'
+# DEFINE TRAINING META PARAMETERS
+data_dir = '/home/rb/all_files/airsim_datasets/soccer_1k'
+output_dir = '/home/rb/all_files/model_outputs/cmvae_con'
 batch_size = 32
-epochs = 3#10000
+epochs = 50
 n_z = 10
 latent_space_constraints = True
 img_res = 64

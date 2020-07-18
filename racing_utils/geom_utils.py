@@ -5,7 +5,6 @@ import math
 from airsimdroneracingvae.utils import to_eularian_angles, to_quaternion
 import numpy as np
 from airsimdroneracingvae.types import Pose, Vector3r, Quaternionr
-import airsimdroneracingvae
 
 def interp_vector(a, b, n):
     delta = (b-a)/(n-1)
@@ -28,17 +27,8 @@ def randomQuadPose(x_range, y_range, z_range, yaw_range, pitch_range, roll_range
     q_o_b = Quaternionr(q[0], q[1], q[2], q[3])
     return Pose(t_o_b, q_o_b), yaw
 
-def QuadPose(quad_pose):
-    x, y, z, roll, pitch, yaw = quad_pose
-    q = Rotation.from_euler('ZYX', [yaw, pitch, roll])  # capital letters denote intrinsic rotation (lower case would be extrinsic)
-    q = q.as_quat()
-    t_o_b = Vector3r(x,y,z)
-    q_o_b = Quaternionr(q[0], q[1], q[2], q[3])
-    return Pose(t_o_b, q_o_b)
-
 def randomSample(value_range):
     return (value_range[1] - value_range[0])*np.random.random() + value_range[0]
-
 
 def randomGatePose(p_o_b, phi_base, r_range, cam_fov, correction):
     gate_ok = False
@@ -77,7 +67,6 @@ def randomGatePose(p_o_b, phi_base, r_range, cam_fov, correction):
         p_o_g = Pose(t_o_g, Quaternionr(q[0], q[1], q[2], q[3]))
 
         return p_o_g, r, theta, psi, phi_rel
-
 
 def debugRelativeOrientation(p_o_b, p_o_g, phi_rel):
     phi_quad_ref = get_yaw_base(p_o_b)

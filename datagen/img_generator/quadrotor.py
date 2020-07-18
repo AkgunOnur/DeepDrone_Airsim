@@ -271,9 +271,9 @@ class Quadrotor:
 
         U1, U2, U3, U4 = l2[1], l1[0], l1[1], l2[0]
 
-        U1 = np.clip(U1, 1e-3, 1e3)
-        U2 = np.clip(U2, -1e3, 1e3)
-        U3 = np.clip(U3, -1e3, 1e3)
+        U1 = np.clip(U1, 1.0, 1e2)
+        U2 = np.clip(U2, -1e2, 1e2)
+        U3 = np.clip(U3, -1e2, 1e2)
         U4 = np.clip(U4, -1e2, 1e2)
 
         U = np.array([U1, U2, U3, U4])
@@ -331,12 +331,12 @@ class Quadrotor:
 
 
         ## ADD NOISE ##
-        self.state[6] = normal(self.state[6], r_std / 3.0)
-        self.state[7] = normal(self.state[7], r_std / 3.0)
-        self.state[8] = normal(self.state[8], r_std / 3.0)
-        self.state[9] = normal(self.state[9], phi_std)
-        self.state[10] = normal(self.state[10], theta_std)
-        self.state[11] = normal(self.state[11], psi_std)
+        self.state[6] = normal(self.state[6], 0*r_std / 3.0)
+        self.state[7] = normal(self.state[7], 0*r_std / 3.0)
+        self.state[8] = normal(self.state[8], 0*r_std / 3.0)
+        self.state[9] = normal(self.state[9], 0*phi_std)
+        self.state[10] = normal(self.state[10], 0*theta_std)
+        self.state[11] = normal(self.state[11], 0*psi_std)
 
         X_test = np.array([self.state[0], self.state[1], self.state[2], self.state[6], self.state[7], self.state[8], self.state[3], self.state[4], self.state[5], self.state[9], self.state[10], self.state[11],
                     current_traj[0], current_traj[1], current_traj[2], current_traj[3], current_traj[4], current_traj[5], current_traj[6], current_traj[7], current_traj[8],
@@ -347,31 +347,31 @@ class Quadrotor:
         X_test = scaler.transform(X_test)
 
         #print ("X_test: ", X_test)
-        if method == "MAX":
-            pred = self.predict(X_test, model, device, method)
-            cont = self.Controllers[pred]
-            U = self.get_control_input(cont, current_traj)
-            self.count_dict[cont] += 1
+        # if method == "MAX":
+        #     pred = self.predict(X_test, model, device, method)
+        #     cont = self.Controllers[pred]
+        #     U = self.get_control_input(cont, current_traj)
+        #     self.count_dict[cont] += 1
 
-        elif method == "DICE":
-            pred = self.predict(X_test, model, device, method)
-            cont = self.Controllers[pred]
-            U = self.get_control_input(cont, current_traj)
-            self.count_dict[cont] += 1
+        # elif method == "DICE":
+        #     pred = self.predict(X_test, model, device, method)
+        #     cont = self.Controllers[pred]
+        #     U = self.get_control_input(cont, current_traj)
+        #     self.count_dict[cont] += 1
 
-        elif method == "MIX":
-            probs = self.predict(X_test, model, device, method)
-            U = 0
-            for k in range(4):
-                cont = self.Controllers[k]
-                cont_prob = probs[k]
-                U_single = self.get_control_input(cont, current_traj)
-                U = U + (cont_prob * U_single)
-        else:
-            #This time a controller info comes in method variable
-            U = self.get_control_input(cont, current_traj, self.state)
+        # elif method == "MIX":
+        #     probs = self.predict(X_test, model, device, method)
+        #     U = 0
+        #     for k in range(4):
+        #         cont = self.Controllers[k]
+        #         cont_prob = probs[k]
+        #         U_single = self.get_control_input(cont, current_traj)
+        #         U = U + (cont_prob * U_single)
+        # else:
+        #     #This time a controller info comes in method variable
+        #     U = self.get_control_input(cont, current_traj, self.state)
 
-        # U = self.get_control_input("Backstepping_4", current_traj)
+        U = self.get_control_input("Backstepping_4", current_traj)
 
         sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
         self.state = sol.y[:,-1]
@@ -389,7 +389,7 @@ class Quadrotor:
                 self.coeff_angle*angular_error + 
                 self.coeff_control*cont_input)
 
-
+"""
         print ("Cost Value: ", self.costValue)
         if (method == "MAX" or method == "DICE" or method == "DT" or method == "FOREST"):
             print ("How many times Backstepping_1 is called?: ", self.count_dict["Backstepping_1"])
@@ -398,4 +398,4 @@ class Quadrotor:
             print ("How many times Backstepping_4 is called?: ", self.count_dict["Backstepping_4"])
         print ("Final state, x: {0:.3}, y: {1:.3}, z: {2:.3}, phi: {3:.3}, theta: {4:.3}, psi: {5:.3}, vx: {6:.3}, vy: {7:.3}, vz: {8:.3}, p: {9:.3}, q: {10:.3}, r: {11:.3}"
             .format(self.state[0],self.state[1],self.state[2],self.state[3],self.state[4],self.state[5], self.state[6],self.state[7],self.state[8], self.state[9],self.state[10],self.state[11]))
-        
+"""

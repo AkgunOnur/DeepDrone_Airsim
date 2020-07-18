@@ -113,7 +113,7 @@ def de_normalize_gate(pose):
 
 def read_images(data_dir, res, max_size=None):
     print('Going to read image file list')
-    files_list = glob.glob(os.path.join(data_dir, 'images/*.jpg'))
+    files_list = glob.glob(os.path.join(data_dir, 'images/*.png'))
     print('Done. Starting sorting.')
     files_list.sort()  # make sure we're reading the images in order later
     print('Done. Before images_np init')
@@ -143,7 +143,7 @@ def read_images(data_dir, res, max_size=None):
 
 def create_dataset_csv(data_dir, batch_size, res, max_size=None):
     print('Going to read file list')
-    files_list = glob.glob(os.path.join(data_dir, 'images/*.jpg'))
+    files_list = glob.glob(os.path.join(data_dir, 'images/*.png'))
     print('Done. Starting sorting.')
     files_list.sort()  # make sure we're reading the images in order later
     print('Done. Before images_np init')
@@ -217,7 +217,7 @@ def create_unsup_dataset_multiple_sources(data_dir_list, batch_size, res):
 def create_test_dataset_csv(data_dir, res, read_table=True):
     # prepare image dataset from a folder
     print('Going to read file list')
-    files_list = glob.glob(os.path.join(data_dir, 'images/*.jpg'))
+    files_list = glob.glob(os.path.join(data_dir, 'images/*.png'))
     print('Done. Starting sorting.')
     files_list.sort()  # make sure we're reading the images in order later
     print('Done. Before images_np init')

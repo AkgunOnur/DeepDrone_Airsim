@@ -1,8 +1,8 @@
 import time
 from pose_sampler import *
 
-num_samples = 1
-dataset_path = '/home/merkez/Downloads/DeepDrone_Airsim/datagen/' #'/home/rb/all_files/airsim_datasets/soccer_test'
+num_samples = 100
+dataset_path = '/home/merkez/Downloads/kamil_airsim/'
 
 # check if output folder exists
 if not os.path.isdir(dataset_path):
@@ -14,13 +14,8 @@ else:
 
 pose_sampler = PoseSampler(num_samples, dataset_path)
 
-
 for idx in range(pose_sampler.num_samples):
-    
     pose_sampler.update()
-    
-
-    if idx % 1 == 0:
-        # Crash durumunu yazacak
+    if idx % 1000 == 0:
         print('Num samples: {}'.format(idx))
     # time.sleep(0.3)   #comment this out once you like your ranges of values
