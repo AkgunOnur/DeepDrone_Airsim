@@ -1,8 +1,8 @@
 import time
 from pose_sampler import *
 
-num_samples = 100
-dataset_path = '/home/merkez/Downloads/kamil_airsim/'
+num_samples = 1
+dataset_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
 
 # check if output folder exists
 if not os.path.isdir(dataset_path):

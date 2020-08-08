@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
-
 import os
 import sys
+from os.path import isfile, join
 
 import airsimdroneracingvae as airsim
 # print(os.path.abspath(airsim.__file__))
@@ -52,8 +52,8 @@ R_RANGE = [2, 10]  # in meters
 correction = 0.85
 CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in fact because of cone vs. square
 
-MP_list = ["min_vel", "min_acc", "min_jerk", "min_snap", "min_acc_stop", "min_jerk_stop", "min_snap_stop", 
-           "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_way_timed", "pos_waypoint_interp"] 
+# MP_list = ["min_vel", "min_acc", "min_jerk", "min_snap", "min_acc_stop", "min_jerk_stop", "min_snap_stop", 
+#            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_way_timed", "pos_waypoint_interp"] 
 MP_methods = {"pos_way_timed":1, "pos_waypoint_interp":2, "min_vel":3, "min_acc":4, "min_jerk":5, "min_snap":6,
               "min_acc_stop":7, "min_jerk_stop":8, "min_snap_stop":9, "min_jerk_full_stop":10, "min_snap_full_stop":11,
               "pos_waypoint_arrived":12}
@@ -96,9 +96,9 @@ class PoseSampler:
 
 
         #----- Motion planning parameters -----------------------------
-        self.MP_cost = {"pos_way_timed":0.0, "pos_waypoint_interp":0.0, "min_vel":0.0, "min_acc":0.0, "min_jerk":0.0, "min_snap":0.0,
-                        "min_acc_stop":0.0, "min_jerk_stop":0.0, "min_snap_stop":0.0, "min_jerk_full_stop":0.0, "min_snap_full_stop":0.0,
-                        "pos_waypoint_arrived":0.0}
+        self.MP_cost = {"pos_way_timed":1e6, "pos_waypoint_interp":1e6, "min_vel":1e6, "min_acc":1e6, "min_jerk":1e6, "min_snap":1e6,
+                        "min_acc_stop":1e6, "min_jerk_stop":1e6, "min_snap_stop":1e6, "min_jerk_full_stop":1e6, "min_snap_full_stop":1e6,
+                        "pos_waypoint_arrived":1e6}
         self.MP_states = {"pos_way_timed":[], "pos_waypoint_interp":[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_snap":[],
                           "min_acc_stop":[], "min_jerk_stop":[], "min_snap_stop":[], "min_jerk_full_stop":[], "min_snap_full_stop":[],
                           "pos_waypoint_arrived":[]}
@@ -342,7 +342,7 @@ class PoseSampler:
             psid_dot_pr = psid_dot
 
 
-    def collect_data(self):
+    def collect_data(self, MP_list):
         
         pose_prediction = np.zeros((9999,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
@@ -353,6 +353,7 @@ class PoseSampler:
             self.quad = Quadrotor(self.state0)
             self.trajSelect[0] = MP_methods[algorithm]
             self.curr_idx = 0
+            self.MP_states[algorithm].append(self.quad.state)
 
             print "MP Method: ", algorithm
             track_completed = False
@@ -363,6 +364,7 @@ class PoseSampler:
                 img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
                 img_rgb = img1d.reshape(image_response.height, image_response.width, 3)  # reshape array to 4 channel image array H X W X 3
                 img_rgb = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB)
+                #cv2.imwrite(os.path.join(self.base_path, 'images', "frame" + str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)
                 img =  Image.fromarray(img_rgb)
                 image = self.transformation(img)
                 quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
@@ -448,6 +450,7 @@ class PoseSampler:
                             fail_check = self.quad.collect_data(self.Tf, self.dtau, i, current_traj, prediction_std)
 
                             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
+                            self.MP_states[algorithm].append(self.quad.state)
                             self.client.simSetVehiclePose(QuadPose(quad_pose), True)
 
                             # print ("acc_x:{0:.2}-jerk_x:{1:.2}-snap_x:{2:.2}, acc_y:{3:.2}-jerk_y:{4:.2}-snap_y:{5:.2}, psid:{6:.2}-psid_dot:{7:.2}-psid_ddot:{8:.2}"
@@ -473,7 +476,6 @@ class PoseSampler:
                 self.curr_idx += 1
 
             self.MP_cost[algorithm] = self.quad.costValue
-            self.MP_states[algorithm] = self.quad.state
             print "For ", algorithm, " cost value: ",self.MP_cost[algorithm]
 
         min_cost_index = min(self.MP_cost.items(), key=lambda x: x[1])[0]
@@ -484,6 +486,18 @@ class PoseSampler:
         #     state[0]-current_traj[0], state[1]-current_traj[1], state[2]-current_traj[2], time_rate, t_current, Tf, 
         #     prev_traj[0], prev_traj[1], prev_traj[2], prev_traj[3], prev_traj[4], prev_traj[5], prev_traj[6], prev_traj[7], prev_traj[8], 
         #     Upr_abs_sum, r_std, phi_std, theta_std, psi_std, min_cost_index], flight_filename)
+
+
+
+    def visualize_drone(self, MP_list):
+        for algorithm in MP_list:
+            self.client.simSetVehiclePose(self.drone_init, True)
+            state_list = self.MP_states[algorithm]
+            for state in state_list:
+                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
+                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                time.sleep(0.001)
+
 
 
 
@@ -504,6 +518,8 @@ class PoseSampler:
         # create and set gate pose relative to the quad
         #p_o_g, r, theta, psi, phi_rel = racing_utils.geom_utils.randomGatePose(p_o_b, phi_base, R_RANGE, CAM_FOV, correction)
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
+
+        MP_list = ["min_vel"] 
         if self.with_gate:
             for i, gate in enumerate(self.track):
                 #print ("gate: ", gate)
@@ -522,11 +538,35 @@ class PoseSampler:
 
         prev_traj = np.copy(self.state0)
 
-        self.collect_data()
-
+        self.collect_data(MP_list)
+        self.visualize_drone(MP_list)
+        #self.get_video(MP_list[0])
         
         
 
+    def get_video(self, algorithm):
+
+        pathIn= self.base_path + 'images/'
+        pathOut = self.base_path + algorithm + '_video.avi'
+        fps = 0.5
+        frame_array = []
+        files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]#for sorting the file names properly
+        files.sort(key = lambda x: x[5:-4])
+        for i in range(len(files)):
+            filename=pathIn + files[i]
+            #reading each files
+            img = cv2.imread(filename)
+            height, width, layers = img.shape
+            size = (width,height)
+            
+            #inserting the frames into an image array
+            frame_array.append(img)
+
+        out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+        for i in range(len(frame_array)):
+            # writing to a image array
+            out.write(frame_array[i])
+        out.release()
             
 
     def configureEnvironment(self):
@@ -549,7 +589,7 @@ class PoseSampler:
             img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
             img_rgb = img1d.reshape(image_response.height, image_response.width, 3)  # reshape array to 4 channel image array H X W X 3
             print(image_response.height, image_response.width)
-            cv2.imwrite(os.path.join(self.base_path, 'images', str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)  # write to png
+            cv2.imwrite(os.path.join(self.base_path, 'images', "frame" + str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)  # write to png
         else:
             print('ERROR IN IMAGE SIZE -- NOT SUPPOSED TO HAPPEN')
 
