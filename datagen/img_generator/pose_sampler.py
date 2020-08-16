@@ -29,6 +29,7 @@ import lstmf
 
 #Extras for Trajectory and Control
 import pickle
+import random
 from numpy import zeros
 from sklearn.externals.joblib import dump, load
 from sklearn.preprocessing import StandardScaler
@@ -281,11 +282,13 @@ class PoseSampler:
         return ref_traj
 
 
-    def check_arrival(self, quad_pose, eps=0.25):
+    def check_arrival(self, quad_pose, gate_index, eps=0.15):
         x, y, z = quad_pose[0], quad_pose[1], quad_pose[2]
-        xd, yd, zd = self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val
+        xd = self.track[gate_index].position.x_val
+        yd = self.track[gate_index].position.y_val
+        zd = self.track[gate_index].position.z_val
 
-        if (abs(xd)-abs(x) <= eps) and (abs(yd)-abs(y) <= eps) and (abs(zd)-abs(z) <= eps):
+        if (abs(xd)-abs(x) <= eps) and (abs(yd)-abs(y) <= eps) and (abs(zd)-abs(z) <= 2*eps):
             return True
 
         return False
@@ -344,153 +347,185 @@ class PoseSampler:
 
     def collect_data(self, MP_list):
         
-        pose_prediction = np.zeros((9999,4),dtype=np.float32)
-        prediction_std = np.zeros((4,1),dtype=np.float32)
+        
         path = '/home/merkez/Downloads/kamil_airsim/images'
 
-        for algorithm in MP_list:
-            self.client.simSetVehiclePose(self.drone_init, True)
-            self.quad = Quadrotor(self.state0)
-            self.trajSelect[0] = MP_methods[algorithm]
-            self.curr_idx = 0
-            self.MP_states[algorithm].append(self.quad.state)
+        angle_lim = 10.0
 
-            print "MP Method: ", algorithm
-            track_completed = False
-            fail_check = False
-            while((not track_completed) and (not fail_check)):
-                image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
-                #if len(image_response.image_data_uint8) == image_response.width * image_response.height * 3:
-                img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
-                img_rgb = img1d.reshape(image_response.height, image_response.width, 3)  # reshape array to 4 channel image array H X W X 3
-                img_rgb = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB)
-                #cv2.imwrite(os.path.join(self.base_path, 'images', "frame" + str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)
-                img =  Image.fromarray(img_rgb)
-                image = self.transformation(img)
-                quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
-
-                # if self.check_arrival(quad_pose):
-                #     track_completed = True
-                #     print ("The track is completed!")
-                #     break
-
-                with torch.no_grad():   
-                    # Determine Gat location with Neural Networks
-                    pose_gate_body = self.Dronet(image)
-
-                    if (pose_gate_body[0][0] < 0.25):
-                        track_completed = True
-                        print "The track is completed!"
-                        break
-                    #r,theta,psi,phi = np.asarray(pose_gate_body[0])
-                    #q1,q2,q3,q4 = R.from_euler('zyx',[self.quad.state[5], self.quad.state[4], self.quad.state[3]], degrees=False).as_quat()
-
-                    # print("Initial value of Gate:", self.gate.position.x_val, self.gate.position.y_val, self.gate.position.z_val)
-                    # for_estimation = Pose(Vector3r(self.quad.state[0], self.quad.state[1],self.quad.state[2]),
-                    #                              Quaternionr(q1,q2,q3,q4))
-                    #print("Drone States:", for_estimation)
-                    # estimation = self.debugGatePoses(for_estimation , r, theta, psi)
-                    # print("prediction of gate:", estimation.x_val, estimation.y_val, estimation.z_val)
-                    #time.sleep(0.001)
-                    for i,num in enumerate(pose_gate_body.reshape(-1,1)):
-                        #print(num, i , self.curr_idx)
-                        pose_prediction[self.curr_idx][i] = num.item()
-
-                    if self.curr_idx >= 11:
-                        pose_gate_cov = self.lstmR(torch.from_numpy(pose_prediction[self.curr_idx-11:self.curr_idx+1].reshape(1,12,4)).to(self.device))
-                        
-                        for i, p_g_c in enumerate(pose_gate_cov.reshape(-1,1)):
-                            prediction_std[i] = p_g_c.item()
-                
-                        # Gate ground truth values will be implemented
-                        pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
-                        prediction_std = np.clip(prediction_std, 0, prediction_std)
-
-                        # Trajectory generate
-                        #ef_traj = self.get_trajectory(pose_gate_body, ground_truth = False) # Self olarak trajectory yollacayacak, quad_sim 'in icine
-                        self.Tf = pose_gate_body[0][0]*0.6 # T=r*0.5
-                        waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
-                        pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
-                        posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
-                        yaw0 = self.quad.state[5]
-                        yaw_diff = pose_gate_body[3][0]
-                        yawf = np.pi +(self.quad.state[5]+yaw_diff)-np.pi/2
-                        
-
-                        newTraj = Trajectory(self.trajSelect, self.quad.state, self.Tf, pos0, posf, yaw0, yawf, v_average=1.0)
-                        Waypoint_length = int(self.Tf/self.dtau)
-                        t = linspace(0,self.Tf,num = Waypoint_length)
-                        prediction_std = prediction_std.ravel()
+        for gate_index in range(len(self.track)):
+            phi_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180
+            theta_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180
+            gate_target = self.track[gate_index]
+            gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
+            psi_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - 2*np.pi/3  #drone kapi karsisinde olacak sekilde durmali
+            time_or_speed = random.randint(0,1)
 
 
-                        # Call for Controller
-                        for i in range(Waypoint_length): 
-                            t_current = t[i]
-                            time_rate = float(t_current / self.Tf)
+            for algorithm in MP_list:
+                pose_prediction = np.zeros((1000,4),dtype=np.float32)
+                prediction_std = np.zeros((4,1),dtype=np.float32)
 
-                            pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
-                            xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
-                            xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
-                            xd_ddot, yd_ddot, zd_ddot = acc_des[0], acc_des[1], acc_des[2]
-
-                            xd_dddot = (xd_ddot - self.xd_ddot_pr) / self.dtau
-                            yd_dddot = (yd_ddot - self.yd_ddot_pr) / self.dtau
-                            xd_ddddot = (xd_dddot - self.xd_dddot_pr) / self.dtau
-                            yd_ddddot = (yd_dddot - self.yd_dddot_pr) / self.dtau
-
-                            psid = euler_des[2]
-
-                            psid_dot = (psid - self.psid_pr) / self.dtau
-                            psid_ddot = (psid_dot - self.psid_dot_pr) / self.dtau
-
-                            current_traj = [xd, yd, zd, xd_dot, yd_dot, zd_dot, xd_ddot, yd_ddot, zd_ddot,
-                                         xd_dddot, yd_dddot, xd_ddddot, yd_ddddot,
-                                         psid, psid_dot, psid_ddot]
-
-                            fail_check = self.quad.collect_data(self.Tf, self.dtau, i, current_traj, prediction_std)
-
-                            quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
-                            self.MP_states[algorithm].append(self.quad.state)
-                            self.client.simSetVehiclePose(QuadPose(quad_pose), True)
-
-                            # print ("acc_x:{0:.2}-jerk_x:{1:.2}-snap_x:{2:.2}, acc_y:{3:.2}-jerk_y:{4:.2}-snap_y:{5:.2}, psid:{6:.2}-psid_dot:{7:.2}-psid_ddot:{8:.2}"
-                            #     .format(xd_ddot,xd_dddot,xd_ddddot, yd_ddot,yd_dddot,yd_ddddot, psid,psid_dot,psid_ddot))
-
-                            if fail_check:
-                                break 
-
-                            if self.check_arrival(quad_pose):
-                                track_completed = True
-                                print "The track is completed!"
-                                break
+                if gate_index == 0: #if drone is at initial point
+                    quad_pose = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val, -phi_start, -theta_start, psi_start]
+                    self.state0 = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
+                else:
+                    quad_pose = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val, -phi_start, -theta_start, psi_start]
+                    self.state0 = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
 
 
-                            prev_traj = np.copy(current_traj)
-                            self.xd_ddot_pr = xd_ddot
-                            self.yd_ddot_pr = yd_ddot
-                            self.xd_dddot_pr = xd_dddot
-                            self.yd_dddot_pr = yd_dddot
-                            self.psid_pr = psid
-                            self.psid_dot_pr = psid_dot
+                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                self.quad = Quadrotor(self.state0)
+                self.trajSelect[0] = MP_methods[algorithm]
+                self.trajSelect[1] = 2
+                self.trajSelect[2] = time_or_speed
+                self.curr_idx = 0
+                self.MP_states[algorithm].append(self.quad.state)
 
-                self.curr_idx += 1
+                print "\nMP Method: ", algorithm
+                track_completed = False
+                fail_check = False
+                while((not track_completed) and (not fail_check)):
+                    image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
+                    #if len(image_response.image_data_uint8) == image_response.width * image_response.height * 3:
+                    img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
+                    img_rgb = img1d.reshape(image_response.height, image_response.width, 3)  # reshape array to 4 channel image array H X W X 3
+                    img_rgb = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB)
+                    #cv2.imwrite(os.path.join(self.base_path, 'images', "frame" + str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)
+                    img =  Image.fromarray(img_rgb)
+                    image = self.transformation(img)
+                    quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
-            self.MP_cost[algorithm] = self.quad.costValue
-            print "For ", algorithm, " cost value: ",self.MP_cost[algorithm]
+                    # if self.check_arrival(quad_pose):
+                    #     track_completed = True
+                    #     print ("The track is completed!")
+                    #     break
 
-        min_cost_index = min(self.MP_cost.items(), key=lambda x: x[1])[0]
-        print "Best method: ", min_cost_index
-        # write_stats(flight_columns,
-        #     [state[0], state[1], state[2], state[6], state[7], state[8], state[3], state[4], state[5], state[9], state[10], state[11],
-        #     current_traj[0], current_traj[1], current_traj[2], current_traj[3], current_traj[4], current_traj[5], current_traj[6], current_traj[7], current_traj[8],
-        #     state[0]-current_traj[0], state[1]-current_traj[1], state[2]-current_traj[2], time_rate, t_current, Tf, 
-        #     prev_traj[0], prev_traj[1], prev_traj[2], prev_traj[3], prev_traj[4], prev_traj[5], prev_traj[6], prev_traj[7], prev_traj[8], 
-        #     Upr_abs_sum, r_std, phi_std, theta_std, psi_std, min_cost_index], flight_filename)
+                    with torch.no_grad():   
+                        # Determine Gat location with Neural Networks
+                        pose_gate_body = self.Dronet(image)
+
+                        if self.check_arrival(quad_pose, gate_index=gate_index):
+                            track_completed = True
+                            print "Drone has arrived to the {0}. Gate for {1}".format(gate_index,algorithm) 
+                            break
+                        #r,theta,psi,phi = np.asarray(pose_gate_body[0])
+                        #q1,q2,q3,q4 = R.from_euler('zyx',[self.quad.state[5], self.quad.state[4], self.quad.state[3]], degrees=False).as_quat()
+
+                        # print("Initial value of Gate:", self.gate.position.x_val, self.gate.position.y_val, self.gate.position.z_val)
+                        # for_estimation = Pose(Vector3r(self.quad.state[0], self.quad.state[1],self.quad.state[2]),
+                        #                              Quaternionr(q1,q2,q3,q4))
+                        #print("Drone States:", for_estimation)
+                        # estimation = self.debugGatePoses(for_estimation , r, theta, psi)
+                        # print("prediction of gate:", estimation.x_val, estimation.y_val, estimation.z_val)
+                        #time.sleep(0.001)
+                        for i,num in enumerate(pose_gate_body.reshape(-1,1)):
+                            #print(num, i , self.curr_idx)
+                            pose_prediction[self.curr_idx][i] = num.item()
+
+                        if self.curr_idx >= 11:
+                            pose_gate_cov = self.lstmR(torch.from_numpy(pose_prediction[self.curr_idx-11:self.curr_idx+1].reshape(1,12,4)).to(self.device))
+                            
+                            for i, p_g_c in enumerate(pose_gate_cov.reshape(-1,1)):
+                                prediction_std[i] = p_g_c.item()
+                    
+                            # Gate ground truth values will be implemented
+                            pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
+                            prediction_std = np.clip(prediction_std, 0, prediction_std)
+
+                            # Trajectory generate
+                            #ef_traj = self.get_trajectory(pose_gate_body, ground_truth = False) # Self olarak trajectory yollacayacak, quad_sim 'in icine
+                            self.Tf = random.uniform(0.5,1)*pose_gate_body[0][0] # T=r*0.5
+                            waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
+                            pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
+                            posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
+                            yaw0 = self.quad.state[5]
+                            yaw_diff = pose_gate_body[3][0]
+                            yawf = np.pi +(self.quad.state[5]+yaw_diff)-np.pi/2
+                            
+
+                            if time_or_speed == 0:
+                                newTraj = Trajectory(self.trajSelect, self.quad.state, self.Tf, pos0, posf, yaw0, yawf)
+                                print "Time based trajectory, T: ", newTraj.t_wps[1] 
+                            else:
+                                self.v_average = random.uniform(0.5,3.0)
+                                newTraj = Trajectory(self.trajSelect, self.quad.state, 1.0, pos0, posf, yaw0, yawf, v_average=self.v_average)
+                                print "Velocity based trajectory, V_avg: ", self.v_average, ", T: ", newTraj.t_wps[1]
+
+                            Waypoint_length = int(newTraj.t_wps[1] / self.dtau)
+                            t = linspace(0, newTraj.t_wps[1], num = Waypoint_length)
+                            prediction_std = prediction_std.ravel()
+                            
+                            #print "T_total: ", newTraj.t_wps
+
+                            # Call for Controller
+                            for i in range(Waypoint_length): 
+                                t_current = t[i]
+                                time_rate = float(t_current / self.Tf)
+
+                                pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
+                                xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
+                                xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
+                                xd_ddot, yd_ddot, zd_ddot = acc_des[0], acc_des[1], acc_des[2]
+
+                                xd_dddot = (xd_ddot - self.xd_ddot_pr) / self.dtau
+                                yd_dddot = (yd_ddot - self.yd_ddot_pr) / self.dtau
+                                xd_ddddot = (xd_dddot - self.xd_dddot_pr) / self.dtau
+                                yd_ddddot = (yd_dddot - self.yd_dddot_pr) / self.dtau
+
+                                psid = euler_des[2]
+
+                                psid_dot = (psid - self.psid_pr) / self.dtau
+                                psid_ddot = (psid_dot - self.psid_dot_pr) / self.dtau
+
+                                current_traj = [xd, yd, zd, xd_dot, yd_dot, zd_dot, xd_ddot, yd_ddot, zd_ddot,
+                                             xd_dddot, yd_dddot, xd_ddddot, yd_ddddot,
+                                             psid, psid_dot, psid_ddot]
+
+                                fail_check = self.quad.collect_data(self.Tf, self.dtau, i, current_traj, prediction_std)
+
+                                quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
+                                self.MP_states[algorithm].append(self.quad.state)
+                                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+
+                                # print ("acc_x:{0:.2}-jerk_x:{1:.2}-snap_x:{2:.2}, acc_y:{3:.2}-jerk_y:{4:.2}-snap_y:{5:.2}, psid:{6:.2}-psid_dot:{7:.2}-psid_ddot:{8:.2}"
+                                #     .format(xd_ddot,xd_dddot,xd_ddddot, yd_ddot,yd_dddot,yd_ddddot, psid,psid_dot,psid_ddot))
+
+                                if fail_check:
+                                    break 
+
+                                if self.check_arrival(quad_pose, gate_index=gate_index):
+                                    track_completed = True
+                                    print "Drone has arrived to the {0}. Gate for {1}".format(gate_index,algorithm) 
+                                    break
+
+
+                                prev_traj = np.copy(current_traj)
+                                self.xd_ddot_pr = xd_ddot
+                                self.yd_ddot_pr = yd_ddot
+                                self.xd_dddot_pr = xd_dddot
+                                self.yd_dddot_pr = yd_dddot
+                                self.psid_pr = psid
+                                self.psid_dot_pr = psid_dot
+
+                    self.curr_idx += 1
+
+                self.MP_cost[algorithm] = self.quad.costValue
+                print "For ", algorithm, " cost value: ",self.MP_cost[algorithm]
+
+            min_cost_index = min(self.MP_cost.items(), key=lambda x: x[1])[0]
+            print ">>>Best method for gate ", (gate_index + 1), " is ", min_cost_index
+            # write_stats(flight_columns,
+            #     [state[0], state[1], state[2], state[6], state[7], state[8], state[3], state[4], state[5], state[9], state[10], state[11],
+            #     current_traj[0], current_traj[1], current_traj[2], current_traj[3], current_traj[4], current_traj[5], current_traj[6], current_traj[7], current_traj[8],
+            #     state[0]-current_traj[0], state[1]-current_traj[1], state[2]-current_traj[2], time_rate, t_current, Tf, 
+            #     prev_traj[0], prev_traj[1], prev_traj[2], prev_traj[3], prev_traj[4], prev_traj[5], prev_traj[6], prev_traj[7], prev_traj[8], 
+            #     Upr_abs_sum, r_std, phi_std, theta_std, psi_std, min_cost_index], flight_filename)
 
 
 
     def visualize_drone(self, MP_list):
         for algorithm in MP_list:
+            print "Drone flies by the algorithm, ", algorithm
             self.client.simSetVehiclePose(self.drone_init, True)
             state_list = self.MP_states[algorithm]
             for state in state_list:
@@ -519,7 +554,7 @@ class PoseSampler:
         #p_o_g, r, theta, psi, phi_rel = racing_utils.geom_utils.randomGatePose(p_o_b, phi_base, R_RANGE, CAM_FOV, correction)
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
 
-        MP_list = ["min_vel"] 
+        MP_list = ["min_vel", "min_acc", "min_jerk", "min_snap"] 
         if self.with_gate:
             for i, gate in enumerate(self.track):
                 #print ("gate: ", gate)
