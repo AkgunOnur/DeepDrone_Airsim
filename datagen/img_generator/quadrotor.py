@@ -99,13 +99,12 @@ def body_to_world(state, waypoint_body):
 
 class Quadrotor:
     
-    def __init__(self, state0, coeff_pos=1.0, coeff_vel=0.0, coeff_angle = 0.25, coeff_control = 0.0):
+    def __init__(self, state0, coeff_pos=1.0, coeff_angle = 0.25, coeff_control = 0.0):
         
         self.state = state0
         self.U = [1, 0., 0., 0.]
         self.costValue = 0.
         self.coeff_pos = coeff_pos
-        self.coeff_vel = coeff_vel
         self.coeff_angle = coeff_angle
         self.coeff_control = coeff_control
         self.Controllers = ["Backstepping_1", "Backstepping_2", "Backstepping_3", "Backstepping_4"]
@@ -332,8 +331,6 @@ class Quadrotor:
         N = 1 / dtau
 
         t_current = Tf / N * i
-        time_rate = float(t_current / Tf)
-        Upr_abs_sum = np.sum(np.abs(self.U))
 
         fail_check = False
 
@@ -394,14 +391,13 @@ class Quadrotor:
         if (np.abs(self.state[3]) > np.pi)  | (np.abs(self.state[4]) > np.pi):
             self.costValue = 1e12
             fail_check = True
-            print ("Drone has crashed!")
+            print "Drone has crashed!"
         else:
             position_tracking_error = np.power((current_traj[0]-self.state[0]),2) + np.power((current_traj[1]-self.state[1]),2) + np.power((current_traj[2]-self.state[2]),2)
             velocity_tracking_error = np.power((current_traj[3]-self.state[6]),2) + np.power((current_traj[4]-self.state[7]),2) + np.power((current_traj[5]-self.state[8]),2)
             angular_error = np.power((current_traj[13]-self.state[5]),2)
             cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
             self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
-                self.coeff_vel*velocity_tracking_error + 
                 self.coeff_angle*angular_error + 
                 self.coeff_control*cont_input)
 
@@ -416,6 +412,16 @@ class Quadrotor:
 
         return fail_check
 
+    def calculate_cost(self, target):
+        xd, yd, zd, psid = target
+        position_tracking_error = (xd-self.state[0])**2 + (yd-self.state[1])**2 + (zd-self.state[2])**2
+        angular_error = (np.abs(psid-self.state[5])-np.pi/2)**2 #in perfect conditions, difference between yaw angles of gate and drone should be pi/2
+        cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
+        self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
+                        self.coeff_angle*angular_error + 
+                        self.coeff_control*cont_input)
+
+
 
     def collect_data(self, Tf, dtau, i, current_traj, std_list):
     #     states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
@@ -423,8 +429,6 @@ class Quadrotor:
         N = 1 / dtau
 
         t_current = Tf / N * i
-        time_rate = float(t_current / Tf)
-        Upr_abs_sum = np.sum(np.abs(self.U))
 
         fail_check = False
 
@@ -449,19 +453,13 @@ class Quadrotor:
         self.state = sol.y[:,-1]
         self.U = U
 
-        if (np.abs(self.state[3]) > np.pi)  | (np.abs(self.state[4]) > np.pi):
+        if (np.abs(self.state[3]) > np.pi/2)  | (np.abs(self.state[4]) > np.pi/2):
             self.costValue = 1e12
             fail_check = True
-            print ("Drone has crashed!")
+            print "Drone has crashed!"
         else:
-            position_tracking_error = np.power((current_traj[0]-self.state[0]),2) + np.power((current_traj[1]-self.state[1]),2) + np.power((current_traj[2]-self.state[2]),2)
-            velocity_tracking_error = np.power((current_traj[3]-self.state[6]),2) + np.power((current_traj[4]-self.state[7]),2) + np.power((current_traj[5]-self.state[8]),2)
-            angular_error = np.power((current_traj[13]-self.state[5]),2)
-            cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
-            self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
-                self.coeff_vel*velocity_tracking_error + 
-                self.coeff_angle*angular_error + 
-                self.coeff_control*cont_input)
+            target = [current_traj[0], current_traj[1], current_traj[2], current_traj[13]]
+            self.calculate_cost(target)
 
         
         return fail_check
