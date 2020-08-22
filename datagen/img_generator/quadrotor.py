@@ -412,14 +412,17 @@ class Quadrotor:
 
         return fail_check
 
-    def calculate_cost(self, target):
+    def calculate_cost(self, target, off_road = False):
         xd, yd, zd, psid = target
         position_tracking_error = (xd-self.state[0])**2 + (yd-self.state[1])**2 + (zd-self.state[2])**2
         angular_error = (np.abs(psid-self.state[5])-np.pi/2)**2 #in perfect conditions, difference between yaw angles of gate and drone should be pi/2
         cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
-        self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
-                        self.coeff_angle*angular_error + 
-                        self.coeff_control*cont_input)
+        if off_road == False:
+            self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
+                            self.coeff_angle*angular_error + 
+                            self.coeff_control*cont_input)
+        else:
+            self.costValue = self.costValue + 1e6
 
 
 
@@ -456,7 +459,6 @@ class Quadrotor:
         if (np.abs(self.state[3]) > np.pi/2)  | (np.abs(self.state[4]) > np.pi/2):
             self.costValue = 1e12
             fail_check = True
-            print "Drone has crashed!"
         else:
             target = [current_traj[0], current_traj[1], current_traj[2], current_traj[13]]
             self.calculate_cost(target)

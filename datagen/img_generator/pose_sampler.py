@@ -58,7 +58,7 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 
 
 flight_columns = ['diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
-                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'time_or_speed', 'Tf', 'v_average']
+                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'time_or_speed', 'Tf', 'v_average', 'Cost']
 
 flight_filename = 'data.csv'
 
@@ -288,7 +288,7 @@ class PoseSampler:
         return ref_traj
 
 
-    def check_arrival(self, quad_pose, gate_index, eps=0.25):
+    def check_completion(self, quad_pose, gate_index, eps=0.3):
         x, y, z = quad_pose[0], quad_pose[1], quad_pose[2]
         xd = self.track[gate_index].position.x_val
         yd = self.track[gate_index].position.y_val
@@ -296,7 +296,8 @@ class PoseSampler:
         psid = Rotation.from_quat([self.track[gate_index].orientation.x_val, self.track[gate_index].orientation.y_val, 
                                    self.track[gate_index].orientation.z_val, self.track[gate_index].orientation.w_val]).as_euler('ZYX',degrees=False)[0]
         target = [xd, yd, zd, psid] 
-        divergence_coeff = 1.25
+        div_coef = 3
+        check_arrival = False
 
         if gate_index == 0:
             xd_prev = self.drone_init.position.x_val
@@ -310,12 +311,17 @@ class PoseSampler:
         init_distance = np.sqrt((xd_prev-xd)**2 + (yd_prev-yd)**2 + (zd_prev-zd)**2)
         current_distance = np.sqrt((x-xd)**2 + (y-yd)**2 + (z-zd)**2)
 
-        if ((abs(xd)-abs(x) <= eps) and (abs(yd)-abs(y) <= eps) and (abs(zd)-abs(z) <= eps)) or current_distance > divergence_coeff*init_distance:
+        on_road = (abs(xd_prev)-div_coef*eps <= abs(x) <= abs(xd)+div_coef*eps) and (abs(yd_prev)-div_coef*eps <= abs(y) <= abs(yd)+div_coef*eps) and (abs(zd_prev)-div_coef*eps <= abs(z) <= abs(zd)+div_coef*eps)
+
+        if ((abs(xd)-abs(x) <= eps) and (abs(yd)-abs(y) <= eps) and (abs(zd)-abs(z) <= eps)):
             self.quad.calculate_cost(target)
-            return True
+            check_arrival = True
+
+        if not on_road:
+            self.quad.calculate_cost(target, off_road = True)
 
 
-        return False
+        return check_arrival, on_road
 
 
     def test_algorithm():
@@ -388,6 +394,13 @@ class PoseSampler:
         self.trajSelect[2] = time_or_speed
         self.curr_idx = 0
         self.MP_states[algorithm].append(self.quad.state)
+
+        self.xd_ddot_pr = 0.
+        self.yd_ddot_pr = 0.
+        self.xd_dddot_pr = 0.
+        self.yd_dddot_pr = 0.
+        self.psid_pr = 0.
+        self.psid_dot_pr = 0.
 
         print "\n>>>MP Method: ", algorithm
         track_completed = False
@@ -484,14 +497,6 @@ class PoseSampler:
                         # print ("acc_x:{0:.2}-jerk_x:{1:.2}-snap_x:{2:.2}, acc_y:{3:.2}-jerk_y:{4:.2}-snap_y:{5:.2}, psid:{6:.2}-psid_dot:{7:.2}-psid_ddot:{8:.2}"
                         #     .format(xd_ddot,xd_dddot,xd_ddddot, yd_ddot,yd_dddot,yd_ddddot, psid,psid_dot,psid_ddot))
 
-                        if fail_check:
-                            break 
-
-                        if self.check_arrival(quad_pose, gate_index=gate_index):
-                            track_completed = True
-                            print "Drone has arrived to the {0}.Gate for {1}".format(gate_index+1,algorithm) 
-                            break
-
 
                         self.xd_ddot_pr = xd_ddot
                         self.yd_ddot_pr = yd_ddot
@@ -501,32 +506,48 @@ class PoseSampler:
                         self.psid_dot_pr = psid_dot
 
 
-                    if track_completed: # drone arrived to the gate
-                        self.MP_cost[algorithm] = self.MP_cost[algorithm] + newTraj.t_wps[1] * self.quad.costValue
-                        break
-                    elif fail_check: # drone crashed
-                        self.MP_cost[algorithm] = self.quad.costValue
-                        break
-                    elif (not track_completed) and (not fail_check): # drone didn't arrive or crash
-                        self.MP_cost[algorithm] = self.MP_cost[algorithm] + newTraj.t_wps[1] * self.quad.costValue
-                        self.quad.costValue = 0.
+                        if fail_check:
+                            self.MP_cost[algorithm] = self.quad.costValue
+                            print "Drone has crashed! Current cost: {0:.6}".format(self.MP_cost[algorithm])
+                            break 
+
+                        check_arrival, on_road = self.check_completion(quad_pose, gate_index=gate_index)
+
+                        if check_arrival: # drone arrives to the gate
+                            track_completed = True
+                            self.MP_cost[algorithm] = newTraj.t_wps[1] * self.quad.costValue
+                            print "Drone has arrived to the {0}. gate. Current cost: {1:.6}".format(gate_index+1, self.MP_cost[algorithm]) 
+                            break        
+                        elif not on_road: #drone can not complete the path, but still loop should be ended
+                            track_completed = True
+                            self.MP_cost[algorithm] = self.quad.costValue
+                            print "Drone is out of the path. Current cost: {0:.6}".format(self.MP_cost[algorithm])
+                            break
+
+
+                    if (not track_completed) and (not fail_check): # drone didn't arrive or crash
+                        self.MP_cost[algorithm] = newTraj.t_wps[1] * self.quad.costValue
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.MP_cost[algorithm])
+
+                    self.write_stats(flight_columns,
+                        [posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
+                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], time_or_speed, newTraj.t_wps[1], self.v_average, self.MP_cost[algorithm]], flight_filename)
+                    print "Flight data is written to the file"
+
+                    self.quad.costValue = 0.
+                    if track_completed or fail_check: # drone arrived to the gate or crashed                        
+                        break
 
             self.curr_idx += 1
 
-        print "Final cost: {0:.6}".format(self.MP_cost[algorithm])
 
-        self.write_stats(flight_columns,
-                    [posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
-                     prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], time_or_speed, newTraj.t_wps[1], self.v_average], flight_filename)
+        
 
 
     def collect_data(self, MP_list):
-        
-        
         path = '/home/merkez/Downloads/DeepDrone_Airsim/images'
 
-        angle_lim = 1.0
+        angle_lim = 5.0
         v_upper = 2.5
         v_lower = 0.5
         t_coeff_upper = 1.5 
@@ -613,7 +634,7 @@ class PoseSampler:
         prev_traj = np.copy(self.state0)
 
         self.collect_data(MP_list)
-        self.visualize_drone(MP_list)
+        #self.visualize_drone(MP_list)
         #self.get_video(MP_list[0])
         
         
