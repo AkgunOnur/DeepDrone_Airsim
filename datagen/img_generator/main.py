@@ -1,8 +1,9 @@
 import time
 from pose_sampler import *
 
-num_samples = 1
+num_samples = 100
 dataset_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
+random_range = 0.3
 
 # check if output folder exists
 if not os.path.isdir(dataset_path):
@@ -15,7 +16,8 @@ else:
 pose_sampler = PoseSampler(num_samples, dataset_path)
 
 for idx in range(pose_sampler.num_samples):
-    pose_sampler.update()
-    if idx % 1000 == 0:
-        print('Num samples: {}'.format(idx))
-    # time.sleep(0.3)   #comment this out once you like your ranges of values
+	x_range = random.uniform(-random_range,random_range)
+	y_range = random.uniform(-random_range,random_range)
+	z_range = random.uniform(-random_range,random_range)
+	pos_ranges = [x_range, y_range, z_range]
+	pose_sampler.update(pos_ranges)

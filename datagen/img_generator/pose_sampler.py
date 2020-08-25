@@ -57,8 +57,8 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 #            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_way_timed", "pos_waypoint_interp"] 
 
 
-flight_columns = ['diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
-                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'time_or_speed', 'Tf', 'v_average', 'Cost']
+flight_columns = ['init_x','init_y','init_z','diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'time_or_speed', 'Tf', 'v_average', 'mp_method', 'Cost']
 
 flight_filename = 'data.csv'
 
@@ -374,17 +374,19 @@ class PoseSampler:
             psid_dot_pr = psid_dot
 
 
-    def fly_drone(self, gate_index, time_or_speed, algorithm, angle_start):
+    def fly_drone(self, gate_index, time_or_speed, algorithm, angle_start, pos_ranges):
         pose_prediction = np.zeros((200,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
         phi_start, theta_start, psi_start = angle_start
+        x_range, y_range, z_range = pos_ranges
 
         if gate_index == 0: #if drone is at initial point
-            quad_pose = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val, -phi_start, -theta_start, psi_start]
-            self.state0 = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
+            quad_pose = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, -phi_start, -theta_start, psi_start]
+            self.state0 = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
         else:
-            quad_pose = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val, -phi_start, -theta_start, psi_start]
-            self.state0 = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
+            quad_pose = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, -phi_start, -theta_start, psi_start]
+            self.state0 = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
+
 
 
         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
@@ -530,8 +532,8 @@ class PoseSampler:
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.MP_cost[algorithm])
 
                     self.write_stats(flight_columns,
-                        [posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
-                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], time_or_speed, newTraj.t_wps[1], self.v_average, self.MP_cost[algorithm]], flight_filename)
+                        [pos0[0], pos0[1], pos0[2], posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
+                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], time_or_speed, newTraj.t_wps[1], self.v_average, algorithm, self.MP_cost[algorithm]], flight_filename)
                     print "Flight data is written to the file"
 
                     self.quad.costValue = 0.
@@ -544,7 +546,7 @@ class PoseSampler:
         
 
 
-    def collect_data(self, MP_list):
+    def collect_data(self, MP_list, pos_ranges):
         path = '/home/merkez/Downloads/DeepDrone_Airsim/images'
 
         angle_lim = 5.0
@@ -569,12 +571,12 @@ class PoseSampler:
                     self.MP_cost[algorithm] = 0.
                     time_or_speed = 1 # a velocity based trajectory
                     self.v_average = random.uniform(v_lower, v_upper)
-                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start)
+                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start, pos_ranges)
 
                     self.MP_cost[algorithm] = 0.
                     time_or_speed = 0 # a time based trajectory
                     self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start)
+                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start, pos_ranges)
                 
 
             #min_cost_index = min(self.MP_cost.items(), key=lambda x: x[1])[0]
@@ -596,7 +598,7 @@ class PoseSampler:
 
 
 
-    def update(self):
+    def update(self, pos_ranges):
         '''
         convetion of names:
         p_a_b: pose of frame b relative to frame a
@@ -633,7 +635,7 @@ class PoseSampler:
 
         prev_traj = np.copy(self.state0)
 
-        self.collect_data(MP_list)
+        self.collect_data(MP_list, pos_ranges)
         #self.visualize_drone(MP_list)
         #self.get_video(MP_list[0])
         
