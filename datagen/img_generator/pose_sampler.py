@@ -57,7 +57,7 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 #            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_way_timed", "pos_waypoint_interp"] 
 
 
-flight_columns = ['init_x','init_y','init_z','diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+flight_columns = ['true_init_x','true_init_y','true_init_z','diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
                   'r_std', 'phi_std', 'theta_std', 'psi_std', 'time_or_speed', 'Tf', 'v_average', 'mp_method', 'Cost']
 
 flight_filename = 'data.csv'
@@ -152,11 +152,26 @@ class PoseSampler:
         self.lstmR.eval() 
         
         # Transformation
+        # self.transformation = transforms.Compose([
+        #         transforms.Resize([200, 200]),
+        #         #transforms.ColorJitter(hue=.05, saturation=.05),
+        #         transforms.ToTensor()]
+        # )
+
+
+        self.angle_lim = 0.
+        self.pos_lim = 0.
+        self.brightness = random.uniform(0,0.5)
+        self.contrast = random.uniform(0,2)
+        self.saturation = random.uniform(0,2)
+        self.blur_coeff = 0.
+        self.blur_range = 0
+
         self.transformation = transforms.Compose([
-                transforms.Resize([200, 200]),
-                #transforms.ColorJitter(hue=.05, saturation=.05),
-                transforms.ToTensor()]
-        )
+                            transforms.Resize([200, 200]),
+                            transforms.Lambda(self.gaussian_blur),
+                            #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                            transforms.ToTensor()])
 
         self.drone_init = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -187,6 +202,12 @@ class PoseSampler:
         self.track = self.gate # for circle trajectory change this with circle_track
         self.drone_init = self.drone_init # for circle trajectory change this with drone_init_circle
         #-----------------------------------------------------------------------             
+
+    def gaussian_blur(self, img):
+        image = np.array(img)        
+        image_blur = cv2.GaussianBlur(image,(65,65),self.blur_coeff)
+        return image_blur
+
     def polarTranslation(self,r, theta, psi):
         # follow math convention for polar coordinates
         # r: radius
@@ -374,19 +395,32 @@ class PoseSampler:
             psid_dot_pr = psid_dot
 
 
-    def fly_drone(self, gate_index, time_or_speed, algorithm, angle_start, pos_ranges):
+    def fly_drone(self, gate_index, time_or_speed, algorithm):
         pose_prediction = np.zeros((200,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
-        phi_start, theta_start, psi_start = angle_start
-        x_range, y_range, z_range = pos_ranges
+
+        phi_theta_range = 10.0
+        psi_range = 10.0
+        pos_range = 0.3
+
+        x_range = pos_range*random.uniform(-1.0, 1.0)
+        y_range = pos_range*random.uniform(-1.0, 1.0)
+        z_range = pos_range*random.uniform(-1.0, 1.0)
+
+        phi_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+        theta_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+        gate_target = self.track[gate_index]
+        gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
+        psi_start = psi_range*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
 
         if gate_index == 0: #if drone is at initial point
             quad_pose = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, -phi_start, -theta_start, psi_start]
             self.state0 = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
+            true_init_pos = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val]
         else:
             quad_pose = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, -phi_start, -theta_start, psi_start]
             self.state0 = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
-
+            true_init_pos = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val]
 
 
         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
@@ -403,6 +437,9 @@ class PoseSampler:
         self.yd_dddot_pr = 0.
         self.psid_pr = 0.
         self.psid_dot_pr = 0.
+
+        self.blur_range = 10.
+        self.blur_coeff = random.uniform(0, self.blur_range)
 
         print "\n>>>MP Method: ", algorithm
         track_completed = False
@@ -467,7 +504,10 @@ class PoseSampler:
                     Waypoint_length = newTraj.t_wps[1] // self.dtau
                     t_list = linspace(0, newTraj.t_wps[1], num = Waypoint_length)
                     prediction_std = prediction_std.ravel()
+
+                    print "Covariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     
+                    covariance_sum = prediction_std[0] + prediction_std[1] + prediction_std[2] + prediction_std[3]
                     # Call for Controller
                     for t_current in t_list: 
 
@@ -532,7 +572,7 @@ class PoseSampler:
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.MP_cost[algorithm])
 
                     self.write_stats(flight_columns,
-                        [pos0[0], pos0[1], pos0[2], posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
+                        [true_init_pos[0], true_init_pos[1], true_init_pos[2], posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
                          prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], time_or_speed, newTraj.t_wps[1], self.v_average, algorithm, self.MP_cost[algorithm]], flight_filename)
                     print "Flight data is written to the file"
 
@@ -546,10 +586,9 @@ class PoseSampler:
         
 
 
-    def collect_data(self, MP_list, pos_ranges):
-        path = '/home/merkez/Downloads/DeepDrone_Airsim/images'
+    def collect_data(self, MP_list):
+        path = self.base_path + 'images'
 
-        angle_lim = 5.0
         v_upper = 2.5
         v_lower = 0.5
         t_coeff_upper = 1.5 
@@ -557,48 +596,26 @@ class PoseSampler:
         N_iter = 5
 
         for gate_index in range(len(self.track)):
-            phi_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180
-            theta_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180
-            gate_target = self.track[gate_index]
-            gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
-            psi_start = angle_lim*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
-                    
-
-            angle_start = [phi_start, theta_start, psi_start]
-
             for algorithm in MP_list:
                 for k in range(N_iter): 
                     self.MP_cost[algorithm] = 0.
                     time_or_speed = 1 # a velocity based trajectory
                     self.v_average = random.uniform(v_lower, v_upper)
-                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start, pos_ranges)
+                    self.fly_drone(gate_index, time_or_speed, algorithm)
 
                     self.MP_cost[algorithm] = 0.
                     time_or_speed = 0 # a time based trajectory
                     self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-                    self.fly_drone(gate_index, time_or_speed, algorithm, angle_start, pos_ranges)
+                    self.fly_drone(gate_index, time_or_speed, algorithm)
                 
 
             #min_cost_index = min(self.MP_cost.items(), key=lambda x: x[1])[0]
             #print ">>>Best method for gate ", (gate_index + 1), " is ", min_cost_index
-            
-
-
-
-    def visualize_drone(self, MP_list):
-        for algorithm in MP_list:
-            print "Drone flies by the algorithm, ", algorithm
-            self.client.simSetVehiclePose(self.drone_init, True)
-            state_list = self.MP_states[algorithm]
-            for state in state_list:
-                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
-                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
-                time.sleep(0.001)
 
 
 
 
-    def update(self, pos_ranges):
+    def update(self):
         '''
         convetion of names:
         p_a_b: pose of frame b relative to frame a
@@ -626,20 +643,21 @@ class PoseSampler:
             # self.client.plot_tf([p_o_g], duration=20.0)
         # request quad img from AirSim
         time.sleep(0.001)
-        
-        r = R.from_quat([self.drone_init.orientation.x_val, self.drone_init.orientation.y_val, self.drone_init.orientation.z_val, self.drone_init.orientation.w_val])
-        yaw, pitch, roll = r.as_euler('zyx', degrees=False)
 
-        self.state0 = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val,
-                  roll, pitch, yaw, 0., 0., 0., 0., 0., 0.,]
-
-        prev_traj = np.copy(self.state0)
-
-        self.collect_data(MP_list, pos_ranges)
+        self.collect_data(MP_list)
         #self.visualize_drone(MP_list)
-        #self.get_video(MP_list[0])
         
         
+
+    def visualize_drone(self, MP_list):
+        for algorithm in MP_list:
+            print "Drone flies by the algorithm, ", algorithm
+            self.client.simSetVehiclePose(self.drone_init, True)
+            state_list = self.MP_states[algorithm]
+            for state in state_list:
+                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
+                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                time.sleep(0.001)
 
     def get_video(self, algorithm):
 
@@ -696,5 +714,6 @@ class PoseSampler:
         self.file.write(data_string)
 
     def write_stats(self, stats_columns, stats, filename): #testno,stats_columns
+        filename = os.path.join(self.base_path, filename)
         df_stats = pd.DataFrame([stats], columns=stats_columns)
         df_stats.to_csv(filename, mode='a', index=False, header=not os.path.isfile(filename))
