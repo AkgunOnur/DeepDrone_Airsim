@@ -1,0 +1,699 @@
+
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_vel 
+Gate Predicted, x: 0.162, y: -3.42, z: -3.06, psi: -97.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0071, phi: 0.000118, theta: 0.000183, psi: 0.00192Velocity based trajectory, V_avg: 0.72, T: 4.97
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_vel 
+Gate Predicted, x: 0.308, y: -3.46, z: -2.12, psi: -60.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0098, phi: 0.000137, theta: 0.000183, psi: 0.00196Velocity based trajectory, V_avg: 0.631, T: 5.88Drone hasn't reached the gate yet. Current cost: 21311.4
+Gate Predicted, x: 0.406, y: -5.41, z: -1.93, psi: -1.07e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00773, phi: 0.000174, theta: 0.00021, psi: 0.00194Velocity based trajectory, V_avg: 0.631, T: 3.11Drone has arrived to the 1. gate. Current cost: 3807.91
+>>>MP Method: min_vel 
+Mode TEST 
+
+Mode TEST 
+
+Mode TEST 
+
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: -0.155, y: -2.72, z: -2.45, psi: -84.2 degVariance values, r: 0.0086, phi: 0.000197, theta: 0.000216, psi: 0.00196
+Mode TEST 
+
+Gate Predicted, x: -0.0363, y: -3.36, z: -2.0, psi: -51.5 degVariance values, r: 0.0088, phi: 0.000132, theta: 0.000191, psi: 0.00192Velocity based trajectory, V_avg: 1.58, T: 2.13
+Mode TEST 
+
+Gate Predicted, x: -0.0958, y: -3.37, z: -2.04, psi: -42.0 degVariance values, r: 0.00862, phi: 0.000121, theta: 0.00019, psi: 0.00191Velocity based trajectory, V_avg: 1.76, T: 1.92
+Mode TEST 
+
+Gate Predicted, x: 0.0709, y: -3.87, z: -2.53, psi: -78.4 degVariance values, r: 0.008, phi: 9.97e-05, theta: 0.000172, psi: 0.00192Velocity based trajectory, V_avg: 2.07, T: 1.89Drone hasn't reached the gate yet. Current cost: 2316.34
+Gate Predicted, x: 0.161, y: -5.0, z: -2.02, psi: -97.0 degVariance values, r: 0.008, phi: 0.00019, theta: 0.000219, psi: 0.00194Velocity based trajectory, V_avg: 1.52, T: 0.827Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.105, y: -2.74, z: -2.5, psi: -84.9 degVariance values, r: 0.00835, phi: 0.000191, theta: 0.000214, psi: 0.00196Velocity based trajectory, V_avg: 1.19, T: 2.35Drone hasn't reached the gate yet. Current cost: 3452.74
+Gate Predicted, x: -0.0616, y: -5.38, z: -2.76, psi: -89.9 degVariance values, r: 0.00857, phi: 0.000202, theta: 0.000217, psi: 0.00196Velocity based trajectory, V_avg: 1.04, T: 2.56Drone hasn't reached the gate yet. Current cost: 7826.98
+Gate Predicted, x: 1.17, y: -9.44, z: -3.61, psi: -1.44e+02 degVariance values, r: 0.012, phi: 0.000239, theta: 0.000202, psi: 0.00206Velocity based trajectory, V_avg: 2.27, T: 1.91Drone hasn't reached the gate yet. Current cost: 8116.45
+Gate Predicted, x: 0.897, y: -9.64, z: -3.6, psi: -1.45e+02 degVariance values, r: 0.0104, phi: 0.000302, theta: 0.000252, psi: 0.00203Time based trajectory, T: 0.714Drone hasn't reached the gate yet. Current cost: 3391.23
+Gate Predicted, x: 0.931, y: -9.82, z: -3.59, psi: -1.46e+02 degVariance values, r: 0.0117, phi: 0.000368, theta: 0.000285, psi: 0.00204Time based trajectory, T: 1.14Drone hasn't reached the gate yet. Current cost: 6252.5
+Gate Predicted, x: 0.773, y: -9.92, z: -3.59, psi: -1.47e+02 degVariance values, r: 0.0126, phi: 0.000407, theta: 0.000302, psi: 0.00206Time based trajectory, T: 1.3Drone hasn't reached the gate yet. Current cost: 8196.01
+Gate Predicted, x: 0.622, y: -10.0, z: -3.58, psi: -1.48e+02 degVariance values, r: 0.0133, phi: 0.000431, theta: 0.00031, psi: 0.00207Time based trajectory, T: 1.46Drone hasn't reached the gate yet. Current cost: 10521.8
+Gate Predicted, x: 0.467, y: -10.1, z: -3.57, psi: -1.49e+02 degVariance values, r: 0.0138, phi: 0.000445, theta: 0.000315, psi: 0.00208Time based trajectory, T: 1.57Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: 0.0258, y: -3.95, z: -2.98, psi: -76.6 degVariance values, r: 0.00723, phi: 7.51e-05, theta: 0.000165, psi: 0.00191Velocity based trajectory, V_avg: 2.56, T: 1.59Drone hasn't reached the gate yet. Current cost: 6106.6
+Gate Predicted, x: -0.118, y: -4.86, z: -2.1, psi: -72.0 degVariance values, r: 0.00667, phi: 0.000106, theta: 0.000186, psi: 0.0019Velocity based trajectory, V_avg: 1.99, T: 1.33Drone hasn't reached the gate yet. Current cost: 6224.33
+Gate Predicted, x: 1.71, y: -7.7, z: -2.93, psi: -28.7 degVariance values, r: 0.00708, phi: 0.000104, theta: 0.000186, psi: 0.0019Velocity based trajectory, V_avg: 2.32, T: 1.5Drone hasn't reached the gate yet. Current cost: 11056.7
+Gate Predicted, x: 1.92, y: -8.03, z: -2.72, psi: -68.2 degVariance values, r: 0.00674, phi: 0.000166, theta: 0.000214, psi: 0.00192Velocity based trajectory, V_avg: 1.79, T: 1.05Drone hasn't reached the gate yet. Current cost: 8788.05
+Gate Predicted, x: 1.98, y: -8.26, z: -2.83, psi: -55.2 degVariance values, r: 0.00745, phi: 0.000221, theta: 0.000241, psi: 0.00193Velocity based trajectory, V_avg: 1.57, T: 0.81Drone hasn't reached the gate yet. Current cost: 7136.13
+Gate Predicted, x: 3.74, y: -9.66, z: -3.51, psi: -40.4 degVariance values, r: 0.00792, phi: 0.00022, theta: 0.000236, psi: 0.00194Velocity based trajectory, V_avg: 1.3, T: 1.82Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.0181, y: -3.37, z: -1.95, psi: -59.5 degVariance values, r: 0.00898, phi: 0.000139, theta: 0.000192, psi: 0.00193Velocity based trajectory, V_avg: 1.45, T: 2.32
+Mode TEST 
+
+Gate Predicted, x: -0.0289, y: -3.34, z: -1.95, psi: -56.0 degVariance values, r: 0.00896, phi: 0.000139, theta: 0.000193, psi: 0.00193
+Mode TEST 
+
+Gate Predicted, x: -0.00796, y: -3.92, z: -3.08, psi: -80.4 degVariance values, r: 0.00709, phi: 7.64e-05, theta: 0.000165, psi: 0.00191Velocity based trajectory, Predicted V average: 2.63, T: 1.55Drone hasn't reached the gate yet. Current cost: 1468.46
+Gate Predicted, x: -0.0921, y: -5.23, z: -2.3, psi: -93.2 degVariance values, r: 0.00763, phi: 0.000167, theta: 0.00021, psi: 0.00193Velocity based trajectory, Predicted V average: 1.81, T: 0.853Drone hasn't reached the gate yet. Current cost: 1267.03
+Gate Predicted, x: 1.33, y: -8.51, z: -3.3, psi: -1.8e+02 degVariance values, r: 0.00884, phi: 0.00019, theta: 0.000202, psi: 0.00199Velocity based trajectory, Predicted V average: 3.13, T: 1.2Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.00802, y: -3.36, z: -1.97, psi: -55.4 degVariance values, r: 0.00889, phi: 0.000135, theta: 0.000192, psi: 0.00193Velocity based trajectory, Predicted V average: 1.51, T: 2.23Drone hasn't reached the gate yet. Current cost: 3021.71
+Gate Predicted, x: 0.0355, y: -4.99, z: -2.02, psi: -96.6 degVariance values, r: 0.00759, phi: 0.000191, theta: 0.000221, psi: 0.00194Velocity based trajectory, Predicted V average: 1.56, T: 1.05Drone hasn't reached the gate yet. Current cost: 2092.79
+Gate Predicted, x: 1.7, y: -8.23, z: -2.77, psi: -78.9 degVariance values, r: 0.0104, phi: 0.000206, theta: 0.000208, psi: 0.002Velocity based trajectory, Predicted V average: 1.45, T: 2.59Drone hasn't reached the gate yet. Current cost: 9317.66
+Gate Predicted, x: 3.88, y: -10.4, z: -2.86, psi: -59.4 degVariance values, r: 0.00907, phi: 0.000179, theta: 0.000206, psi: 0.00196Velocity based trajectory, Predicted V average: 1.25, T: 2.45Drone hasn't reached the gate yet. Current cost: 12528.2
+Gate Predicted, x: 5.81, y: -11.9, z: -3.39, psi: -38.1 degVariance values, r: 0.00723, phi: 0.000158, theta: 0.00021, psi: 0.00192Velocity based trajectory, Predicted V average: 1.69, T: 1.51Drone hasn't reached the gate yet. Current cost: 9110.16
+Gate Predicted, x: 7.94, y: -13.9, z: -3.75, psi: -5.0 degVariance values, r: 0.00814, phi: 0.000167, theta: 0.000209, psi: 0.00193Velocity based trajectory, Predicted V average: 1.5, T: 1.95Drone has arrived finished the lap. Current cost: 13570.6
+Mode TEST 
+
+Gate Predicted, x: 0.0987, y: -3.67, z: -2.23, psi: -72.3 degVariance values, r: 0.00848, phi: 0.000119, theta: 0.000181, psi: 0.00193Velocity based trajectory, Predicted V average: 1.71, T: 2.15Drone hasn't reached the gate yet. Current cost: 2839.39
+Gate Predicted, x: 0.0762, y: -4.99, z: -1.87, psi: -89.5 degVariance values, r: 0.00803, phi: 0.000193, theta: 0.000221, psi: 0.00194Velocity based trajectory, Predicted V average: 1.41, T: 0.971Drone hasn't reached the gate yet. Current cost: 1884.14
+Gate Predicted, x: 1.6, y: -7.4, z: -2.63, psi: -58.1 degVariance values, r: 0.00812, phi: 0.000176, theta: 0.000214, psi: 0.00193Velocity based trajectory, Predicted V average: 1.53, T: 1.96Drone hasn't reached the gate yet. Current cost: 6280.85
+Gate Predicted, x: 2.23, y: -8.06, z: -2.31, psi: -63.1 degVariance values, r: 0.00958, phi: 0.000264, theta: 0.00025, psi: 0.00197Velocity based trajectory, Predicted V average: 1.24, T: 0.772Drone hasn't reached the gate yet. Current cost: 2835.5
+Gate Predicted, x: 3.4, y: -9.66, z: -3.55, psi: -36.1 degVariance values, r: 0.00833, phi: 0.000228, theta: 0.000238, psi: 0.00195Velocity based trajectory, Predicted V average: 2.04, T: 1.17Drone hasn't reached the gate yet. Current cost: 5161.54
+Gate Predicted, x: 3.97, y: -10.1, z: -2.77, psi: -44.2 degVariance values, r: 0.0123, phi: 0.000331, theta: 0.000267, psi: 0.00204Velocity based trajectory, Predicted V average: 1.92, T: 0.556Drone hasn't reached the gate yet. Current cost: 2652.99
+Gate Predicted, x: 5.78, y: -11.8, z: -3.14, psi: -25.6 degVariance values, r: 0.0121, phi: 0.000301, theta: 0.000248, psi: 0.00204Velocity based trajectory, Predicted V average: 0.98, T: 2.73
+Mode TEST 
+
+Gate Predicted, x: -0.0127, y: -3.93, z: -2.97, psi: -75.4 degVariance values, r: 0.00726, phi: 7.72e-05, theta: 0.000166, psi: 0.00191Velocity based trajectory, Predicted V average: 2.54, T: 1.6Drone hasn't reached the gate yet. Current cost: 1557.1
+Gate Predicted, x: 0.0294, y: -5.09, z: -2.19, psi: -99.2 degVariance values, r: 0.00793, phi: 0.000178, theta: 0.000213, psi: 0.00194Velocity based trajectory, Predicted V average: 1.83, T: 0.771Drone hasn't reached the gate yet. Current cost: 1112.8
+Gate Predicted, x: 1.27, y: -7.93, z: -3.18, psi: -1.65e+02 degVariance values, r: 0.00805, phi: 0.000187, theta: 0.000208, psi: 0.00196Velocity based trajectory, Predicted V average: 2.65, T: 1.25Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.139, y: -3.51, z: -2.84, psi: -80.9 degVariance values, r: 0.00743, phi: 0.000115, theta: 0.000182, psi: 0.00192Velocity based trajectory, Predicted V average: 2.1, T: 1.72Drone hasn't reached the gate yet. Current cost: 1812.2
+Gate Predicted, x: -0.116, y: -4.79, z: -1.85, psi: -71.4 degVariance values, r: 0.00901, phi: 0.000198, theta: 0.000219, psi: 0.00195Velocity based trajectory, Predicted V average: 1.84, T: 0.881Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.0245, y: -3.89, z: -3.05, psi: -78.7 degVariance values, r: 0.00711, phi: 7.79e-05, theta: 0.000166, psi: 0.00191Velocity based trajectory, Predicted V average: 2.59, T: 1.56Drone hasn't reached the gate yet. Current cost: 1481.82
+Gate Predicted, x: -0.0546, y: -5.12, z: -2.18, psi: -98.2 degVariance values, r: 0.008, phi: 0.000176, theta: 0.000212, psi: 0.00194Velocity based trajectory, Predicted V average: 1.9, T: 0.802Drone hasn't reached the gate yet. Current cost: 1163.13
+Gate Predicted, x: 1.07, y: -7.92, z: -3.39, psi: -1.52e+02 degVariance values, r: 0.00763, phi: 0.000174, theta: 0.000206, psi: 0.00195Velocity based trajectory, Predicted V average: 2.64, T: 1.25Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.029, y: -3.96, z: -2.97, psi: -75.2 degVariance values, r: 0.00726, phi: 7.44e-05, theta: 0.000164, psi: 0.00191Velocity based trajectory, Predicted V average: 2.56, T: 1.59
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0838, y: -3.56, z: -1.72, psi: -73.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00842, phi: 0.00015, theta: 0.000194, psi: 0.00195Velocity based trajectory, V_avg: 1.43, T: 2.32Drone hasn't reached the gate yet. Current cost: 364.053
+Gate Predicted, x: 0.00237, y: -3.41, z: -3.17, psi: -55.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00648, phi: 0.000124, theta: 0.000196, psi: 0.0019Velocity based trajectory, V_avg: 1.43, T: 2.03Drone hasn't reached the gate yet. Current cost: 345.437
+Gate Predicted, x: -0.189, y: -3.3, z: -3.8, psi: -81.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00509, phi: 0.000128, theta: 0.000204, psi: 0.00188Velocity based trajectory, V_avg: 1.43, T: 1.76Drone hasn't reached the gate yet. Current cost: 233.155
+Gate Predicted, x: -0.712, y: -3.24, z: -4.59, psi: -87.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00449, phi: 0.000133, theta: 0.000208, psi: 0.00188Velocity based trajectory, V_avg: 1.43, T: 1.84Drone hasn't reached the gate yet. Current cost: 261.065
+Gate Predicted, x: -0.182, y: -3.57, z: -4.66, psi: -72.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00505, phi: 0.00016, theta: 0.000219, psi: 0.00189Velocity based trajectory, V_avg: 1.43, T: 1.51Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.194, y: -3.39, z: -2.67, psi: -71.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00879, phi: 0.000149, theta: 0.000193, psi: 0.00195Time based trajectory, T: 3.48Drone hasn't reached the gate yet. Current cost: 823.655
+Gate Predicted, x: 0.189, y: -3.67, z: -2.85, psi: -72.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00772, phi: 0.00014, theta: 0.000195, psi: 0.00193Time based trajectory, T: 3.2Drone hasn't reached the gate yet. Current cost: 737.268
+Gate Predicted, x: 0.119, y: -3.97, z: -2.9, psi: -67.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0073, phi: 0.000147, theta: 0.000202, psi: 0.00192Time based trajectory, T: 2.89Drone hasn't reached the gate yet. Current cost: 599.257
+Gate Predicted, x: 0.21, y: -4.38, z: -2.93, psi: -78.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0076, phi: 0.000169, theta: 0.00021, psi: 0.00193Time based trajectory, T: 2.73
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0573, y: -4.18, z: -2.28, psi: -69.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00803, phi: 9.52e-05, theta: 0.000171, psi: 0.00192Velocity based trajectory, V_avg: 2.45, T: 1.6Drone hasn't reached the gate yet. Current cost: 172.782
+Gate Predicted, x: -0.814, y: -3.17, z: -3.32, psi: -79.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00361, phi: 5.83e-05, theta: 0.000181, psi: 0.00184Velocity based trajectory, V_avg: 2.45, T: 1.11Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.115, y: -3.35, z: -1.75, psi: -72.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00898, phi: 0.000143, theta: 0.000188, psi: 0.00195Time based trajectory, T: 4.0Drone hasn't reached the gate yet. Current cost: 1092.1
+Gate Predicted, x: -0.229, y: -3.76, z: -2.69, psi: -58.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0079, phi: 0.000125, theta: 0.000186, psi: 0.00193Time based trajectory, T: 3.9Drone hasn't reached the gate yet. Current cost: 1087.59
+Gate Predicted, x: -0.167, y: -4.16, z: -2.81, psi: -58.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00731, phi: 0.000122, theta: 0.000189, psi: 0.00191Time based trajectory, T: 3.65Drone hasn't reached the gate yet. Current cost: 944.197
+Gate Predicted, x: -0.0204, y: -4.44, z: -2.97, psi: -54.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00692, phi: 0.000129, theta: 0.000195, psi: 0.00191Time based trajectory, T: 3.33Drone hasn't reached the gate yet. Current cost: 790.935
+Gate Predicted, x: -0.0333, y: -4.82, z: -2.68, psi: -74.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00757, phi: 0.000162, theta: 0.000206, psi: 0.00193Time based trajectory, T: 3.04Drone hasn't reached the gate yet. Current cost: 658.69
+Gate Predicted, x: -0.149, y: -4.99, z: -2.63, psi: -73.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0081, phi: 0.000195, theta: 0.000218, psi: 0.00195Time based trajectory, T: 2.63
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.21, y: -4.01, z: -2.22, psi: -95.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00752, phi: 0.000105, theta: 0.000175, psi: 0.00193Velocity based trajectory, V_avg: 1.6, T: 2.4Drone hasn't reached the gate yet. Current cost: 392.914
+Gate Predicted, x: -0.845, y: -3.18, z: -3.97, psi: -82.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00355, phi: 5.06e-05, theta: 0.000174, psi: 0.00184Velocity based trajectory, V_avg: 1.6, T: 2.04Drone hasn't reached the gate yet. Current cost: 353.682
+Gate Predicted, x: 0.147, y: -3.09, z: -2.93, psi: -1.28e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00469, phi: 0.00014, theta: 0.000211, psi: 0.00188Velocity based trajectory, V_avg: 1.6, T: 1.07Drone hasn't reached the gate yet. Current cost: 92.3055
+Gate Predicted, x: -1.11, y: -5.37, z: -4.11, psi: -86.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00682, phi: 0.000146, theta: 0.000198, psi: 0.00193Velocity based trajectory, V_avg: 1.6, T: 2.36Drone hasn't reached the gate yet. Current cost: 422.9
+Gate Predicted, x: -0.147, y: -4.68, z: -4.5, psi: -1.3e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00497, phi: 0.000144, theta: 0.000206, psi: 0.0019Velocity based trajectory, V_avg: 1.6, T: 1.56Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.267, y: -3.8, z: -1.61, psi: -65.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00935, phi: 0.000121, theta: 0.000177, psi: 0.00195Time based trajectory, T: 4.31Drone hasn't reached the gate yet. Current cost: 1265.66
+Gate Predicted, x: 0.751, y: -4.23, z: -2.29, psi: -73.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00823, phi: 0.000109, theta: 0.000177, psi: 0.00193Time based trajectory, T: 4.11Drone hasn't reached the gate yet. Current cost: 1207.35
+Gate Predicted, x: 0.663, y: -4.81, z: -2.34, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00783, phi: 0.000112, theta: 0.00018, psi: 0.00192Time based trajectory, T: 4.0Drone hasn't reached the gate yet. Current cost: 1135.13
+Gate Predicted, x: 0.519, y: -4.77, z: -2.48, psi: -84.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00649, phi: 0.000117, theta: 0.000191, psi: 0.0019Time based trajectory, T: 3.24Drone hasn't reached the gate yet. Current cost: 749.724
+Gate Predicted, x: 0.168, y: -5.01, z: -2.5, psi: -75.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00651, phi: 0.00014, theta: 0.000203, psi: 0.00191Time based trajectory, T: 2.88Drone hasn't reached the gate yet. Current cost: 595.421
+Gate Predicted, x: 0.27, y: -5.31, z: -2.67, psi: -96.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.007, phi: 0.000176, theta: 0.000215, psi: 0.00193Time based trajectory, T: 2.66Drone hasn't reached the gate yet. Current cost: 507.518
+Gate Predicted, x: 0.313, y: -5.42, z: -2.52, psi: -1.22e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00772, phi: 0.000224, theta: 0.000231, psi: 0.00196Time based trajectory, T: 2.19Drone hasn't reached the gate yet. Current cost: 346.554
+Gate Predicted, x: 0.0542, y: -5.03, z: -2.42, psi: -85.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00829, phi: 0.000264, theta: 0.000253, psi: 0.00197Time based trajectory, T: 1.28Drone hasn't reached the gate yet. Current cost: 120.536
+Gate Predicted, x: -0.152, y: -5.66, z: -2.88, psi: -1.07e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00871, phi: 0.000289, theta: 0.00026, psi: 0.00199Time based trajectory, T: 1.65Drone has arrived to the 1. gate. Current cost: 161.423
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.00433, y: -1.99, z: -2.89, psi: -1.01e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00988, phi: 0.00027, theta: 0.000238, psi: 0.00202Velocity based trajectory, V_avg: 1.57, T: 1.47Drone hasn't reached the gate yet. Current cost: 145.143
+Gate Predicted, x: -0.516, y: -2.45, z: -3.2, psi: -1.27e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00887, phi: 0.000257, theta: 0.000234, psi: 0.00201Velocity based trajectory, V_avg: 1.57, T: 1.58Drone hasn't reached the gate yet. Current cost: 205.862
+Gate Predicted, x: -0.14, y: -1.32, z: -2.44, psi: -1.04e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0102, phi: 0.000325, theta: 0.000268, psi: 0.00202Velocity based trajectory, V_avg: 1.57, T: 0.368Drone hasn't reached the gate yet. Current cost: 9.59191
+Gate Predicted, x: -0.866, y: -3.78, z: -2.43, psi: -1.03e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0104, phi: 0.000298, theta: 0.000249, psi: 0.00203Velocity based trajectory, V_avg: 1.57, T: 1.71Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap_full_stop 
+Gate Predicted, x: 0.225, y: -3.48, z: -3.14, psi: -57.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00776, phi: 0.000117, theta: 0.000188, psi: 0.00191Velocity based trajectory, V_avg: 1.64, T: 2.08Drone hasn't reached the gate yet. Current cost: 288.575
+Gate Predicted, x: -0.145, y: -3.48, z: -3.82, psi: -51.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00603, phi: 9.86e-05, theta: 0.00019, psi: 0.00188Velocity based trajectory, V_avg: 1.64, T: 1.87Drone hasn't reached the gate yet. Current cost: 283.858
+Gate Predicted, x: -1.64, y: -4.09, z: -5.22, psi: -76.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00679, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.64, T: 2.48Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap_full_stop 
+Gate Predicted, x: 0.222, y: -3.5, z: -2.13, psi: -70.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00861, phi: 0.000146, theta: 0.000193, psi: 0.00194Time based trajectory, T: 4.32Drone hasn't reached the gate yet. Current cost: 1274.67
+Gate Predicted, x: 0.38, y: -3.93, z: -2.5, psi: -67.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00798, phi: 0.000139, theta: 0.000193, psi: 0.00193Time based trajectory, T: 4.2Drone hasn't reached the gate yet. Current cost: 1245.99
+Gate Predicted, x: 0.394, y: -4.07, z: -2.46, psi: -75.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00724, phi: 0.000144, theta: 0.0002, psi: 0.00192Time based trajectory, T: 3.61
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.236, y: -3.79, z: -2.26, psi: -70.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00737, phi: 0.000102, theta: 0.000182, psi: 0.0019Velocity based trajectory, V_avg: 1.85, T: 1.92Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.219, y: -3.36, z: -3.4, psi: -88.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00639, phi: 9.82e-05, theta: 0.000178, psi: 0.00191Time based trajectory, T: 3.19Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap_stop 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0249, y: -3.66, z: -2.01, psi: -66.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00815, phi: 0.000107, theta: 0.000179, psi: 0.00192Velocity based trajectory, V_avg: 1.65, T: 2.24Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0604, y: -4.98, z: -1.89, psi: -77.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00723, phi: 0.000176, theta: 0.000219, psi: 0.00192Velocity based trajectory, V_avg: 1.65, T: 0.806Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.14, y: -5.73, z: -0.9, psi: -72.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0102, phi: 0.000258, theta: 0.000244, psi: 0.00198Velocity based trajectory, V_avg: 1.65, T: 0.944Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0493, y: -3.15, z: -3.65, psi: -91.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00722, phi: 0.000126, theta: 0.000187, psi: 0.00193Time based trajectory, T: 4.27Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap_stop 
+Gate Predicted, x: -0.158, y: -2.43, z: -3.05, psi: -96.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00813, phi: 0.000191, theta: 0.000213, psi: 0.00196Velocity based trajectory, V_avg: 2.02, T: 1.41Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap_stop 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.142, y: -4.53, z: -1.77, psi: -78.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00822, phi: 4.73e-05, theta: 0.000146, psi: 0.00191Velocity based trajectory, V_avg: 2.37, T: 1.97Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 1.09, y: -6.41, z: -2.64, psi: -59.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00216, phi: 6.96e-06, theta: 0.000169, psi: 0.00179Velocity based trajectory, V_avg: 2.37, T: 1.02Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.176, y: -3.3, z: -2.9, psi: -47.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00813, phi: 0.000127, theta: 0.000195, psi: 0.00191Time based trajectory, T: 2.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.719, y: -5.04, z: -1.96, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0094, phi: 0.000206, theta: 0.00022, psi: 0.00196Time based trajectory, T: 1.43Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.17, y: -3.69, z: -2.6, psi: -60.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00718, phi: 8.02e-05, theta: 0.000173, psi: 0.00189Velocity based trajectory, V_avg: 2.0, T: 1.91Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.304, y: -4.83, z: -1.91, psi: -92.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00827, phi: 0.000192, theta: 0.00022, psi: 0.00194Velocity based trajectory, V_avg: 2.0, T: 0.668Drone has crashed! Current cost: 1e+12
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.192, y: -3.4, z: -2.63, psi: -67.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00748, phi: 0.000101, theta: 0.000182, psi: 0.0019Time based trajectory, T: 3.81Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.142, y: -4.91, z: -2.04, psi: -85.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00816, phi: 0.000185, theta: 0.000218, psi: 0.00194Time based trajectory, T: 1.73Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0111, y: -1.66, z: -2.56, psi: -1.05e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0104, phi: 0.000309, theta: 0.000256, psi: 0.00203Velocity based trajectory, V_avg: 0.69, T: 2.71Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.66, y: -4.88, z: -4.05, psi: -1.03e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0122, phi: 0.000295, theta: 0.000231, psi: 0.00207Velocity based trajectory, V_avg: 0.69, T: 5.24Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.101, y: -3.66, z: -2.62, psi: -58.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00858, phi: 0.000119, theta: 0.000185, psi: 0.00192Time based trajectory, T: 2.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.202, y: -5.0, z: -2.16, psi: -91.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00862, phi: 0.000205, theta: 0.000224, psi: 0.00195Time based trajectory, T: 1.17Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.12, y: -3.83, z: -1.93, psi: -73.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00862, phi: 9.53e-05, theta: 0.000166, psi: 0.00193Velocity based trajectory, V_avg: 1.15, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.156, y: -5.03, z: -1.86, psi: -91.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00643, phi: 0.000157, theta: 0.000212, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 1.07Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.129, y: -3.47, z: -2.92, psi: -67.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00755, phi: 0.00011, theta: 0.000184, psi: 0.00191Time based trajectory, T: 3.05Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.502, y: -3.98, z: -2.19, psi: -85.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00755, phi: 0.000104, theta: 0.000177, psi: 0.00192Velocity based trajectory, V_avg: 1.06, T: 3.52Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.123, y: -5.01, z: -2.38, psi: -68.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00567, phi: 0.000154, theta: 0.000218, psi: 0.00189Velocity based trajectory, V_avg: 1.06, T: 1.04Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0247, y: -3.39, z: -1.7, psi: -83.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0089, phi: 0.000155, theta: 0.000194, psi: 0.00195Time based trajectory, T: 2.62Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0204, y: -4.98, z: -1.9, psi: -89.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00706, phi: 0.000182, theta: 0.000221, psi: 0.00192Time based trajectory, T: 1.25Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.185, y: -4.71, z: -2.36, psi: -55.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00865, phi: 5.32e-05, theta: 0.000148, psi: 0.00192Velocity based trajectory, V_avg: 1.03, T: 4.49Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0411, y: -3.75, z: -2.99, psi: -72.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00819, phi: 0.000112, theta: 0.000176, psi: 0.00193Time based trajectory, T: 4.35Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.11, y: -3.3, z: -2.66, psi: -66.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0075, phi: 0.00013, theta: 0.00019, psi: 0.00192Velocity based trajectory, V_avg: 0.933, T: 3.61Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0367, y: -4.91, z: -1.99, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00881, phi: 0.000207, theta: 0.000222, psi: 0.00196Velocity based trajectory, V_avg: 0.933, T: 1.87Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.148, y: -2.84, z: -1.79, psi: -85.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00887, phi: 0.000191, theta: 0.000209, psi: 0.00197Time based trajectory, T: 3.78Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0913, y: -5.12, z: -3.49, psi: -76.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00632, phi: 0.000151, theta: 0.000205, psi: 0.00192Time based trajectory, T: 3.6Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.116, y: -3.49, z: -2.58, psi: -62.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00879, phi: 0.000136, theta: 0.000187, psi: 0.00194Velocity based trajectory, V_avg: 1.19, T: 2.97Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.136, y: -4.82, z: -1.98, psi: -73.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00915, phi: 0.000213, theta: 0.000225, psi: 0.00196Velocity based trajectory, V_avg: 1.19, T: 1.22Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.166, y: -3.43, z: -2.8, psi: -72.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00757, phi: 0.000108, theta: 0.000178, psi: 0.00192Time based trajectory, T: 5.01Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0457, y: -4.98, z: -2.01, psi: -86.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00842, phi: 0.000187, theta: 0.000215, psi: 0.00195Time based trajectory, T: 2.36Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.154, y: -3.4, z: -2.72, psi: -69.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00866, phi: 0.000135, theta: 0.000189, psi: 0.00194Velocity based trajectory, V_avg: 0.988, T: 3.51Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0415, y: -4.88, z: -2.07, psi: -70.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00905, phi: 0.000202, theta: 0.000222, psi: 0.00195Velocity based trajectory, V_avg: 0.988, T: 1.64Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.156, y: -3.39, z: -2.22, psi: -75.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00821, phi: 0.000132, theta: 0.000186, psi: 0.00194Time based trajectory, T: 2.61Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.357, y: -5.28, z: -2.24, psi: -84.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00706, phi: 0.000167, theta: 0.000212, psi: 0.00192Time based trajectory, T: 1.4Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.159, y: -3.88, z: -2.37, psi: -53.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00826, phi: 9.61e-05, theta: 0.000174, psi: 0.00191Velocity based trajectory, V_avg: 1.05, T: 3.65Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.312, y: -5.15, z: -1.96, psi: -75.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00791, phi: 0.000182, theta: 0.000218, psi: 0.00193Velocity based trajectory, V_avg: 1.05, T: 1.28Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.191, y: -3.21, z: -3.4, psi: -84.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00738, phi: 0.000147, theta: 0.000195, psi: 0.00194Time based trajectory, T: 4.3Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.413, y: -2.36, z: -2.37, psi: -84.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00948, phi: 0.000238, theta: 0.000227, psi: 0.00199Velocity based trajectory, V_avg: 1.02, T: 2.48Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0669, y: -4.85, z: -2.8, psi: -76.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00947, phi: 0.000234, theta: 0.000226, psi: 0.00199Velocity based trajectory, V_avg: 1.02, T: 2.51Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.15, y: -3.89, z: -1.98, psi: -66.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00924, phi: 0.0001, theta: 0.000171, psi: 0.00193Time based trajectory, T: 5.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0289, y: -5.18, z: -1.94, psi: -77.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00679, phi: 0.000156, theta: 0.000213, psi: 0.0019Time based trajectory, T: 1.93Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.268, y: -2.81, z: -3.13, psi: -78.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00767, phi: 0.000141, theta: 0.000192, psi: 0.00194Velocity based trajectory, V_avg: 1.2, T: 2.82Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.109, y: -3.32, z: -2.29, psi: -73.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00849, phi: 0.00013, theta: 0.000187, psi: 0.00193Time based trajectory, T: 4.06Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0314, y: -4.9, z: -2.01, psi: -82.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0078, phi: 0.000184, theta: 0.000219, psi: 0.00193Time based trajectory, T: 1.86Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.348, y: -3.89, z: -3.7, psi: -75.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00656, phi: 6.73e-05, theta: 0.000168, psi: 0.00189Velocity based trajectory, V_avg: 1.16, T: 3.38Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.00896, y: -3.72, z: -2.21, psi: -92.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00939, phi: 0.000157, theta: 0.000186, psi: 0.00198Time based trajectory, T: 3.53Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0158, y: -5.3, z: -2.0, psi: -87.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00772, phi: 0.000186, theta: 0.000217, psi: 0.00194Time based trajectory, T: 1.52Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0181, y: -3.6, z: -2.48, psi: -66.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00839, phi: 0.000113, theta: 0.000179, psi: 0.00193Velocity based trajectory, V_avg: 0.948, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.107, y: -4.98, z: -1.99, psi: -91.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00819, phi: 0.000191, theta: 0.000219, psi: 0.00194Velocity based trajectory, V_avg: 0.948, T: 1.55Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.208, y: -2.14, z: -2.07, psi: -91.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00974, phi: 0.000254, theta: 0.000233, psi: 0.00201Time based trajectory, T: 3.32Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.212, y: -5.05, z: -4.81, psi: -74.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0104, phi: 0.000224, theta: 0.000208, psi: 0.00202Time based trajectory, T: 5.52Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.00253, y: -3.57, z: -2.17, psi: -72.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00981, phi: 0.000162, theta: 0.000196, psi: 0.00196Velocity based trajectory, V_avg: 1.16, T: 2.89Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0512, y: -5.01, z: -2.0, psi: -86.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00854, phi: 0.00021, theta: 0.000227, psi: 0.00195Velocity based trajectory, V_avg: 1.16, T: 1.26Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.556, y: -3.71, z: -1.72, psi: -59.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00795, phi: 0.000102, theta: 0.000182, psi: 0.0019Time based trajectory, T: 3.64Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.847, y: -6.0, z: -2.18, psi: -1.06e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00594, phi: 0.000129, theta: 0.000201, psi: 0.00189Time based trajectory, T: 2.41Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.304, y: -3.18, z: -2.63, psi: -94.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00778, phi: 0.000156, theta: 0.000198, psi: 0.00194Velocity based trajectory, V_avg: 1.17, T: 2.76Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.699, y: -5.11, z: -2.15, psi: -93.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00794, phi: 0.000184, theta: 0.000215, psi: 0.00194Velocity based trajectory, V_avg: 1.17, T: 1.91Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.156, y: -3.52, z: -1.29, psi: -58.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00903, phi: 0.000137, theta: 0.000189, psi: 0.00194Time based trajectory, T: 3.61Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.282, y: -5.21, z: -2.19, psi: -1.03e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00556, phi: 0.000149, theta: 0.00021, psi: 0.0019Time based trajectory, T: 2.01Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.232, y: -3.8, z: -2.18, psi: -75.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00829, phi: 9.51e-05, theta: 0.000169, psi: 0.00193Velocity based trajectory, V_avg: 1.16, T: 3.47Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0279, y: -5.03, z: -1.95, psi: -96.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00686, phi: 0.000166, theta: 0.000214, psi: 0.00192Velocity based trajectory, V_avg: 1.16, T: 1.1Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.00156, y: -3.83, z: -1.93, psi: -86.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00866, phi: 0.000103, theta: 0.000168, psi: 0.00194Time based trajectory, T: 3.83Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0387, y: -5.01, z: -1.91, psi: -90.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0064, phi: 0.000159, theta: 0.000213, psi: 0.00191Time based trajectory, T: 1.1Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.153, y: -3.78, z: -2.7, psi: -40.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0075, phi: 5.51e-05, theta: 0.000163, psi: 0.00188Velocity based trajectory, V_avg: 1.08, T: 3.72Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.943, y: -5.12, z: -1.97, psi: -85.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00713, phi: 0.000145, theta: 0.000205, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 1.58Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.204, y: -2.35, z: -2.11, psi: -78.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00744, phi: 0.00018, theta: 0.000216, psi: 0.00193Time based trajectory, T: 3.47Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.155, y: -5.54, z: -3.61, psi: -62.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00869, phi: 0.000181, theta: 0.000205, psi: 0.00196Time based trajectory, T: 4.54Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.318, y: -3.35, z: -2.99, psi: -87.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00722, phi: 9.9e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 0.91, T: 4.12Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.294, y: -3.61, z: -2.3, psi: -50.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00809, phi: 8.68e-05, theta: 0.000175, psi: 0.0019Time based trajectory, T: 3.67Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.489, y: -5.6, z: -2.16, psi: -1.17e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00666, phi: 0.000148, theta: 0.000205, psi: 0.00191Time based trajectory, T: 1.94Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_acc 
+Gate Predicted, x: 0.213, y: -2.84, z: -2.32, psi: -87.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00915, phi: 0.000198, theta: 0.000209, psi: 0.00198Velocity based trajectory, V_avg: 0.953, T: 3.15Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.3, y: -5.31, z: -2.03, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00965, phi: 0.000214, theta: 0.000217, psi: 0.00198Velocity based trajectory, V_avg: 0.953, T: 2.67Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_acc 
+Gate Predicted, x: -0.00481, y: -3.58, z: -1.34, psi: -87.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00894, phi: 0.000135, theta: 0.000182, psi: 0.00195Time based trajectory, T: 3.21Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0435, y: -5.09, z: -1.47, psi: -92.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00659, phi: 0.000165, theta: 0.000215, psi: 0.00191Time based trajectory, T: 1.31Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 1.41, y: -8.11, z: -0.0496, psi: -49.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0111, phi: 0.000205, theta: 0.000208, psi: 0.002Time based trajectory, T: 3.19Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_acc 
+Gate Predicted, x: -0.0812, y: -3.63, z: -1.0, psi: -86.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00971, phi: 0.000138, theta: 0.000181, psi: 0.00196Velocity based trajectory, V_avg: 0.96, T: 3.96Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_acc 
+Gate Predicted, x: -0.311, y: -2.67, z: -1.87, psi: -96.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00948, phi: 0.000217, theta: 0.000215, psi: 0.00199Time based trajectory, T: 3.96Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.305, y: -5.19, z: -3.56, psi: -93.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00738, phi: 0.000175, theta: 0.000207, psi: 0.00195Time based trajectory, T: 4.1Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_acc 
+Gate Predicted, x: -0.0752, y: -4.48, z: -1.93, psi: -61.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00839, phi: 6.15e-05, theta: 0.000152, psi: 0.00192Velocity based trajectory, V_avg: 1.06, T: 4.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.611, y: -5.38, z: -1.79, psi: -83.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00518, phi: 0.000124, theta: 0.000204, psi: 0.00188Velocity based trajectory, V_avg: 1.06, T: 1.08Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_acc 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.136, y: -3.93, z: -3.34, psi: -82.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00749, phi: 0.000102, theta: 0.000175, psi: 0.00192Velocity based trajectory, V_avg: 1.15, T: 3.31
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0711, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0724, y: -3.61, z: -1.93, psi: -85.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0723, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00883, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0793, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0755, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00883, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0788, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0789, y: -3.61, z: -1.93, psi: -85.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.074, y: -3.61, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0788, y: -3.61, z: -1.93, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0815, y: -3.62, z: -1.93, psi: -85.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00886, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.084, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00886, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0843, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0819, y: -3.61, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00884, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.087, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0841, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00886, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.087, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00886, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0879, y: -3.62, z: -1.93, psi: -85.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00887, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.24Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0836, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0899, y: -3.62, z: -1.93, psi: -85.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0898, y: -3.62, z: -1.93, psi: -85.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00885, phi: 0.000137, theta: 0.000188, psi: 0.00194Velocity based trajectory, V_avg: 1.09, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.29, y: -3.5, z: -2.45, psi: -64.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.29, y: -3.5, z: -2.45, psi: -64.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.289, y: -3.5, z: -2.44, psi: -64.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000104, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.284, y: -3.5, z: -2.45, psi: -63.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00763, phi: 0.000104, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.281, y: -3.5, z: -2.45, psi: -63.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00764, phi: 0.000104, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.279, y: -3.51, z: -2.45, psi: -64.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00765, phi: 0.000104, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.277, y: -3.5, z: -2.45, psi: -63.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00763, phi: 0.000104, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.277, y: -3.5, z: -2.45, psi: -63.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.273, y: -3.5, z: -2.45, psi: -63.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.273, y: -3.5, z: -2.45, psi: -63.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00763, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.278, y: -3.5, z: -2.45, psi: -63.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.273, y: -3.5, z: -2.45, psi: -63.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.275, y: -3.5, z: -2.46, psi: -63.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00762, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.28, y: -3.5, z: -2.45, psi: -63.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.28, y: -3.5, z: -2.45, psi: -64.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.283, y: -3.5, z: -2.46, psi: -64.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.28, y: -3.5, z: -2.46, psi: -64.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0076, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.282, y: -3.5, z: -2.46, psi: -64.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00761, phi: 0.000103, theta: 0.00018, psi: 0.00191Velocity based trajectory, V_avg: 1.01, T: 3.58Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.188, y: -3.6, z: -2.13, psi: -93.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0091, phi: 0.000135, theta: 0.000182, psi: 0.00195Velocity based trajectory, V_avg: 1.01, T: 3.7Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.154, y: -4.85, z: -1.87, psi: -92.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00788, phi: 0.000191, theta: 0.000222, psi: 0.00194Velocity based trajectory, V_avg: 1.01, T: 1.27Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.515, y: -3.53, z: -3.84, psi: -70.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00664, phi: 8.42e-05, theta: 0.000171, psi: 0.0019Time based trajectory, T: 4.39Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.845, y: -4.25, z: -2.55, psi: -77.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00731, phi: 4.16e-05, theta: 0.000149, psi: 0.00189Velocity based trajectory, V_avg: 1.18, T: 3.81Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0955, y: -5.24, z: -1.79, psi: -69.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00634, phi: 0.000118, theta: 0.000199, psi: 0.00188Velocity based trajectory, V_avg: 1.18, T: 1.24Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0102, y: -3.46, z: -2.75, psi: -34.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00812, phi: 9.34e-05, theta: 0.00018, psi: 0.00189Time based trajectory, T: 3.29Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.923, y: -5.44, z: -1.84, psi: -43.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00847, phi: 0.000151, theta: 0.000203, psi: 0.00192Time based trajectory, T: 2.18Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0943, y: -4.19, z: -3.13, psi: -83.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00619, phi: 5.97e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0903, y: -4.17, z: -3.12, psi: -84.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00614, phi: 5.93e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.106, y: -4.21, z: -3.13, psi: -82.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00628, phi: 6.08e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.96Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0869, y: -4.17, z: -3.12, psi: -84.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00614, phi: 5.92e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0949, y: -4.19, z: -3.13, psi: -83.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00618, phi: 5.97e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0908, y: -4.18, z: -3.12, psi: -84.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00616, phi: 5.97e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0949, y: -4.18, z: -3.12, psi: -83.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00617, phi: 6e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0907, y: -4.17, z: -3.12, psi: -83.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00616, phi: 5.99e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0925, y: -4.17, z: -3.12, psi: -83.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00616, phi: 6.02e-05, theta: 0.000163, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0903, y: -4.16, z: -3.11, psi: -84.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00614, phi: 6.02e-05, theta: 0.000163, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.91Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.091, y: -4.18, z: -3.12, psi: -83.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00621, phi: 6.11e-05, theta: 0.000163, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0929, y: -4.18, z: -3.12, psi: -83.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00622, phi: 6.1e-05, theta: 0.000163, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0975, y: -4.18, z: -3.13, psi: -83.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00622, phi: 6.07e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0906, y: -4.19, z: -3.12, psi: -83.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00625, phi: 6.08e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.94Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.103, y: -4.18, z: -3.12, psi: -82.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00621, phi: 6.02e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.93Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.101, y: -4.2, z: -3.11, psi: -83.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00625, phi: 6.05e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.94Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0941, y: -4.17, z: -3.1, psi: -83.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00615, phi: 5.95e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.91Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.104, y: -4.18, z: -3.11, psi: -83.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00618, phi: 6e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0993, y: -4.18, z: -3.11, psi: -83.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00619, phi: 6.04e-05, theta: 0.000162, psi: 0.00189Velocity based trajectory, V_avg: 1.04, T: 3.92Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.654, y: -3.07, z: -3.08, psi: -85.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00804, phi: 0.000157, theta: 0.000195, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.37Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.655, y: -3.06, z: -3.08, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00802, phi: 0.000156, theta: 0.000195, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.36Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.656, y: -3.05, z: -3.08, psi: -85.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.008, phi: 0.000156, theta: 0.000195, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.35Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.657, y: -3.04, z: -3.08, psi: -85.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00799, phi: 0.000156, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.34Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.654, y: -3.05, z: -3.08, psi: -85.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00801, phi: 0.000157, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.35Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.656, y: -3.03, z: -3.08, psi: -85.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00798, phi: 0.000157, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.33Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.66, y: -3.05, z: -3.08, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00803, phi: 0.000158, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.35Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.651, y: -3.07, z: -3.08, psi: -85.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00809, phi: 0.000158, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.37Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.651, y: -3.07, z: -3.08, psi: -85.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0081, phi: 0.000158, theta: 0.000196, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.37Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.653, y: -3.06, z: -3.08, psi: -85.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00807, phi: 0.000157, theta: 0.000195, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.36Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.656, y: -3.07, z: -3.07, psi: -85.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00809, phi: 0.000157, theta: 0.000195, psi: 0.00195Velocity based trajectory, V_avg: 0.986, T: 3.37Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.129, y: -3.21, z: -2.12, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00736, phi: 0.00012, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.136, y: -3.21, z: -2.12, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.00012, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.13, y: -3.21, z: -2.12, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.00012, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.129, y: -3.21, z: -2.12, psi: -78.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.00012, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.131, y: -3.21, z: -2.12, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.131, y: -3.21, z: -2.12, psi: -78.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.129, y: -3.21, z: -2.12, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.134, y: -3.21, z: -2.12, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.00012, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.126, y: -3.21, z: -2.12, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.135, y: -3.21, z: -2.13, psi: -78.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00733, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.135, y: -3.21, z: -2.13, psi: -78.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.128, y: -3.21, z: -2.12, psi: -78.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00733, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.139, y: -3.2, z: -2.12, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00731, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.137, y: -3.21, z: -2.13, psi: -78.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.138, y: -3.21, z: -2.12, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.14, y: -3.21, z: -2.12, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00733, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.133, y: -3.21, z: -2.12, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.141, y: -3.21, z: -2.12, psi: -78.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.14Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.133, y: -3.21, z: -2.12, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00735, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.139, y: -3.2, z: -2.11, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00734, phi: 0.000119, theta: 0.000189, psi: 0.00191Velocity based trajectory, V_avg: 1.08, T: 3.13Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.289, y: -3.38, z: -3.66, psi: -89.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00609, phi: 7.98e-05, theta: 0.000172, psi: 0.00189Velocity based trajectory, V_avg: 1.15, T: 3.25Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.291, y: -3.38, z: -3.65, psi: -89.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00614, phi: 8.29e-05, theta: 0.000173, psi: 0.00189Velocity based trajectory, V_avg: 1.15, T: 3.25Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.297, y: -3.37, z: -3.65, psi: -89.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00624, phi: 8.64e-05, theta: 0.000174, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.25Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.287, y: -3.38, z: -3.65, psi: -88.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00635, phi: 8.94e-05, theta: 0.000175, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.25Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.291, y: -3.38, z: -3.65, psi: -89.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00642, phi: 9.13e-05, theta: 0.000176, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.25Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.29, y: -3.35, z: -3.65, psi: -89.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0064, phi: 9.21e-05, theta: 0.000176, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.29, y: -3.37, z: -3.64, psi: -88.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00648, phi: 9.39e-05, theta: 0.000176, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.292, y: -3.36, z: -3.65, psi: -89.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0065, phi: 9.47e-05, theta: 0.000177, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.276, y: -3.35, z: -3.65, psi: -88.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0065, phi: 9.52e-05, theta: 0.000177, psi: 0.0019Velocity based trajectory, V_avg: 1.15, T: 3.23Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.289, y: -3.35, z: -3.64, psi: -89.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00651, phi: 9.59e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.286, y: -3.35, z: -3.64, psi: -88.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00653, phi: 9.63e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.296, y: -3.35, z: -3.64, psi: -88.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00653, phi: 9.65e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.287, y: -3.35, z: -3.64, psi: -88.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00654, phi: 9.68e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.295, y: -3.34, z: -3.64, psi: -89.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00653, phi: 9.68e-05, theta: 0.000177, psi: 0.00191Velocity based trajectory, V_avg: 1.15, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0255, y: -2.66, z: -2.69, psi: -92.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00808, phi: 0.000195, theta: 0.000215, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.72Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0267, y: -2.67, z: -2.69, psi: -91.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00811, phi: 0.000195, theta: 0.000215, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.73Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0244, y: -2.65, z: -2.68, psi: -91.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00811, phi: 0.000196, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.72Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0251, y: -2.64, z: -2.68, psi: -91.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0081, phi: 0.000196, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.7Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.026, y: -2.65, z: -2.69, psi: -91.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00814, phi: 0.000197, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.72Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0226, y: -2.64, z: -2.68, psi: -92.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00813, phi: 0.000197, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.71Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0178, y: -2.64, z: -2.69, psi: -92.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00812, phi: 0.000197, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.71Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0187, y: -2.62, z: -2.68, psi: -92.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00811, phi: 0.000198, theta: 0.000217, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.69Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0178, y: -2.64, z: -2.69, psi: -92.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00815, phi: 0.000198, theta: 0.000216, psi: 0.00196Velocity based trajectory, V_avg: 1.01, T: 2.71Drone hasn't reached the gate yet. Current cost: 0.0
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.156, y: -4.27, z: -2.87, psi: -81.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00702, phi: 6.95e-05, theta: 0.000163, psi: 0.0019Velocity based trajectory, V_avg: 1.13, T: 3.66
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.407, y: -3.16, z: -2.21, psi: -72.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00781, phi: 0.000128, theta: 0.000187, psi: 0.00193Velocity based trajectory, V_avg: 0.966, T: 3.59Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.333, y: -4.85, z: -2.02, psi: -92.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00746, phi: 0.000183, theta: 0.000218, psi: 0.00193Velocity based trajectory, V_avg: 0.966, T: 1.76Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0391, y: -3.31, z: -2.32, psi: -47.7 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00872, phi: 0.000129, theta: 0.000189, psi: 0.00193Time based trajectory, T: 2.4Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.341, y: -5.38, z: -2.05, psi: -1.04e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00804, phi: 0.000183, theta: 0.000213, psi: 0.00195Time based trajectory, T: 1.47Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0585, y: -3.5, z: -3.71, psi: -90.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00636, phi: 8.62e-05, theta: 0.000174, psi: 0.0019Velocity based trajectory, V_avg: 1.04, T: 3.62Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0476, y: -3.49, z: -2.72, psi: -91.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00817, phi: 0.00012, theta: 0.000178, psi: 0.00194Time based trajectory, T: 2.67Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.0574, y: -4.89, z: -1.87, psi: -84.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00853, phi: 0.000185, theta: 0.000215, psi: 0.00195Time based trajectory, T: 1.15Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Mode DATA_COLLECTION 
+
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.18, y: -3.13, z: -2.81, psi: -39.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00786, phi: 9.69e-05, theta: 0.000184, psi: 0.00189Velocity based trajectory, V_avg: 1.15, T: 3.03Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.362, y: -4.9, z: -2.01, psi: -91.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00826, phi: 0.000169, theta: 0.000213, psi: 0.00193Velocity based trajectory, V_avg: 1.15, T: 1.71Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0586, y: -4.13, z: -2.96, psi: -78.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00694, phi: 6.88e-05, theta: 0.000162, psi: 0.0019Time based trajectory, T: 1.66Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.264, y: -3.48, z: -3.19, psi: -52.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0075, phi: 0.000107, theta: 0.000183, psi: 0.00191Velocity based trajectory, V_avg: 0.92, T: 3.83Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.0562, y: -3.66, z: -2.23, psi: -70.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00871, phi: 0.000135, theta: 0.000187, psi: 0.00194Time based trajectory, T: 1.41Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.156, y: -4.93, z: -1.85, psi: -94.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00852, phi: 0.000211, theta: 0.000226, psi: 0.00196Time based trajectory, T: 0.537Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.034, y: -3.46, z: -2.16, psi: -62.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00916, phi: 0.000131, theta: 0.000185, psi: 0.00194Velocity based trajectory, V_avg: 1.06, T: 3.37Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.169, y: -5.0, z: -2.02, psi: -92.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00747, phi: 0.000177, theta: 0.000218, psi: 0.00192Velocity based trajectory, V_avg: 1.06, T: 1.47Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.246, y: -4.16, z: -2.57, psi: -69.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00835, phi: 8.72e-05, theta: 0.000166, psi: 0.00192Time based trajectory, T: 1.64Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0147, y: -5.09, z: -2.03, psi: -88.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0082, phi: 0.000188, theta: 0.000218, psi: 0.00194Time based trajectory, T: 0.439Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.0915, y: -3.36, z: -1.42, psi: -1e+02 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00959, phi: 0.000152, theta: 0.000187, psi: 0.00197Velocity based trajectory, V_avg: 1.1, T: 3.3Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.117, y: -4.93, z: -2.09, psi: -84.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0055, phi: 0.000138, theta: 0.00021, psi: 0.00188Velocity based trajectory, V_avg: 1.1, T: 1.55Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: -0.477, y: -3.36, z: -3.03, psi: -78.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00654, phi: 0.000111, theta: 0.000186, psi: 0.0019Time based trajectory, T: 1.37Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.161, y: -3.6, z: -2.45, psi: -78.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00803, phi: 0.000129, theta: 0.000187, psi: 0.00193Velocity based trajectory, V_avg: 1.03, T: 3.39Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.069, y: -4.84, z: -1.97, psi: -83.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00849, phi: 0.000205, theta: 0.000226, psi: 0.00195Velocity based trajectory, V_avg: 1.03, T: 1.3Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_snap 
+Gate Predicted, x: 0.129, y: -3.4, z: -2.6, psi: -63.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00849, phi: 0.000125, theta: 0.000186, psi: 0.00193Time based trajectory, T: 1.41Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.153, y: -4.94, z: -2.03, psi: -73.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00859, phi: 0.000193, theta: 0.000219, psi: 0.00195Time based trajectory, T: 0.662Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.269, y: -3.62, z: -2.65, psi: -43.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00832, phi: 0.000117, theta: 0.000186, psi: 0.00191Velocity based trajectory, V_avg: 1.07, T: 3.22Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: 0.417, y: -5.17, z: -2.12, psi: -93.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00835, phi: 0.000191, theta: 0.00022, psi: 0.00194Velocity based trajectory, V_avg: 1.07, T: 1.55Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.0449, y: -4.2, z: -3.94, psi: -81.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00683, phi: 4.58e-05, theta: 0.00015, psi: 0.0019Time based trajectory, T: 1.8Drone is out of the path. Current cost: 1e+09
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.0707, y: -3.92, z: -2.72, psi: -82.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00729, phi: 7.46e-05, theta: 0.000162, psi: 0.00191Velocity based trajectory, V_avg: 1.16, T: 3.6Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0341, y: -4.88, z: -1.82, psi: -83.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00849, phi: 0.000181, theta: 0.000213, psi: 0.00194Velocity based trajectory, V_avg: 1.16, T: 1.14Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.0851, y: -3.75, z: -2.4, psi: -62.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00979, phi: 0.000123, theta: 0.000175, psi: 0.00195Time based trajectory, T: 1.57Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.0574, y: -4.88, z: -2.04, psi: -92.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00851, phi: 0.000201, theta: 0.000221, psi: 0.00195Time based trajectory, T: 0.476Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: -0.0746, y: -3.53, z: -2.19, psi: -79.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00843, phi: 0.000128, theta: 0.000181, psi: 0.00195Velocity based trajectory, V_avg: 1.01, T: 3.67Drone hasn't reached the gate yet. Current cost: 0.0
+Gate Predicted, x: -0.166, y: -5.1, z: -1.95, psi: -84.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00744, phi: 0.000176, theta: 0.000215, psi: 0.00193Velocity based trajectory, V_avg: 1.01, T: 1.59Drone has arrived to the 1. gate. Current cost: 0.0
+>>>MP Method: min_jerk 
+Gate Predicted, x: 0.369, y: -3.52, z: -3.51, psi: -97.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00689, phi: 0.000109, theta: 0.000179, psi: 0.00192Time based trajectory, T: 1.47
+Mode TEST 
+
+Gate Predicted, x: -0.0337, y: -3.95, z: -3.01, psi: -76.8 degVariance values, r: 0.00723, phi: 7.53e-05, theta: 0.000164, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 2721.88
+Gate Predicted, x: -0.0131, y: -4.94, z: -2.18, psi: -95.2 degVariance values, r: 0.00833, phi: 0.000184, theta: 0.000215, psi: 0.00194Drone hasn't reached the gate yet. Current cost: 1140.56
+Gate Predicted, x: 1.28, y: -7.61, z: -0.637, psi: -1.03e+02 degVariance values, r: 0.0104, phi: 0.000209, theta: 0.000212, psi: 0.00199Drone is out of the path. Current cost: 1e+09
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: -0.0451, y: -3.54, z: -2.14, psi: -44.4 degVariance values, r: 0.00843, phi: 0.000108, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 2017.05
+Gate Predicted, x: 0.066, y: -4.99, z: -1.93, psi: -83.4 degVariance values, r: 0.00752, phi: 0.000176, theta: 0.000219, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 1170.95
+Gate Predicted, x: 1.82, y: -7.91, z: -2.56, psi: -44.9 degVariance values, r: 0.00952, phi: 0.000186, theta: 0.000209, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 4591.4
+Gate Predicted, x: 3.99, y: -10.0, z: -2.96, psi: -39.2 degVariance values, r: 0.00871, phi: 0.000172, theta: 0.000206, psi: 0.00195Drone hasn't reached the gate yet. Current cost: 5589.52
+Gate Predicted, x: 5.99, y: -12.0, z: -3.45, psi: -31.1 degVariance values, r: 0.00803, phi: 0.000165, theta: 0.000207, psi: 0.00194Drone hasn't reached the gate yet. Current cost: 6599.43
+Gate Predicted, x: 7.99, y: -14.1, z: -3.97, psi: 3.32 degVariance values, r: 0.00817, phi: 0.000162, theta: 0.000207, psi: 0.00193Drone has arrived finished the lap. Current cost: 7903.45
+Mode TEST 
+
+Gate Predicted, x: -0.0414, y: -3.53, z: -2.14, psi: -43.5 degVariance values, r: 0.00836, phi: 0.000107, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 2001.23
+Gate Predicted, x: 0.0868, y: -5.05, z: -1.94, psi: -86.8 degVariance values, r: 0.00741, phi: 0.000173, theta: 0.000218, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 1236.45
+Gate Predicted, x: 1.96, y: -7.96, z: -2.64, psi: -54.0 degVariance values, r: 0.00946, phi: 0.000185, theta: 0.000208, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 4745.41
+Gate Predicted, x: 4.07, y: -10.0, z: -3.03, psi: -51.0 degVariance values, r: 0.00841, phi: 0.00017, theta: 0.000206, psi: 0.00194Drone hasn't reached the gate yet. Current cost: 5481.36
+Gate Predicted, x: 6.1, y: -12.1, z: -3.53, psi: -30.4 degVariance values, r: 0.00796, phi: 0.000161, theta: 0.000206, psi: 0.00193Drone hasn't reached the gate yet. Current cost: 6786.42
+Gate Predicted, x: 7.96, y: -14.0, z: -3.99, psi: -0.764 degVariance values, r: 0.00775, phi: 0.000158, theta: 0.000208, psi: 0.00192Drone has arrived finished the lap. Current cost: 7330.29
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: -0.0662, y: -3.53, z: -2.11, psi: -43.5 degVariance values, r: 0.00848, phi: 0.000109, theta: 0.000184, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 2001.27
+Gate Predicted, x: 0.0411, y: -4.99, z: -1.93, psi: -82.7 degVariance values, r: 0.00752, phi: 0.000176, theta: 0.000219, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 1175.06
+Gate Predicted, x: 1.86, y: -7.89, z: -2.59, psi: -45.8 degVariance values, r: 0.00951, phi: 0.000186, theta: 0.000209, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 4636.42
+Gate Predicted, x: 4.05, y: -10.1, z: -2.99, psi: -38.3 degVariance values, r: 0.00883, phi: 0.000172, theta: 0.000205, psi: 0.00195Drone hasn't reached the gate yet. Current cost: 5732.21
+Mode TEST 
+
+Gate Predicted, x: -0.0611, y: -3.54, z: -2.13, psi: -43.4 degVariance values, r: 0.0084, phi: 0.000107, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 2007.84
+Gate Predicted, x: 0.0762, y: -5.0, z: -1.92, psi: -84.4 degVariance values, r: 0.00751, phi: 0.000175, theta: 0.000219, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 1183.13
+Gate Predicted, x: 1.85, y: -7.89, z: -2.55, psi: -45.6 degVariance values, r: 0.00947, phi: 0.000186, theta: 0.000209, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 4571.57
+Gate Predicted, x: 3.99, y: -10.0, z: -2.98, psi: -37.4 degVariance values, r: 0.00861, phi: 0.00017, theta: 0.000206, psi: 0.00194Drone hasn't reached the gate yet. Current cost: 5543.13
+Gate Predicted, x: 6.05, y: -12.0, z: -3.46, psi: -28.0 degVariance values, r: 0.00807, phi: 0.000164, theta: 0.000207, psi: 0.00193Drone hasn't reached the gate yet. Current cost: 6665.04
+Gate Predicted, x: 8.02, y: -14.0, z: -3.96, psi: 4.12 degVariance values, r: 0.00814, phi: 0.000162, theta: 0.000207, psi: 0.00193Drone has arrived finished the lap. Current cost: 7779.68
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: -0.07, y: -3.55, z: -2.14, psi: -44.2 degVariance values, r: 0.00839, phi: 0.000106, theta: 0.000183, psi: 0.00191Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.0658, y: -3.54, z: -2.14, psi: -44.1 degVariance values, r: 0.00836, phi: 0.000106, theta: 0.000183, psi: 0.00191Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.0588, y: -3.56, z: -2.14, psi: -44.4 degVariance values, r: 0.00842, phi: 0.000107, theta: 0.000182, psi: 0.00191Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Gate Predicted, x: -0.057, y: -3.55, z: -2.15, psi: -44.4 degVariance values, r: 0.00842, phi: 0.000107, theta: 0.000183, psi: 0.00191Drone has crashed! Current cost: 1e+12
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: -0.0659, y: -3.53, z: -2.14, psi: -43.9 degVariance values, r: 0.00841, phi: 0.000108, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1497.32
+Gate Predicted, x: 0.0846, y: -5.0, z: -1.87, psi: -83.7 degVariance values, r: 0.00748, phi: 0.000171, theta: 0.000218, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 914.688
+Gate Predicted, x: 1.94, y: -8.1, z: -1.94, psi: -46.7 degVariance values, r: 0.00973, phi: 0.000185, theta: 0.000207, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 3642.56
+Gate Predicted, x: 4.07, y: -10.1, z: -3.02, psi: -45.4 degVariance values, r: 0.0075, phi: 0.000147, theta: 0.000201, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4349.68
+Gate Predicted, x: 6.09, y: -12.1, z: -3.39, psi: -34.1 degVariance values, r: 0.00737, phi: 0.00015, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 5013.89
+Gate Predicted, x: 7.99, y: -14.0, z: -3.95, psi: -0.425 degVariance values, r: 0.00725, phi: 0.000148, theta: 0.000207, psi: 0.00191Drone has arrived finished the lap. Current cost: 5553.16
+Mode TEST 
+
+Gate Predicted, x: -0.0721, y: -3.55, z: -2.14, psi: -42.7 degVariance values, r: 0.00839, phi: 0.000106, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1508.09
+Gate Predicted, x: 0.0465, y: -5.04, z: -1.91, psi: -83.1 degVariance values, r: 0.00735, phi: 0.000167, theta: 0.000217, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 932.765
+Gate Predicted, x: 1.93, y: -8.08, z: -1.95, psi: -51.3 degVariance values, r: 0.00963, phi: 0.000184, theta: 0.000207, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 3615.03
+Gate Predicted, x: 4.1, y: -10.1, z: -3.01, psi: -47.1 degVariance values, r: 0.00753, phi: 0.000148, theta: 0.000201, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4381.85
+Gate Predicted, x: 6.05, y: -12.1, z: -3.39, psi: -30.9 degVariance values, r: 0.00733, phi: 0.000148, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4994.73
+Gate Predicted, x: 8.01, y: -14.0, z: -3.95, psi: -0.548 degVariance values, r: 0.00731, phi: 0.000147, theta: 0.000206, psi: 0.00191Drone has arrived finished the lap. Current cost: 5669.2
+Mode TEST 
+
+Gate Predicted, x: -0.0784, y: -3.54, z: -2.13, psi: -42.8 degVariance values, r: 0.00841, phi: 0.000107, theta: 0.000183, psi: 0.00191
+Mode TEST 
+
+Gate Predicted, x: -0.0349, y: -3.55, z: -2.14, psi: -44.4 degVariance values, r: 0.0084, phi: 0.000107, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1513.65
+Gate Predicted, x: 0.0434, y: -4.99, z: -1.94, psi: -78.9 degVariance values, r: 0.00734, phi: 0.000168, theta: 0.000218, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 889.459
+Gate Predicted, x: 2.02, y: -8.03, z: -1.75, psi: -58.2 degVariance values, r: 0.00997, phi: 0.000192, theta: 0.000208, psi: 0.00197Drone hasn't reached the gate yet. Current cost: 3690.93
+Gate Predicted, x: 4.07, y: -9.98, z: -3.04, psi: -48.0 degVariance values, r: 0.0073, phi: 0.000145, theta: 0.000201, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4394.49
+Gate Predicted, x: 6.12, y: -12.1, z: -3.3, psi: -30.3 degVariance values, r: 0.0076, phi: 0.000149, theta: 0.000203, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 5301.91
+Gate Predicted, x: 8.0, y: -14.0, z: -3.99, psi: 5.44 degVariance values, r: 0.00702, phi: 0.000139, theta: 0.000205, psi: 0.0019Drone has arrived finished the lap. Current cost: 5624.52
+Mode TEST 
+
+Gate Predicted, x: -0.0457, y: -3.55, z: -2.13, psi: -44.3 degVariance values, r: 0.00845, phi: 0.000108, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1513.76
+Gate Predicted, x: 0.0528, y: -5.02, z: -1.92, psi: -83.4 degVariance values, r: 0.00737, phi: 0.000169, theta: 0.000218, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 910.545
+Gate Predicted, x: 1.96, y: -8.01, z: -1.84, psi: -46.9 degVariance values, r: 0.00968, phi: 0.000185, theta: 0.000208, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 3554.49
+Gate Predicted, x: 4.05, y: -10.1, z: -3.01, psi: -45.0 degVariance values, r: 0.00752, phi: 0.000147, theta: 0.000201, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4408.09
+Gate Predicted, x: 6.08, y: -12.0, z: -3.34, psi: -34.4 degVariance values, r: 0.00741, phi: 0.000151, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4996.35
+Gate Predicted, x: 7.99, y: -13.9, z: -3.94, psi: 2.74 degVariance values, r: 0.00727, phi: 0.000146, theta: 0.000206, psi: 0.00191Drone has arrived finished the lap. Current cost: 5627.36
+Mode TEST 
+
+Gate Predicted, x: -0.041, y: -3.54, z: -2.14, psi: -44.0 degVariance values, r: 0.00841, phi: 0.000107, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1504.4
+Gate Predicted, x: 0.0446, y: -5.01, z: -1.9, psi: -79.4 degVariance values, r: 0.00742, phi: 0.000169, theta: 0.000218, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 915.949
+Gate Predicted, x: 2.01, y: -8.02, z: -1.98, psi: -45.7 degVariance values, r: 0.00968, phi: 0.000184, theta: 0.000207, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 3629.84
+Gate Predicted, x: 3.98, y: -10.0, z: -2.99, psi: -40.3 degVariance values, r: 0.0074, phi: 0.000147, theta: 0.000203, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4163.2
+Gate Predicted, x: 6.05, y: -12.0, z: -3.5, psi: -37.1 degVariance values, r: 0.00742, phi: 0.000152, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 5127.44
+Gate Predicted, x: 8.04, y: -14.0, z: -3.99, psi: -7.11 degVariance values, r: 0.00753, phi: 0.000153, theta: 0.000207, psi: 0.00192Drone has arrived finished the lap. Current cost: 5725.33
+Mode TEST 
+
+Gate Predicted, x: -0.0621, y: -3.52, z: -2.13, psi: -43.8 degVariance values, r: 0.00841, phi: 0.000109, theta: 0.000184, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1486.57
+Gate Predicted, x: 0.0786, y: -5.01, z: -1.86, psi: -81.2 degVariance values, r: 0.00749, phi: 0.00017, theta: 0.000218, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 930.08
+Gate Predicted, x: 1.96, y: -8.02, z: -2.06, psi: -45.8 degVariance values, r: 0.00948, phi: 0.000181, theta: 0.000207, psi: 0.00196Drone hasn't reached the gate yet. Current cost: 3584.32
+Gate Predicted, x: 3.97, y: -9.99, z: -2.93, psi: -54.0 degVariance values, r: 0.00743, phi: 0.000153, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 4049.22
+Gate Predicted, x: 6.05, y: -12.0, z: -3.5, psi: -30.4 degVariance values, r: 0.00743, phi: 0.000151, theta: 0.000205, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 5106.26
+Gate Predicted, x: 8.01, y: -14.0, z: -4.02, psi: -7.18 degVariance values, r: 0.0075, phi: 0.000151, theta: 0.000206, psi: 0.00192Drone has arrived finished the lap. Current cost: 5724.45
+Mode TEST 
+
+Gate Predicted, x: -0.0701, y: -3.54, z: -2.13, psi: -43.0 degVariance values, r: 0.00844, phi: 0.000108, theta: 0.000183, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 1500.11
+Gate Predicted, x: 0.061, y: -5.03, z: -1.88, psi: -78.5 degVariance values, r: 0.00742, phi: 0.000167, theta: 0.000217, psi: 0.00191Drone hasn't reached the gate yet. Current cost: 940.555
+Gate Predicted, x: 1.91, y: -8.01, z: -2.07, psi: -48.2 degVariance values, r: 0.0093, phi: 0.000179, theta: 0.000208, psi: 0.00195Drone hasn't reached the gate yet. Current cost: 3525.53
+Gate Predicted, x: 4.02, y: -10.0, z: -2.94, psi: -52.0 degVariance values, r: 0.00761, phi: 0.000154, theta: 0.000204, psi: 0.00193Drone hasn't reached the gate yet. Current cost: 4224.13
+Gate Predicted, x: 6.07, y: -12.1, z: -3.5, psi: -30.0 degVariance values, r: 0.00746, phi: 0.00015, theta: 0.000204, psi: 0.00192Drone hasn't reached the gate yet. Current cost: 5171.25
+Gate Predicted, x: 8.01, y: -14.0, z: -4.03, psi: -2.69 degVariance values, r: 0.00733, phi: 0.000148, theta: 0.000206, psi: 0.00191Drone has arrived finished the lap. Current cost: 5598.8
+Mode TEST 
+
+Mode TEST 
+
+Gate Predicted, x: 1.17, y: -5.84, z: -2.73, psi: -46.9 degVariance values, r: 0.0113, phi: 1.43e-05, theta: 0.00011, psi: 0.00196
+Mode DATA_COLLECTION 
+
+Mode DATA_COLLECTION 
+
+>>>Controller Method: Backstepping_1 
+Time of arrival: 3.24, time coefficient: 0.987Gate Predicted, x: 0.193, y: -3.03, z: -2.96, psi: -59.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00832, phi: 0.000142, theta: 0.000194, psi: 0.00193Blurring coefficient: 2.91Drone is out of the path. Current cost: 1e+09
+Mode DATA_COLLECTION 
+
+>>>Controller Method: Backstepping_1 
+Time of arrival: 2.0, time coefficient: 0.508Gate Predicted, x: -0.069, y: -3.77, z: -2.12, psi: -57.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00841, phi: 8.68e-05, theta: 0.00017, psi: 0.00191Blurring coefficient: 1.22Drone hasn't reached the gate yet. Current cost: 0.0
+Time of arrival: 0.696, time coefficient: 0.508Gate Predicted, x: 0.059, y: -5.14, z: -2.08, psi: -87.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00655, phi: 0.000155, theta: 0.000212, psi: 0.00191Blurring coefficient: 1.22Drone has arrived to the 1. gate. Current cost: 0.0
+>>>Controller Method: Backstepping_1 
+Time of arrival: 3.13, time coefficient: 0.777Gate Predicted, x: 0.169, y: -4.12, z: -3.08, psi: -77.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00805, phi: 8.99e-05, theta: 0.000167, psi: 0.00192Blurring coefficient: 6.11Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_1 
+Time of arrival: 1.52, time coefficient: 0.386Gate Predicted, x: 0.145, y: -3.53, z: -3.32, psi: -90.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00623, phi: 8.01e-05, theta: 0.00017, psi: 0.0019Blurring coefficient: 7.27Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_1 
+Time of arrival: 1.59, time coefficient: 0.418Gate Predicted, x: 0.044, y: -3.69, z: -2.84, psi: -67.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00801, phi: 9.3e-05, theta: 0.000175, psi: 0.00191Blurring coefficient: 0.808
+Mode DATA_COLLECTION 
+
+>>>Controller Method: Backstepping_1 
+Time of arrival: 2.27, time coefficient: 0.581Gate Predicted, x: 0.175, y: -4.07, z: -2.4, psi: -71.4 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00739, phi: 8.7e-05, theta: 0.000171, psi: 0.00191Blurring coefficient: 5.31Drone hasn't reached the gate yet. Current cost: 3184.45
+Time of arrival: 0.603, time coefficient: 0.581Gate Predicted, x: 0.334, y: -4.94, z: -1.84, psi: -94.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00852, phi: 0.000207, theta: 0.000224, psi: 0.00195Blurring coefficient: 5.31Drone has arrived to the 1. gate. Current cost: 170.763
+>>>Controller Method: Backstepping_2 
+Time of arrival: 1.74, time coefficient: 0.489Gate Predicted, x: -0.0144, y: -3.65, z: -1.88, psi: -76.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00947, phi: 0.000145, theta: 0.000188, psi: 0.00195Blurring coefficient: 3.44Drone hasn't reached the gate yet. Current cost: 1878.83
+Time of arrival: 0.642, time coefficient: 0.489Gate Predicted, x: 0.0373, y: -4.96, z: -1.92, psi: -94.0 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0075, phi: 0.000192, theta: 0.000223, psi: 0.00193Blurring coefficient: 3.44Drone has arrived to the 1. gate. Current cost: 212.671
+>>>Controller Method: Backstepping_3 
+Time of arrival: 1.16, time coefficient: 0.325Gate Predicted, x: 0.503, y: -3.82, z: -2.02, psi: -63.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00883, phi: 0.000131, theta: 0.000185, psi: 0.00194Blurring coefficient: 0.395Drone hasn't reached the gate yet. Current cost: 770.442
+Time of arrival: 0.524, time coefficient: 0.325Gate Predicted, x: 0.42, y: -5.4, z: -1.88, psi: -97.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00763, phi: 0.000186, theta: 0.000218, psi: 0.00194Blurring coefficient: 0.395Drone has arrived to the 1. gate. Current cost: 85.0187
+>>>Controller Method: Backstepping_4 
+Time of arrival: 1.67, time coefficient: 0.484Gate Predicted, x: 0.171, y: -3.56, z: -2.89, psi: -94.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00876, phi: 0.000154, theta: 0.000192, psi: 0.00196Blurring coefficient: 4.69Drone hasn't reached the gate yet. Current cost: 1730.0
+Mode DATA_COLLECTION 
+
+>>>Controller Method: Backstepping_1 
+Time of arrival: 1.79, time coefficient: 0.576Gate Predicted, x: 0.287, y: -3.33, z: -2.1, psi: -79.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00846, phi: 0.000168, theta: 0.000203, psi: 0.00195Blurring coefficient: 3.31Drone hasn't reached the gate yet. Current cost: 1977.76
+Time of arrival: 0.919, time coefficient: 0.576Gate Predicted, x: 0.23, y: -4.92, z: -1.95, psi: -91.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00839, phi: 0.000218, theta: 0.000229, psi: 0.00196Blurring coefficient: 3.31Drone has arrived to the 1. gate. Current cost: 460.576
+>>>Controller Method: Backstepping_2 
+Time of arrival: 2.34, time coefficient: 0.693Gate Predicted, x: -0.105, y: -3.13, z: -2.83, psi: -96.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00755, phi: 0.000142, theta: 0.000192, psi: 0.00194Blurring coefficient: 8.82Drone hasn't reached the gate yet. Current cost: 3385.42
+Time of arrival: 1.36, time coefficient: 0.693Gate Predicted, x: 0.393, y: -4.89, z: -2.13, psi: -95.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00818, phi: 0.00019, theta: 0.000218, psi: 0.00195Blurring coefficient: 8.82Drone has arrived to the 1. gate. Current cost: 1028.17
+>>>Controller Method: Backstepping_3 
+Time of arrival: 2.75, time coefficient: 0.777Gate Predicted, x: 0.109, y: -3.71, z: -1.53, psi: -62.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00979, phi: 0.000149, theta: 0.000188, psi: 0.00196Blurring coefficient: 0.768Drone hasn't reached the gate yet. Current cost: 4533.17
+Time of arrival: 1.12, time coefficient: 0.777Gate Predicted, x: 0.228, y: -5.08, z: -1.98, psi: -94.5 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00662, phi: 0.000178, theta: 0.00022, psi: 0.00192Blurring coefficient: 0.768Drone has arrived to the 1. gate. Current cost: 469.794
+>>>Controller Method: Backstepping_4 
+Mode DATA_COLLECTION 
+
+>>>Controller Method: Backstepping_1 
+Time of arrival: 2.2, time coefficient: 0.646Gate Predicted, x: -0.671, y: -3.14, z: -3.02, psi: -66.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00723, phi: 0.000111, theta: 0.000187, psi: 0.0019Blurring coefficient: 8.56Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_2 
+Time of arrival: 2.83, time coefficient: 0.62Gate Predicted, x: -0.315, y: -4.29, z: -2.99, psi: -76.2 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0091, phi: 7.47e-05, theta: 0.000152, psi: 0.00194Blurring coefficient: 6.62Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_3 
+Time of arrival: 2.08, time coefficient: 0.436Gate Predicted, x: -0.0475, y: -4.8, z: -1.39, psi: -89.1 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0104, phi: 9.41e-05, theta: 0.00015, psi: 0.00198Blurring coefficient: 2.47Drone hasn't reached the gate yet. Current cost: 2635.29
+Time of arrival: 0.14, time coefficient: 0.436Gate Predicted, x: -0.0374, y: -5.12, z: -1.38, psi: -89.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00736, phi: 0.000188, theta: 0.00022, psi: 0.00194Blurring coefficient: 2.47Drone hasn't reached the gate yet. Current cost: 21.6927
+Time of arrival: 0.29, time coefficient: 0.436Gate Predicted, x: -0.064, y: -5.58, z: -1.86, psi: -87.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00878, phi: 0.000271, theta: 0.000258, psi: 0.00196Blurring coefficient: 2.47Drone hasn't reached the gate yet. Current cost: 70.5916
+Time of arrival: 0.181, time coefficient: 0.436Gate Predicted, x: -0.798, y: -6.14, z: -1.86, psi: -88.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0106, phi: 0.000345, theta: 0.000285, psi: 0.00201Blurring coefficient: 2.47Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_4 
+Time of arrival: 3.67, time coefficient: 0.723Gate Predicted, x: -0.0595, y: -5.0, z: -3.84, psi: -65.8 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00875, phi: 3.17e-05, theta: 0.000133, psi: 0.00192Blurring coefficient: 4.97Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_1 
+Time of arrival: 2.44, time coefficient: 0.485Gate Predicted, x: -0.0215, y: -4.72, z: -0.873, psi: -87.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.0115, phi: 8.83e-05, theta: 0.000143, psi: 0.00198Blurring coefficient: 1.51Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_2 
+Time of arrival: 4.72, time coefficient: 0.876Gate Predicted, x: -1.18, y: -5.15, z: -1.87, psi: -65.9 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00973, phi: 2.27e-05, theta: 0.000125, psi: 0.00193Blurring coefficient: 8.18Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_3 
+Time of arrival: 2.15, time coefficient: 0.444Gate Predicted, x: -0.249, y: -4.77, z: -1.83, psi: -79.6 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00938, phi: 6.17e-05, theta: 0.000143, psi: 0.00194Blurring coefficient: 5.78Drone has arrived to the 1. gate. Current cost: 2741.33
+>>>Controller Method: Backstepping_4 
+Time of arrival: 2.32, time coefficient: 0.5Gate Predicted, x: -0.499, y: -4.52, z: -3.1, psi: -81.3 degGate Ground truth, x: 0.0, y: -5.0, z: -2.0, psi: -90.0 degVariance values, r: 0.00904, phi: 7.18e-05, theta: 0.00015, psi: 0.00194Blurring coefficient: 7.25Drone is out of the path. Current cost: 1e+09
+>>>Controller Method: Backstepping_1 

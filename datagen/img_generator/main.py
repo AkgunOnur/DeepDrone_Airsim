@@ -1,19 +1,17 @@
-import time
 from pose_sampler import *
 
-num_samples = 100
-dataset_path = '/home/merkez/Downloads/DeepDrone_Airsim/files/'
-random_range = 0.3
+base_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
 
+num_samples = 1
+mode = 0 # If 1, drone flies in test mode, otherwise it flies data collection mode
+flight_log = True
 # check if output folder exists
-if not os.path.isdir(dataset_path):
-    os.makedirs(dataset_path)
-    img_dir = os.path.join(dataset_path, 'images')
+if not os.path.isdir(base_path):
+    os.makedirs(base_path)
+    img_dir = os.path.join(base_path, 'images')
     os.makedirs(img_dir)
-else:
-    print('Error: path already exists')
 
-pose_sampler = PoseSampler(num_samples, dataset_path)
+pose_sampler = PoseSampler(num_samples, base_path, flight_log)
 
 for idx in range(pose_sampler.num_samples):
-	pose_sampler.update()
+	pose_sampler.update(mode)

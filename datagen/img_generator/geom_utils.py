@@ -101,7 +101,7 @@ def debugGatePoses(p_o_b, r, theta, psi):
     rot_gate = Rotation.from_euler('ZYX', [phi_gate, 0, 0])
     q = rot_gate.as_quat()
     p_o_g = Pose(t_o_g, Quaternionr(q[0], q[1], q[2], q[3]))
-    return p_o_g, r, theta, psi, phi_rel
+    return p_o_g
 
 def polarTranslation(r, theta, psi):
     # follow math convention for polar coordinates
