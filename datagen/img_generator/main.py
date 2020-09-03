@@ -3,7 +3,7 @@ from pose_sampler import *
 base_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
 
 num_samples = 1
-mode = 0 # If 1, drone flies in test mode, otherwise it flies data collection mode
+mode = 1 # If 1, drone flies in test mode, otherwise it flies data collection mode
 flight_log = True
 # check if output folder exists
 if not os.path.isdir(base_path):

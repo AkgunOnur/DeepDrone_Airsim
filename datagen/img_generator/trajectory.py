@@ -22,17 +22,16 @@ import config
 
 class Trajectory:
 
-    def __init__(self, trajSelect, state, t, waypoint0, waypoint, yaw0, yaw, v_average=1.5):
+    def __init__(self, trajSelect, state, time_list, waypoint_list, yaw_list, v_average=1.5):
 
         self.xyzType = trajSelect[0]
         self.yawType = trajSelect[1]
         self.averVel = trajSelect[2]
 
-        t_wps, wps, y_wps, v_wp = makeWaypoints(t, waypoint0, waypoint, yaw0, yaw, v_average)
-        self.t_wps = t_wps
-        self.wps   = wps
-        self.y_wps = y_wps
-        self.v_wp  = v_wp
+        self.t_wps = time_list
+        self.wps   = waypoint_list
+        self.y_wps = yaw_list
+        self.v_wp  = v_average
 
         self.end_reached = 0
 

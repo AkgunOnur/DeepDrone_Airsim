@@ -99,7 +99,7 @@ def body_to_world(state, waypoint_body):
 
 class Quadrotor:
     
-    def __init__(self, state0, coeff_pos=1.0, coeff_angle = 0.25, coeff_control = 0.0):
+    def __init__(self, state0, coeff_pos=1.0, coeff_angle = 0.25, coeff_control = 0.0, coeff_final_pos=0.0):
         
         self.state = state0
         self.U = [1, 0., 0., 0.]
@@ -107,6 +107,7 @@ class Quadrotor:
         self.coeff_pos = coeff_pos
         self.coeff_angle = coeff_angle
         self.coeff_control = coeff_control
+        self.coeff_final_pos = coeff_final_pos
         self.Controllers = ["Backstepping_1","Backstepping_2","Backstepping_3","Backstepping_4"]
         
     
@@ -306,21 +307,35 @@ class Quadrotor:
         self.state = sol.y[:,-1]
 
 
-    def calculate_cost(self, target, off_road = False):
+    def calculate_cost(self, target, final_target=None, off_road = False, final_calculation = False):
         xd, yd, zd, psid = target
+        
+
         position_tracking_error = (xd-self.state[0])**2 + (yd-self.state[1])**2 + (zd-self.state[2])**2
         angular_error = (np.abs(psid-self.state[5])-np.pi/2)**2 #in perfect conditions, difference between yaw angles of gate and drone should be pi/2
         cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
-        if off_road == False:
-            self.costValue = self.costValue + (self.coeff_pos*position_tracking_error + 
-                            self.coeff_angle*angular_error + 
-                            self.coeff_control*cont_input)
-        else:
+
+        if off_road:
             self.costValue = 1e9
+            return
+        
+        if final_calculation:
+            self.costValue += (self.coeff_pos*position_tracking_error + 
+                            self.coeff_angle*angular_error + self.coeff_control*cont_input)
+        else:
+            xf, yf, zf = final_target
+            pos_final_error = (xf-self.state[0])**2 + (yf-self.state[1])**2 + (zf-self.state[2])**2
+            self.costValue += (self.coeff_pos*position_tracking_error + 
+                            self.coeff_angle*angular_error + 
+                            self.coeff_control*cont_input +
+                            self.coeff_final_pos*pos_final_error)
+                
+
+        
 
 
 
-    def simulate(self, dtau, current_traj, method, std_list):
+    def simulate(self, dtau, current_traj, final_target, std_list, method="Backstepping_3"):
     #     states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
         r_std, phi_std, theta_std, psi_std = std_list
         fail_check = False
@@ -344,7 +359,7 @@ class Quadrotor:
             fail_check = True
         else:
             target = [current_traj[0], current_traj[1], current_traj[2], current_traj[13]]
-            self.calculate_cost(target)
+            self.calculate_cost(target=target, final_target=final_target)
 
         
         return fail_check
