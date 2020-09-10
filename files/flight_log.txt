@@ -1,23 +1,52 @@
 
-Mode TEST 
+Mode DATA_COLLECTION 
 
-Gate Predicted, x: -0.0497, y: -3.52, z: -2.13, psi: -43.6 deg
-Variance values, r: 0.0084, phi: 0.000108, theta: 0.000184, psi: 0.00191
-Prediction mode is off. MP algorithm: min_snap
-Estimated time of arrival: 1.5861142158508301 s.
-Drone hasn't reached the gate yet. Current cost: 1308.9
-Gate Predicted, x: 0.0878, y: -4.65, z: -0.945, psi: -86.1 deg
-Variance values, r: 0.00892, phi: 0.000197, theta: 0.00022, psi: 0.00195
-Prediction mode is off. MP algorithm: min_snap
-Estimated time of arrival: 0.7387653350830078 s.
-Drone is out of the path. Current cost: 1e+09
-Gate Predicted, x: -0.0387, y: -3.54, z: -2.14, psi: -44.0 deg
-Variance values, r: 0.00838, phi: 0.000107, theta: 0.000183, psi: 0.00191
-Prediction mode is off. MP algorithm: min_jerk
-Estimated time of arrival: 1.5928072929382324 s.
-Drone hasn't reached the gate yet. Current cost: 1322.4
-Gate Predicted, x: 0.143, y: -4.69, z: -1.11, psi: -81.5 deg
-Variance values, r: 0.00874, phi: 0.000195, theta: 0.000221, psi: 0.00195
-Prediction mode is off. MP algorithm: min_jerk
-Estimated time of arrival: 0.7000827312469483 s.
-Drone is out of the path. Current cost: 1e+09
+Gate Predicted, x: -0.0737, y: -3.58, z: -1.71, psi: -44.9 deg
+Variance values, r: 0.0088, phi: 0.000117, theta: 0.000184, psi: 0.00192
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 3.6782712192680047 s.
+Drone hasn't reached the gate yet. Current cost: 10532.2
+Gate Predicted, x: 0.226, y: -3.86, z: -2.15, psi: -58.4 deg
+Variance values, r: 0.00838, phi: 0.000116, theta: 0.000185, psi: 0.00192
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 3.602776726938395 s.
+Drone hasn't reached the gate yet. Current cost: 4054.54
+Gate Predicted, x: 0.238, y: -4.45, z: -1.59, psi: -68.1 deg
+Variance values, r: 0.00827, phi: 0.000138, theta: 0.000195, psi: 0.00193
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 3.093528517890585 s.
+Drone hasn't reached the gate yet. Current cost: 6106.7
+Gate Predicted, x: 0.25, y: -4.77, z: -1.83, psi: -70.9 deg
+Variance values, r: 0.0079, phi: 0.000165, theta: 0.000209, psi: 0.00193
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 2.497206378076695 s.
+Drone hasn't reached the gate yet. Current cost: 7817.85
+Gate Predicted, x: 0.257, y: -5.18, z: -1.96, psi: -87.5 deg
+Variance values, r: 0.00825, phi: 0.000203, theta: 0.000223, psi: 0.00195
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 2.2702213094547523 s.
+Drone hasn't reached the gate yet. Current cost: 9374.83
+Gate Predicted, x: 0.212, y: -5.18, z: -1.96, psi: -93.4 deg
+Variance values, r: 0.00888, phi: 0.000251, theta: 0.000241, psi: 0.00198
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 1.725525723677377 s.
+Drone hasn't reached the gate yet. Current cost: 10181.5
+Gate Predicted, x: 0.16, y: -5.06, z: -1.98, psi: -87.6 deg
+Variance values, r: 0.00981, phi: 0.000299, theta: 0.00026, psi: 0.002
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 1.2385802691593184 s.
+Drone hasn't reached the gate yet. Current cost: 11266.5
+Gate Predicted, x: 0.0685, y: -4.96, z: -2.05, psi: -81.2 deg
+Variance values, r: 0.0105, phi: 0.000336, theta: 0.000276, psi: 0.00202
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 0.9293546597295087 s.
+Drone hasn't reached the gate yet. Current cost: 13536.4
+Gate Predicted, x: 0.067, y: -5.21, z: -2.14, psi: -67.7 deg
+Variance values, r: 0.0108, phi: 0.000346, theta: 0.00028, psi: 0.00202
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 1.0732394753293781 s.
+Drone hasn't reached the gate yet. Current cost: 21132.6
+Gate Predicted, x: 0.152, y: -5.8, z: -2.59, psi: -48.5 deg
+Variance values, r: 0.01, phi: 0.000314, theta: 0.00027, psi: 0.002
+MP algorithm: pos_waypoint_interp
+Estimated time of arrival: 1.6703116506084772 s.

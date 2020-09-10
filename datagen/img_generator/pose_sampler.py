@@ -56,29 +56,29 @@ correction = 0.85
 CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in fact because of cone vs. square
 
 # MP_list = ["min_vel", "min_acc", "min_jerk", "min_snap", "min_acc_stop", "min_jerk_stop", "min_snap_stop", 
-#            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_way_timed", "pos_waypoint_interp"] 
+#            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_waypoint_timed", "pos_waypoint_interp"] 
 
 
-flight_columns = ['true_init_x','true_init_y','true_init_z','diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
-                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'Tf', 'Backstepping_method', 'Cost']
+flight_columns = ['true_init_x','true_init_y','true_init_z', 'blur_coeff', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'Tf', 'MP_Method', 'Cost']
 
 mp_list = []
 
 flight_filename = 'data.csv'
 
 class PoseSampler:
-    def __init__(self, num_samples, dataset_path, flight_log, with_gate=True):
-        self.num_samples = num_samples
+    def __init__(self, dataset_path, flight_log, with_gate=True):
+        self.num_samples = 1
         self.base_path = dataset_path
         self.csv_path = os.path.join(self.base_path, 'files/gate_training_data.csv')
         self.curr_idx = 0
+        self.current_gate = 0
         self.with_gate = with_gate
         self.client = airsim.MultirotorClient()
-
         self.client.confirmConnection()
         self.client.simLoadLevel('Soccer_Field_Easy')
-        time.sleep(4)
-        self.client = airsim.MultirotorClient()
+        time.sleep(1)        
+        #self.client = airsim.MultirotorClient()
         self.configureEnvironment()
         self.log_path = os.path.join(self.base_path, 'files/flight_log.txt')
         self.flight_log = flight_log
@@ -108,6 +108,7 @@ class PoseSampler:
         self.x_dot_pr = 0.
         self.y_dot_pr = 0.
         self.z_dot_pr = 0.
+        self.vel_sum = 0.
         self.quadrotor_freq = int(1. / self.dtau)
         self.method = "MAX"
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -125,19 +126,21 @@ class PoseSampler:
 
 
         #----- Motion planning parameters -----------------------------
-        self.MP_methods = {"pos_way_timed":1, "pos_waypoint_interp":2, "min_vel":3, "min_acc":4, "min_jerk":5, "min_snap":6,
+        self.MP_methods = {"pos_waypoint_timed":1, "pos_waypoint_interp":2, "min_vel":3, "min_acc":4, "min_jerk":5, "min_snap":6,
                               "min_acc_stop":7, "min_jerk_stop":8, "min_snap_stop":9, "min_jerk_full_stop":10, "min_snap_full_stop":11,
                               "pos_waypoint_arrived":12}
-        self.MP_names = ["hover", "pos_way_timed", "pos_waypoint_interp", "min_vel", "min_acc", "min_jerk", "min_snap",
+        self.MP_names = ["hover", "pos_waypoint_timed", "pos_waypoint_interp", "min_vel", "min_acc", "min_jerk", "min_snap",
                          "min_acc_stop", "min_jerk_stop", "min_snap_stop", "min_jerk_full_stop", "min_snap_full_stop","pos_waypoint_arrived"]
-        self.MP_cost = {"pos_way_timed":1e9, "pos_waypoint_interp":1e9, "min_vel":1e9, "min_acc":1e9, "min_jerk":1e9, "min_snap":1e9,
+        self.MP_cost = {"pos_waypoint_timed":1e9, "pos_waypoint_interp":1e9, "min_vel":1e9, "min_acc":1e9, "min_jerk":1e9, "min_snap":1e9,
                         "min_acc_stop":1e9, "min_jerk_stop":1e9, "min_snap_stop":1e9, "min_jerk_full_stop":1e9, "min_snap_full_stop":1e9,
                         "pos_waypoint_arrived":1e9}
-        self.MP_states = {"pos_way_timed":[], "pos_waypoint_interp":[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_snap":[],
+        self.MP_states = {"pos_waypoint_timed":[], "pos_waypoint_interp":[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_snap":[],
                           "min_acc_stop":[], "min_jerk_stop":[], "min_snap_stop":[], "min_jerk_full_stop":[], "min_snap_full_stop":[],
                           "pos_waypoint_arrived":[]}
 
         self.MP_types = ["Time", "Speed"]
+
+
 
         self.trajSelect = np.zeros(3)
         # Select Position Trajectory Type (0: hover,                    1: pos_waypoint_timed,      2: pos_waypoint_interp,    
@@ -191,12 +194,19 @@ class PoseSampler:
                             #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
                             transforms.ToTensor()])
 
-        self.drone_init = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
-        self.gate = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
-                     Pose(Vector3r(2.,-8.,-2.5), Quaternionr(0., 0., 0.25881905, 0.96592583)),
-                     Pose(Vector3r(4.,-10.,-3.), Quaternionr(0., 0., 0.38268343, 0.92387953)),
-                     Pose(Vector3r(6.,-12.,-3.5), Quaternionr(0., 0., 0.5, 0.8660254)),
-                     Pose(Vector3r(8.,-14.,-4), Quaternionr(0., 0., 0.70710678, 0.70710678))]
+        quat0 = R.from_euler('ZYX',[-90.,0.,0.],degrees=True).as_quat()
+        quat1 = R.from_euler('ZYX',[0.,0.,0.],degrees=True).as_quat()
+        quat2 = R.from_euler('ZYX',[30.,0.,0.],degrees=True).as_quat()
+        quat3 = R.from_euler('ZYX',[45.,0.,0.],degrees=True).as_quat()
+        quat4 = R.from_euler('ZYX',[60.,0.,0.],degrees=True).as_quat()
+        quat5 = R.from_euler('ZYX',[90.,0.,0.],degrees=True).as_quat()
+
+        self.drone_init = Pose(Vector3r(0.,0.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
+        self.gate = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+                     Pose(Vector3r(2.,-8.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(4.,-10.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3])),
+                     Pose(Vector3r(6.,-12.,-3.5), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3])),
+                     Pose(Vector3r(9.,-14.,-4), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -277,6 +287,9 @@ class PoseSampler:
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
+
+        
+
         if self.flight_log:
             f=open(self.log_path, "a")
 
@@ -315,11 +328,14 @@ class PoseSampler:
                     
                     # Trajectory generate
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
+                    waypoint_world = [self.track[self.current_gate].position.x_val, self.track[self.current_gate].position.y_val, self.track[self.current_gate].position.z_val]
                     pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
                     posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
                     yaw0 = self.quad.state[5]
                     yaw_diff = pose_gate_body[3][0]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
+                    yawf = Rotation.from_quat([self.track[self.current_gate].orientation.x_val, self.track[self.current_gate].orientation.y_val, 
+                                       self.track[self.current_gate].orientation.z_val, self.track[self.current_gate].orientation.w_val]).as_euler('ZYX',degrees=False)[0] - np.pi/2
 
                     print "\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
                     print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
@@ -521,32 +537,22 @@ class PoseSampler:
         return check_arrival, on_road
 
 
-    def fly_drone(self, f, gate_index, method, pos_ranges, angles_start):
-        pose_prediction = np.zeros((2000,4),dtype=np.float32)
+    def fly_drone(self, f, method, pos_offset, angle_start):
+        x_offset, y_offset, z_offset = pos_offset
+        phi_start, theta_start, gate_psi, psi_start = angle_start
+
+        pose_prediction = np.zeros((1000,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
 
-        x_range, y_range, z_range = pos_ranges
-        phi_start, theta_start, gate_psi, psi_start = angles_start
-        
-        if gate_index == 0: #if drone is at initial point
-            quad_pose = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, -phi_start, -theta_start, psi_start]
-            self.state0 = [self.drone_init.position.x_val+x_range, self.drone_init.position.y_val+y_range, self.drone_init.position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
-            true_init_pos = [self.drone_init.position.x_val, self.drone_init.position.y_val, self.drone_init.position.z_val]
-        else:
-            quad_pose = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, -phi_start, -theta_start, psi_start]
-            self.state0 = [self.track[gate_index-1].position.x_val+x_range, self.track[gate_index-1].position.y_val+y_range, self.track[gate_index-1].position.z_val+z_range, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
-            true_init_pos = [self.track[gate_index-1].position.x_val, self.track[gate_index-1].position.y_val, self.track[gate_index-1].position.z_val]
-
+        #if drone is at initial point
+        quad_pose = [self.drone_init.position.x_val+x_offset, self.drone_init.position.y_val+y_offset, self.drone_init.position.z_val+z_offset, -phi_start, -theta_start, psi_start]
+        self.state0 = [self.drone_init.position.x_val+x_offset, self.drone_init.position.y_val+y_offset, self.drone_init.position.z_val+z_offset, phi_start, theta_start, psi_start, 0., 0., 0., 0., 0., 0.]
 
         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
         self.quad = Quadrotor(self.state0)
-        # this is only used for yaw motion planning
-        self.trajSelect[0] = self.MP_methods[method]
-        self.trajSelect[1] = 2 
-        self.trajSelect[2] = 0
+        
         self.curr_idx = 0
-        #self.Controller_states[method].append(self.quad.state)
-        self.MP_states[method].append(self.quad.state)
+        self.test_states.append(self.quad.state)
 
         self.xd_ddot_pr = 0.
         self.yd_ddot_pr = 0.
@@ -555,20 +561,14 @@ class PoseSampler:
         self.psid_pr = 0.
         self.psid_dot_pr = 0.
 
-        
-        cov_coeff = 0.
 
-        initial_start = True
-
-        final_target = [self.track[gate_index].position.x_val, self.track[gate_index].position.y_val, self.track[gate_index].position.z_val]
-
-
-        print "\n>>>MP Method: ", method
         track_completed = False
         fail_check = False
+        init_start = True
 
-        if self.flight_log:
-            f.write("\n\n>>>MP Method: %s " %method)
+        final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
+
+
 
         while((not track_completed) and (not fail_check)):
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
@@ -601,84 +601,71 @@ class PoseSampler:
                     prediction_std = np.clip(prediction_std, 0, prediction_std)
                     prediction_std = prediction_std.ravel()
                     covariance_sum = np.sum(prediction_std)
-                    
-                    # r,theta,psi,phi = pose_gate_body[0][0],pose_gate_body[1][0],pose_gate_body[2][0],pose_gate_body[3][0] # notation is different. In our case, phi equals to psi
-                    # q1,q2,q3,q4 = R.from_euler('ZYX',[self.quad.state[5], self.quad.state[4], self.quad.state[3]], degrees=False).as_quat()
-                    # quad_pose = Pose(Vector3r(self.quad.state[0], self.quad.state[1],self.quad.state[2]),Quaternionr(q1,q2,q3,q4))
-                    # estimation = geom_utils.debugGatePoses(quad_pose , r, theta, psi)
+
+                    self.trajSelect[0] = self.MP_methods[method]
+                    self.trajSelect[1] = 2
+                    self.trajSelect[2] = 0
+                    self.Tf = self.time_coeff*pose_gate_body[0][0]
                     
                     # Trajectory generate
-                    self.Tf = self.time_coeff*pose_gate_body[0][0] # T=r*0.5
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
                     pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
                     vel0 = [self.quad.state[6], self.quad.state[7], self.quad.state[8]]
-                    #acc0 = [float(self.quad.state[6]-self.x_dot_pr)/self.dtau, float(self.quad.state[7]-self.y_dot_pr)/self.dtau, float(self.quad.state[8]-self.z_dot_pr)/self.dtau]
                     acc0 = [0., 0., 0.]
                     yaw0 = self.quad.state[5]
 
-                    posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
-                    velf = [float(posf[0]-pos0[0])/self.Tf, float(posf[1]-pos0[1])/self.Tf, float(posf[2]-pos0[2])/self.Tf]
-                    accf = [0., 0., 0.]
                     yaw_diff = pose_gate_body[3][0]
+                    posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
+                    velf = [(posf[0]-pos0[0])/self.Tf, (posf[1]-pos0[1])/self.Tf, (posf[2]-pos0[2])/self.Tf]
+                    accf = [0., 0., 0.]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
 
-                    pos_next = np.array(velf) * self.Tf
 
-                    time_list = np.hstack((0., self.Tf, 2*self.Tf)).astype(float)
-                    waypoint_list = np.vstack((pos0, posf, pos_next)).astype(float)
-                    yaw_list = np.hstack((yaw0, yawf, yawf)).astype(float)
+                    print "\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
+                    #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
+                    print "Blur coefficient: {0:.3}/{1:.3}. Covariance sum: {2:.3}".format(self.blur_coeff, self.blur_range, covariance_sum)
+                    if self.flight_log:
+                        f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
+                        f.write("\nVariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]))
+
+
+                    if method == "min_jerk":
+                        mp_algorithm = MyTraj(gravity = -9.81)
+                        traj = mp_algorithm.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
+                        
+                    
+                    print "MP algorithm: " + method 
+                    print "Estimated time of arrival: " + str(self.Tf) + " s."
+                    if self.flight_log:
+                        f.write("\nMP algorithm: " + method)
+                        f.write("\nEstimated time of arrival: " + str(self.Tf) + " s.")
+
+
+                    time_list = np.hstack((0., self.Tf)).astype(float)
+                    waypoint_list = np.vstack((pos0, posf)).astype(float)
+                    yaw_list = np.hstack((yaw0, yawf)).astype(float)
 
                     newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
-                    print "\nTime of arrival: {0:.3} s., time coefficient: {1:.3}".format(self.Tf, self.time_coeff)
-                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
-                    print "Gate Ground truth, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(final_target[0], final_target[1], final_target[2], (gate_psi-np.pi/2)*180/np.pi)
-                    print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
-                    print "Blurring coefficient: {0:.3}/{1:.3}".format(self.blur_coeff,self.blur_range)
+                    flight_period = self.Tf / 4.
+                    Waypoint_length = flight_period // self.dtau
+
+                    if init_start:
+                        t_list = linspace(0, flight_period, num = Waypoint_length)
+                        init_start = False
+                    else:
+                        t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
 
 
-                    if self.flight_log:
-                        f.write("\nTime of arrival: {0:.3}, time coefficient: {1:.3}".format(self.Tf, self.time_coeff))
-                        f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
-                        f.write("\nGate Ground truth, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(self.track[gate_index].position.x_val, self.track[gate_index].position.y_val, self.track[gate_index].position.z_val, (gate_psi-np.pi/2)*180/np.pi))
-                        f.write("\nVariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]))
-                        f.write("\nBlurring coefficient: {0:.3}".format(self.blur_coeff))
-                    
-                    # if initial_start:
-                    #     init_time = 0.
-                    #     initial_start = False
-                    # else:
-                    #     init_time = newTraj.t_wps[1] / 6.0
+                    self.vel_sum = 0.
+                    # Call for Controller
+                    for ind, t_current in enumerate(t_list): 
 
-
-                    Waypoint_length = newTraj.t_wps[1] // self.dtau
-                    t_list = linspace(0., newTraj.t_wps[1], num = Waypoint_length)
-
-
-                    # if time_or_speed == 0:
-                    #     newTraj = Trajectory(self.trajSelect, self.quad.state, self.Tf, pos0, posf, yaw0, yawf)
-                    #     print "Time based trajectory, T: {0:.3}".format(newTraj.t_wps[1])
-                    #     if self.flight_log:
-                    #         f.write("Time based trajectory, T: {0:.3}".format(newTraj.t_wps[1]))
-                    # else:
-                    #     newTraj = Trajectory(self.trajSelect, self.quad.state, 1.0, pos0, posf, yaw0, yawf, v_average=self.v_average)
-                    #     print "Velocity based trajectory, V_avg: {0:.3}, T: {1:.3}".format(self.v_average, newTraj.t_wps[1])
-                    #     if self.flight_log:
-                    #         f.write("Velocity based trajectory, V_avg: {0:.3}, T: {1:.3}".format(self.v_average, newTraj.t_wps[1]))
-
-                    
-
-                    # mp_algorithm = MyTraj(gravity = -9.81)
-                    # traj = mp_algorithm.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
-                    
-                    # Waypoint_length = int(self.Tf / self.dtau)
-                    # t_list = linspace(0., self.Tf, num = Waypoint_length)
-                    
-
-                    for t_current in t_list: 
                         pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
+                        if method == "min_jerk":
+                            pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
 
-                        #pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
+                        self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
 
                         xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
                         xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
@@ -695,13 +682,13 @@ class PoseSampler:
                         psid_ddot = (psid_dot - self.psid_dot_pr) / self.dtau
 
                         current_traj = [xd, yd, zd, xd_dot, yd_dot, zd_dot, xd_ddot, yd_ddot, zd_ddot,
-                                     xd_dddot, yd_dddot, xd_ddddot, yd_ddddot,
-                                     psid, psid_dot, psid_ddot]
+                                         xd_dddot, yd_dddot, xd_ddddot, yd_ddddot,
+                                         psid, psid_dot, psid_ddot]
 
                         fail_check = self.quad.simulate(self.dtau, current_traj, final_target, prediction_std)
 
                         quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
-                        self.MP_states[method].append(self.quad.state)
+                        self.test_states.append(self.quad.state)
                         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
 
 
@@ -712,104 +699,94 @@ class PoseSampler:
                         self.psid_pr = psid
                         self.psid_dot_pr = psid_dot
 
+                        self.x_dot_pr = self.quad.state[6]
+                        self.y_dot_pr = self.quad.state[7]
+                        self.z_dot_pr = self.quad.state[8]
+
 
                         if fail_check:
-                            self.MP_cost[method] = self.quad.costValue
-                            print "Drone has crashed! Current cost: {0:.6}".format(self.MP_cost[method])
+                            self.test_cost = self.quad.costValue
+                            print "Drone has crashed! Current cost: {0:.6}".format(self.test_cost)
                             if self.flight_log:
-                                f.write("\nDrone has crashed! Current cost: {0:.6}".format(self.MP_cost[method]))
+                                f.write("\nDrone has crashed! Current cost: {0:.6}".format(self.test_cost))
                             break 
 
-                        check_arrival, on_road = self.check_completion(quad_pose, gate_index=gate_index)
+                        check_arrival, on_road = self.check_completion(quad_pose, -1, test_control = True)
 
                         if check_arrival: # drone arrives to the gate
                             track_completed = True
-                            self.MP_cost[method] = self.Tf * self.quad.costValue + cov_coeff*np.sum(prediction_std)
-                            print "Drone has arrived to the {0}. gate. Current cost: {1:.6}".format(gate_index+1, self.MP_cost[method]) 
+                            self.vel_sum = self.vel_sum / (ind + 1)
+                            print "Velocity Sum (Normalized): ", self.vel_sum
+                            self.test_cost = self.Tf * self.quad.costValue / self.vel_sum # time * cost / velocity_sum
+                            print "Drone has arrived finished the lap. Current cost: {0:.6}".format(self.test_cost) 
                             if self.flight_log:
-                                f.write("\nDrone has arrived to the {0}. gate. Current cost: {1:.6}".format(gate_index+1, self.MP_cost[method]))
+                                f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_cost))
                             break        
                         elif not on_road: #drone can not complete the path, but still loop should be ended
                             track_completed = True
-                            self.MP_cost[method] = self.quad.costValue
-                            print "Drone is out of the path. Current cost: {0:.6}".format(self.MP_cost[method])
+                            self.test_cost = self.quad.costValue
+                            print "Drone is out of the path. Current cost: {0:.6}".format(self.test_cost)
                             if self.flight_log:
-                                f.write("\nDrone is out of the path. Current cost: {0:.6}".format(self.MP_cost[method]))
+                                f.write("\nDrone is out of the path. Current cost: {0:.6}".format(self.test_cost))
                             break
 
 
                     if (not track_completed) and (not fail_check): # drone didn't arrive or crash
-                        self.MP_cost[method] = self.Tf * self.quad.costValue + cov_coeff*np.sum(prediction_std)
-                        print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.MP_cost[method])
+                        self.vel_sum = self.vel_sum / Waypoint_length
+                        print "Velocity Sum (Normalized): ", self.vel_sum
+                        self.test_cost = self.Tf * self.quad.costValue / self.vel_sum # time * cost / velocity_sum
+                        print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost)
                         if self.flight_log:
-                            f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.MP_cost[method]))
+                            f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost))
+
 
                     self.write_stats(flight_columns,
-                        [true_init_pos[0], true_init_pos[1], true_init_pos[2], posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
-                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.MP_cost[method]], flight_filename)
-                    #print "Flight data is written to the file"
+                        [pos0[0], pos0[1], pos0[2], self.blur_coeff, covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
+                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.test_cost], flight_filename)
 
-                    self.quad.costValue = 0.
                     if track_completed or fail_check: # drone arrived to the gate or crashed                        
                         break
 
             self.curr_idx += 1
-
+    
 
         
 
 
     def collect_data(self, MP_list):
         path = self.base_path + 'images'
-
-        # v_upper = 1.2
-        # v_lower = 0.9
-        t_coeff_upper = 0.6
-        t_coeff_lower = 0.3
+        t_coeff_upper = 1.2
+        t_coeff_lower = 0.6
         phi_theta_range = 5.0
         psi_range = 5.0
         pos_range = 0.3
         self.blur_range = 3. # blurring coefficient 
-        N_iter = 1
         gate_index = 0
         
+        if self.flight_log:
+            f=open(self.log_path, "a")
 
-        for gate_index in range(len(self.track)):
-            for k in range(N_iter):
-                print "\nIteration: {0}/{1}".format(k+1, N_iter)
-                if self.flight_log:
-                    f=open(self.log_path, "a")
-                    f.write("\n\nIteration: {0}/{1}".format(k+1, N_iter))
+        self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
+        self.blur_coeff = random.uniform(0, self.blur_range)
 
-                self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-                self.blur_coeff = random.uniform(0, self.blur_range)
+        x_offset = pos_range*random.uniform(-1.0, 1.0)
+        y_offset = pos_range*random.uniform(-1.0, 1.0)
+        z_offset = pos_range*random.uniform(-1.0, 1.0)
 
-                x_range = pos_range*random.uniform(-1.0, 1.0)
-                y_range = pos_range*random.uniform(-1.0, 1.0)
-                z_range = pos_range*random.uniform(-1.0, 1.0)
+        phi_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+        theta_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+        gate_target = self.track[gate_index]
+        gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
+        psi_start = psi_range*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
 
-                phi_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
-                theta_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
-                gate_target = self.track[gate_index]
-                gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
-                psi_start = psi_range*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
-
-                pos_ranges = [x_range, y_range, z_range]
-                angles_start = [phi_start, theta_start, gate_psi, psi_start]
-                for method in MP_list:
-                    self.fly_drone(f, gate_index, method, pos_ranges, angles_start) 
-                    # self.MP_cost[algorithm] = 0.
-                    # time_or_speed = 1 # a velocity based trajectory
-                    # self.v_average = random.uniform(v_lower, v_upper)
-                    # self.fly_drone(gate_index, time_or_speed, algorithm)
-
-                    # self.MP_cost[algorithm] = 0.
-                    # time_or_speed = 0 # a time based trajectory
-                    # self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-                    # self.fly_drone(gate_index, time_or_speed, algorithm)
-
-                if self.flight_log:
-                    f.close()
+        pos_offset = [x_offset, y_offset, z_offset]
+        angle_start = [phi_start, theta_start, gate_psi, psi_start]
+        for method in MP_list:
+            self.fly_drone(f, method, pos_offset, angle_start)
+            #self.fly_drone(f, method, pos_offset, angle_start) 
+            
+        if self.flight_log:
+            f.close()
                 
 
 
@@ -832,17 +809,10 @@ class PoseSampler:
         # create and set gate pose relative to the quad
         #p_o_g, r, theta, psi, phi_rel = racing_utils.geom_utils.randomGatePose(p_o_b, phi_base, R_RANGE, CAM_FOV, correction)
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
-
-        Modes = ["DATA_COLLECTION", "TEST"]
-        Method_List = ["Backstepping_1","Backstepping_2","Backstepping_3","Backstepping_4"]
-        MP_list = ["min_vel", "min_acc", "min_jerk", "min_snap"] 
-        MP_list = ["min_snap", "min_jerk"] 
+        #min_vel, min_acc, min_jerk, pos_waypoint_interp, min_acc_stop, min_jerk_full_stop
+        MP_list = ["pos_waypoint_interp", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
         Prediction_mode = False
         if self.with_gate:
-            # gate_name = "gate_0" 
-            # gate = self.track[0]
-            # self.tgt_name = self.client.simSpawnObject(gate_name, "RedGate16x16", Pose(position_val=Vector3r(0,0,15)), 0.75)
-            # self.client.simSetObjectPose(self.tgt_name, gate, True)
             for i, gate in enumerate(self.track):
                 #print ("gate: ", gate)
                 gate_name = "gate_" + str(i)
@@ -853,12 +823,12 @@ class PoseSampler:
 
         if self.flight_log:
             f=open(self.log_path, "w")
-            f.write("\nMode %s \n" % Modes[mode])
+            f.write("\nMode %s \n" % mode)
             f.close()
 
-        if Modes[mode] == "DATA_COLLECTION":
+        if mode == "DATA_COLLECTION":
             self.collect_data(MP_list)
-        elif Modes[mode] == "TEST":    
+        elif mode == "TEST":    
             if Prediction_mode:
                 self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/mp_classifier_best_model.pt'))
                 self.t_or_s_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/t_or_s_classifier_best_model.pt'))
@@ -875,46 +845,7 @@ class PoseSampler:
                     time_coeff = 0.45
                     self.test_algorithm(method = method, time_coeff = time_coeff)
                     
-
-            
         
-        
-        
-
-    def visualize_drone(self, MP_list):
-        for algorithm in MP_list:
-            print "Drone flies by the algorithm, ", algorithm
-            self.client.simSetVehiclePose(self.drone_init, True)
-            state_list = self.MP_states[algorithm]
-            for state in state_list:
-                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
-                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
-                time.sleep(0.001)
-
-    def get_video(self, algorithm):
-
-        pathIn= self.base_path + 'images/'
-        pathOut = self.base_path + algorithm + '_video.avi'
-        fps = 0.5
-        frame_array = []
-        files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]#for sorting the file names properly
-        files.sort(key = lambda x: x[5:-4])
-        for i in range(len(files)):
-            filename=pathIn + files[i]
-            #reading each files
-            img = cv2.imread(filename)
-            height, width, layers = img.shape
-            size = (width,height)
-            
-            #inserting the frames into an image array
-            frame_array.append(img)
-
-        out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
-        for i in range(len(frame_array)):
-            # writing to a image array
-            out.write(frame_array[i])
-        out.release()
-            
 
     def configureEnvironment(self):
         for gate_object in self.client.simListSceneObjects(".*[Gg]ate.*"):

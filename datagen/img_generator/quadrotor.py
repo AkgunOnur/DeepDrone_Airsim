@@ -329,6 +329,8 @@ class Quadrotor:
                             self.coeff_angle*angular_error + 
                             self.coeff_control*cont_input +
                             self.coeff_final_pos*pos_final_error)
+
+        self.costValue = self.costValue
                 
 
         
