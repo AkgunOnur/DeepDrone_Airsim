@@ -537,7 +537,7 @@ class PoseSampler:
         return check_arrival, on_road
 
 
-    def fly_drone(self, f, method, pos_offset, angle_start):
+    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 75):
         x_offset, y_offset, z_offset = pos_offset
         phi_start, theta_start, gate_psi, psi_start = angle_start
 
@@ -568,7 +568,7 @@ class PoseSampler:
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
-
+        method_iteration = 0
 
         while((not track_completed) and (not fail_check)):
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
@@ -581,6 +581,7 @@ class PoseSampler:
             image = self.transformation(img)
             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
+            
 
             with torch.no_grad():   
                 # Determine Gat location with Neural Networks
@@ -591,6 +592,7 @@ class PoseSampler:
                     pose_prediction[self.curr_idx][i] = num.item()
 
                 if self.curr_idx >= 11:
+                    method_iteration += 1
                     pose_gate_cov = self.lstmR(torch.from_numpy(pose_prediction[self.curr_idx-11:self.curr_idx+1].reshape(1,12,4)).to(self.device))
                     
                     for i, p_g_c in enumerate(pose_gate_cov.reshape(-1,1)):
@@ -620,11 +622,12 @@ class PoseSampler:
                     accf = [0., 0., 0.]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
 
-
-                    print "\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
+                    print "\nMethod Iteration: ", method_iteration
+                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
                     #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     print "Blur coefficient: {0:.3}/{1:.3}. Covariance sum: {2:.3}".format(self.blur_coeff, self.blur_range, covariance_sum)
                     if self.flight_log:
+                        f.write("\nMethod Iteration: " + str(method_iteration))
                         f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
                         f.write("\nVariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]))
 
@@ -660,7 +663,6 @@ class PoseSampler:
                     self.vel_sum = 0.
                     # Call for Controller
                     for ind, t_current in enumerate(t_list): 
-
                         pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
                         if method == "min_jerk":
                             pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
@@ -748,6 +750,9 @@ class PoseSampler:
                         break
 
             self.curr_idx += 1
+
+            if method_iteration >= max_iteration:
+                break
     
 
         

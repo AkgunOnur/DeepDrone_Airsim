@@ -13,5 +13,5 @@ if not os.path.isdir(base_path):
 
 pose_sampler = PoseSampler(base_path, flight_log)
 for i in range(num_iterations):
-	print "Iteration: {0}/{1}".format(i+1, num_iterations)
+	print mode + " Iteration: {0}/{1}".format(i+1, num_iterations)
 	pose_sampler.update(mode)
