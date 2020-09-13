@@ -64,7 +64,7 @@ flight_columns = ['true_init_x','true_init_y','true_init_z', 'blur_coeff', 'var_
 
 mp_list = []
 
-flight_filename = 'data.csv'
+flight_filename = 'files/data.csv'
 
 class PoseSampler:
     def __init__(self, dataset_path, flight_log, with_gate=True):
@@ -245,7 +245,7 @@ class PoseSampler:
      
         if method=="MAX" and isClassifier:
             _, pred = torch.max(output, 1)
-            return pred[0]
+            return pred.item()
 
         elif method=="DICE" and isClassifier:
             probs = softmax(outputs).cpu().detach().numpy()[0]
@@ -254,10 +254,10 @@ class PoseSampler:
 
         return output.item() # if mode is regression
 
-    def test_algorithm(self, method = None, time_coeff = None, use_model = False):
+    def test_algorithm(self, method = None, use_model = False):
         pose_prediction = np.zeros((1000,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
-
+        labels_dict = {0:3, 1:4, 2:5, 3:10, 4:-1}
         gate_target = self.track[0]
         gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
         psi_start = gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
@@ -284,11 +284,9 @@ class PoseSampler:
 
         track_completed = False
         fail_check = False
+        init_start = True
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
-
-
-        
 
         if self.flight_log:
             f=open(self.log_path, "a")
@@ -328,14 +326,18 @@ class PoseSampler:
                     
                     # Trajectory generate
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
-                    waypoint_world = [self.track[self.current_gate].position.x_val, self.track[self.current_gate].position.y_val, self.track[self.current_gate].position.z_val]
+                    #waypoint_world = [self.track[self.current_gate].position.x_val, self.track[self.current_gate].position.y_val, self.track[self.current_gate].position.z_val]
                     pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
+                    vel0 = [self.quad.state[6], self.quad.state[7], self.quad.state[8]]
+                    acc0 = [0.,0.,0.]
                     posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
+                    
+                    accf = [0.,0.,0.]
                     yaw0 = self.quad.state[5]
                     yaw_diff = pose_gate_body[3][0]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
-                    yawf = Rotation.from_quat([self.track[self.current_gate].orientation.x_val, self.track[self.current_gate].orientation.y_val, 
-                                       self.track[self.current_gate].orientation.z_val, self.track[self.current_gate].orientation.w_val]).as_euler('ZYX',degrees=False)[0] - np.pi/2
+                    #yawf = Rotation.from_quat([self.track[self.current_gate].orientation.x_val, self.track[self.current_gate].orientation.y_val, 
+                    #                   self.track[self.current_gate].orientation.z_val, self.track[self.current_gate].orientation.w_val]).as_euler('ZYX',degrees=False)[0] - np.pi/2
 
                     print "\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
                     print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
@@ -345,67 +347,83 @@ class PoseSampler:
                         f.write("\nVariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]))
 
 
-                    
+                    min_jerk_check = False
                     if use_model:
-                        # diff_x, diff_y, diff_z, diff_phi, diff_theta, diff_psi, std_r, std_phi, std_theta, std_psi
+                        #true_init_x, true_init_y, true_init_z, blur_coeff, var_sum, diff_x, diff_y, diff_z, diff_phi, diff_theta, diff_psi, r_std, phi_std, theta_std, psi_std, Tf, MP_Method, Cost
+                        #[arr[i][5],arr[i][6],arr[i][7],arr[i][8],arr[i][9],arr[i][10], arr[i][4],arr[i][11],arr[i][12],arr[i][13],arr[i][14],int(arr[i][16])]
+                    
                         X_test = np.array([posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -self.quad.state[3], -self.quad.state[4], yawf-yaw0,
-                                    prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
+                                         covariance_sum, prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
 
                         X_mp_test = self.mp_scaler.transform(X_test)
-                        X_ts_test = self.t_or_s_scaler.transform(X_test)
                         X_time_test = self.time_scaler.transform(X_test)
-                        X_speed_test =  self.speed_scaler.transform(X_test)
 
-                        time_or_speed = self.predict(X_ts_test, model=self.t_or_s_classifier, isClassifier=True)
                         mp_method = self.predict(X_mp_test, model=self.mp_classifier, isClassifier=True)
 
-                        self.trajSelect[0] = mp_method + 3 # this is the offset, i.e. 0-min_vel corresponds 3 here
+                        print "labels_dict[mp_method]: ", mp_method
+                        self.trajSelect[0] = labels_dict[mp_method] # this is the offset, i.e. 0-min_vel corresponds 3 here
                         self.trajSelect[1] = 2
-                        self.trajSelect[2] = time_or_speed
+                        self.trajSelect[2] = 0
 
-                        print "Predicted MP Algorithm: ", self.MP_names[int(self.trajSelect[0])]
-                        print "Predicted MP Type: ", self.MP_types[int(self.trajSelect[2])]
+                        if self.trajSelect[0] != -1:
+                            print "Predicted MP Algorithm: ", self.MP_names[int(self.trajSelect[0])]
 
-                        if time_or_speed == 0:
                             self.Tf = self.predict(X_time_test, model=self.time_regressor, isClassifier=False)
-                            print "Time based trajectory, T: {0:.3}".format(newTraj.t_wps[1])
+                            print "Time based trajectory, T: {0:.3}".format(self.Tf)
                             print "Predicted Time Length: {0:.3}".format(self.Tf)
                             if self.flight_log:
-                                f.write("\nTime based trajectory, T: {0:.3}".format(newTraj.t_wps[1]))
+                                f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
                         else:
-                            self.v_average = self.predict(X_speed_test, model=self.speed_regressor, isClassifier=False)
-                            print "Velocity based trajectory, Predicted V average: {0:.3}, T: {1:.3}".format(self.v_average, newTraj.t_wps[1])
+                            print "Drone is in Safe Mode"
                             if self.flight_log:
-                                f.write("\nVelocity based trajectory, Predicted V average: {0:.3}, T: {1:.3}".format(self.v_average, newTraj.t_wps[1]))
+                                f.write("\nDrone is in Safe Mode")
+
+                        
+
+                        if labels_dict[mp_method] == 5: #min_jerk
+                            min_jerk_check = True
+                            
                     else:
                         self.trajSelect[0] = self.MP_methods[method]
                         self.trajSelect[1] = 2
                         self.trajSelect[2] = 0
-                        self.Tf = time_coeff*pose_gate_body[0][0]
+                        self.Tf = self.time_coeff*pose_gate_body[0][0]
                         print "Prediction mode is off. MP algorithm: " + method 
                         print "Estimated time of arrival: " + str(self.Tf) + " s."
                         if self.flight_log:
                             f.write("\nPrediction mode is off. MP algorithm: " + method)
                             f.write("\nEstimated time of arrival: " + str(self.Tf) + " s.")
 
-
+                        if method == "min_jerk":
+                            min_jerk_check = True
+                            
+                    
                     velf = [float(posf[0]-pos0[0])/self.Tf, float(posf[1]-pos0[1])/self.Tf, float(posf[2]-pos0[2])/self.Tf]
-                    pos_next = np.array(velf) * self.Tf
+                    time_list = np.hstack((0., self.Tf)).astype(float)
+                    waypoint_list = np.vstack((pos0, posf)).astype(float)
+                    yaw_list = np.hstack((yaw0, yawf)).astype(float)
 
-                    time_list = np.hstack((0., self.Tf, 2*self.Tf)).astype(float)
-                    waypoint_list = np.vstack((pos0, posf, pos_next)).astype(float)
-                    yaw_list = np.hstack((yaw0, yawf, yawf)).astype(float)
+                    if min_jerk_check:
+                        mp_algorithm = MyTraj(gravity = -9.81)
+                        traj = mp_algorithm.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
 
                     newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
-                    Waypoint_length = newTraj.t_wps[1] // self.dtau
-                    t_list = linspace(0, self.Tf, num = Waypoint_length)
+                    flight_period = self.Tf / 4.
+                    Waypoint_length = flight_period // self.dtau
+
+                    if init_start:
+                        t_list = linspace(0, flight_period, num = Waypoint_length)
+                        init_start = False
+                    else:
+                        t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
                                         
                     
                     # Call for Controller
                     for t_current in t_list: 
-
                         pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
+                        if min_jerk_check:
+                            pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
                         xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
                         xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
                         xd_ddot, yd_ddot, zd_ddot = acc_des[0], acc_des[1], acc_des[2]
@@ -552,7 +570,6 @@ class PoseSampler:
         self.quad = Quadrotor(self.state0)
         
         self.curr_idx = 0
-        self.test_states.append(self.quad.state)
 
         self.xd_ddot_pr = 0.
         self.yd_ddot_pr = 0.
@@ -571,6 +588,7 @@ class PoseSampler:
         method_iteration = 0
 
         while((not track_completed) and (not fail_check)):
+            self.blur_coeff = random.uniform(0, self.blur_range)
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
             #if len(image_response.image_data_uint8) == image_response.width * image_response.height * 3:
             img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
@@ -607,7 +625,7 @@ class PoseSampler:
                     self.trajSelect[0] = self.MP_methods[method]
                     self.trajSelect[1] = 2
                     self.trajSelect[2] = 0
-                    self.Tf = self.time_coeff*pose_gate_body[0][0]
+                    self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) + 0.1
                     
                     # Trajectory generate
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
@@ -690,7 +708,6 @@ class PoseSampler:
                         fail_check = self.quad.simulate(self.dtau, current_traj, final_target, prediction_std)
 
                         quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
-                        self.test_states.append(self.quad.state)
                         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
 
 
@@ -765,30 +782,27 @@ class PoseSampler:
         phi_theta_range = 5.0
         psi_range = 5.0
         pos_range = 0.3
-        self.blur_range = 3. # blurring coefficient 
+        self.blur_range = 7. # blurring coefficient 
         gate_index = 0
         
         if self.flight_log:
             f=open(self.log_path, "a")
 
-        self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-        self.blur_coeff = random.uniform(0, self.blur_range)
-
-        x_offset = pos_range*random.uniform(-1.0, 1.0)
-        y_offset = pos_range*random.uniform(-1.0, 1.0)
-        z_offset = pos_range*random.uniform(-1.0, 1.0)
-
-        phi_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
-        theta_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
-        gate_target = self.track[gate_index]
-        gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
-        psi_start = psi_range*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
-
-        pos_offset = [x_offset, y_offset, z_offset]
-        angle_start = [phi_start, theta_start, gate_psi, psi_start]
         for method in MP_list:
+            self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
+            x_offset = pos_range*random.uniform(-1.0, 1.0)
+            y_offset = pos_range*random.uniform(-1.0, 1.0)
+            z_offset = pos_range*random.uniform(-1.0, 1.0)
+
+            phi_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+            theta_start = phi_theta_range*random.uniform(-1.0,1.0)*np.pi/180
+            gate_target = self.track[gate_index]
+            gate_psi = Rotation.from_quat([gate_target.orientation.x_val, gate_target.orientation.y_val, gate_target.orientation.z_val, gate_target.orientation.w_val]).as_euler('ZYX',degrees=False)[0]
+            psi_start = psi_range*random.uniform(-1.0,1.0)*np.pi/180 + gate_psi - np.pi/2  #drone kapi karsisinde olacak sekilde durmali
+
+            pos_offset = [x_offset, y_offset, z_offset]
+            angle_start = [phi_start, theta_start, gate_psi, psi_start]
             self.fly_drone(f, method, pos_offset, angle_start)
-            #self.fly_drone(f, method, pos_offset, angle_start) 
             
         if self.flight_log:
             f.close()
@@ -815,8 +829,8 @@ class PoseSampler:
         #p_o_g, r, theta, psi, phi_rel = racing_utils.geom_utils.randomGatePose(p_o_b, phi_base, R_RANGE, CAM_FOV, correction)
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
         #min_vel, min_acc, min_jerk, pos_waypoint_interp, min_acc_stop, min_jerk_full_stop
-        MP_list = ["pos_waypoint_interp", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
-        Prediction_mode = False
+        MP_list = ["min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
+        Prediction_mode = True
         if self.with_gate:
             for i, gate in enumerate(self.track):
                 #print ("gate: ", gate)
@@ -836,19 +850,14 @@ class PoseSampler:
         elif mode == "TEST":    
             if Prediction_mode:
                 self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/mp_classifier_best_model.pt'))
-                self.t_or_s_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/t_or_s_classifier_best_model.pt'))
-                self.speed_regressor.load_state_dict(torch.load(self.base_path + 'classifier_files/speed_regressor_best_model.pt'))
                 self.time_regressor.load_state_dict(torch.load(self.base_path + 'classifier_files/time_regressor_best_model.pt'))
                 self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
-                self.t_or_s_scaler = load(self.base_path + 'classifier_files/t_or_s_scaler.bin')
-                self.speed_scaler = load(self.base_path + 'classifier_files/speed_scaler.bin')
                 self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
-
                 self.test_algorithm(use_model = True)
             else:
                 for method in MP_list:
-                    time_coeff = 0.45
-                    self.test_algorithm(method = method, time_coeff = time_coeff)
+                    self.time_coeff = 0.45
+                    self.test_algorithm(method = method)
                     
         
 

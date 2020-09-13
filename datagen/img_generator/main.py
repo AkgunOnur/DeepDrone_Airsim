@@ -1,7 +1,7 @@
 from pose_sampler import *
 
 base_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
-num_iterations = 5
+num_iterations = 100
 
 mode = "DATA_COLLECTION" # If 1, drone flies in test mode, otherwise it flies data collection mode
 flight_log = True
