@@ -1,0 +1,331 @@
+
+Mode DATA_COLLECTION 
+
+Current index: 11
+Predicted r: 3.26, Covariance sum: 0.13
+Brightness: 0.186, Contast: 0.83, Saturation: 0.395
+MP algorithm: min_vel
+Estimated time of arrival: 2.57 s.
+Gate Predicted, x: 0.101, y: -2.97, z: -2.02, psi: -40.2 deg
+Drone hasn't reached the gate yet. Current cost: 673.262
+Current index: 12
+Predicted r: 0.824, Covariance sum: 0.533
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 0.725 s.
+Gate Predicted, x: -0.116, y: -0.812, z: -2.41, psi: -45.4 deg
+Drone hasn't reached the gate yet. Current cost: 18.248
+Current index: 13
+Predicted r: 2.14, Covariance sum: 0.526
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 1.72 s.
+Gate Predicted, x: 0.19, y: -2.32, z: -2.73, psi: -55.0 deg
+Drone hasn't reached the gate yet. Current cost: 148.767
+Current index: 14
+Predicted r: 0.222, Covariance sum: 0.383
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 0.269 s.
+Gate Predicted, x: 0.179, y: -0.888, z: -2.17, psi: -87.2 deg
+Drone hasn't reached the gate yet. Current cost: 2.51699
+Current index: 15
+Predicted r: 2.22, Covariance sum: 0.731
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 1.78 s.
+Gate Predicted, x: -0.416, y: -2.56, z: -1.03, psi: -56.3 deg
+Drone hasn't reached the gate yet. Current cost: 178.032
+Current index: 16
+Predicted r: 1.46, Covariance sum: 0.864
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 1.2 s.
+Gate Predicted, x: 0.346, y: -2.46, z: -2.85, psi: -57.4 deg
+Drone hasn't reached the gate yet. Current cost: 78.6937
+Current index: 17
+Predicted r: 1.57, Covariance sum: 0.283
+Brightness: 3.7, Contast: 3.72, Saturation: 2.18
+MP algorithm: min_vel
+Estimated time of arrival: 1.29 s.
+Gate Predicted, x: 0.413, y: -2.67, z: -1.24, psi: -1.08e+02 deg
+Drone hasn't reached the gate yet. Current cost: 83.4303
+Current index: 18
+Predicted r: 3.1, Covariance sum: 1.31
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 2.45 s.
+Gate Predicted, x: 0.433, y: -4.78, z: -1.63, psi: -92.4 deg
+Drone hasn't reached the gate yet. Current cost: 254.158
+Current index: 19
+Predicted r: 2.48, Covariance sum: 0.955
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 1.98 s.
+Gate Predicted, x: 0.358, y: -4.89, z: -1.88, psi: -86.9 deg
+Drone hasn't reached the gate yet. Current cost: 121.35
+Current index: 20
+Predicted r: 1.9, Covariance sum: 0.496
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 1.54 s.
+Gate Predicted, x: 0.107, y: -4.93, z: -1.78, psi: -74.8 deg
+Drone hasn't reached the gate yet. Current cost: 90.7747
+Current index: 21
+Predicted r: 1.83, Covariance sum: 0.153
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 1.49 s.
+Gate Predicted, x: 0.446, y: -5.3, z: -2.0, psi: -1.06e+02 deg
+Drone hasn't reached the gate yet. Current cost: 81.891
+Current index: 22
+Predicted r: 1.34, Covariance sum: 0.0226
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 1.12 s.
+Gate Predicted, x: 0.0802, y: -5.21, z: -1.66, psi: -81.2 deg
+Drone hasn't reached the gate yet. Current cost: 51.3527
+Current index: 23
+Predicted r: 0.987, Covariance sum: 0.0719
+Brightness: 0.208, Contast: 0.0927, Saturation: 0.411
+MP algorithm: min_vel
+Estimated time of arrival: 0.849 s.
+Gate Predicted, x: 0.146, y: -5.11, z: -2.17, psi: -68.2 deg
+Drone hasn't reached the gate yet. Current cost: 31.1788
+Current index: 24
+Predicted r: 1.47, Covariance sum: 0.928
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 1.22 s.
+Gate Predicted, x: 0.0874, y: -5.81, z: -1.46, psi: -54.1 deg
+Drone hasn't reached the gate yet. Current cost: 71.6291
+Current index: 25
+Predicted r: 2.39, Covariance sum: 3.89
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 1.92 s.
+Gate Predicted, x: 0.896, y: -6.97, z: -1.95, psi: -39.9 deg
+Drone hasn't reached the gate yet. Current cost: 148.923
+Current index: 26
+Predicted r: 6.03, Covariance sum: 0.222
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 4.68 s.
+Gate Predicted, x: 2.72, y: -10.7, z: -2.0, psi: -75.4 deg
+Drone hasn't reached the gate yet. Current cost: 671.595
+Current index: 27
+Predicted r: 1.15, Covariance sum: 1.59
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 0.971 s.
+Gate Predicted, x: 1.24, y: -7.96, z: -1.75, psi: -51.4 deg
+Drone hasn't reached the gate yet. Current cost: 28.7026
+Current index: 28
+Predicted r: 2.04, Covariance sum: 1.86
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 1.64 s.
+Gate Predicted, x: 2.68, y: -8.24, z: -2.44, psi: -71.2 deg
+Drone hasn't reached the gate yet. Current cost: 145.528
+Current index: 29
+Predicted r: 1.11, Covariance sum: 1.04
+Brightness: 3.04, Contast: 2.25, Saturation: 3.05
+MP algorithm: min_vel
+Estimated time of arrival: 0.943 s.
+Gate Predicted, x: 1.82, y: -8.43, z: -1.86, psi: -50.7 deg
+Drone hasn't reached the gate yet. Current cost: 33.8981
+Current index: 30
+Predicted r: 1.21, Covariance sum: 1.28
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 1.02 s.
+Gate Predicted, x: 2.07, y: -8.02, z: -2.89, psi: -77.6 deg
+Drone hasn't reached the gate yet. Current cost: 52.0773
+Current index: 31
+Predicted r: 1.4, Covariance sum: 1.18
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 1.16 s.
+Gate Predicted, x: 2.65, y: -8.76, z: -2.13, psi: -65.4 deg
+Drone hasn't reached the gate yet. Current cost: 115.003
+Current index: 32
+Predicted r: 1.34, Covariance sum: 1.08
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 1.11 s.
+Gate Predicted, x: 2.23, y: -9.1, z: -2.51, psi: -60.1 deg
+Drone hasn't reached the gate yet. Current cost: 64.4279
+Current index: 33
+Predicted r: 2.79, Covariance sum: 1.97
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 2.22 s.
+Gate Predicted, x: 4.13, y: -9.41, z: -3.33, psi: -44.6 deg
+Drone hasn't reached the gate yet. Current cost: 230.698
+Current index: 34
+Predicted r: 2.19, Covariance sum: 1.44
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 1.76 s.
+Gate Predicted, x: 3.75, y: -10.2, z: -2.68, psi: -40.3 deg
+Drone hasn't reached the gate yet. Current cost: 106.577
+Current index: 35
+Predicted r: 1.78, Covariance sum: 0.916
+Brightness: 0.592, Contast: 0.653, Saturation: 0.383
+MP algorithm: min_vel
+Estimated time of arrival: 1.45 s.
+Gate Predicted, x: 3.91, y: -9.82, z: -3.37, psi: -51.3 deg
+Drone hasn't reached the gate yet. Current cost: 80.1341
+Current index: 36
+Predicted r: 1.39, Covariance sum: 0.135
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 1.16 s.
+Gate Predicted, x: 3.66, y: -10.3, z: -2.43, psi: -25.5 deg
+Drone hasn't reached the gate yet. Current cost: 61.3628
+Current index: 37
+Predicted r: 1.13, Covariance sum: 0.0985
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 0.958 s.
+Gate Predicted, x: 3.67, y: -10.1, z: -3.3, psi: -44.4 deg
+Drone hasn't reached the gate yet. Current cost: 42.8105
+Current index: 38
+Predicted r: 0.677, Covariance sum: 13.7
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 0.614 s.
+Gate Predicted, x: 3.77, y: -10.0, z: -2.79, psi: -69.2 deg
+Drone hasn't reached the gate yet. Current cost: 17.6199
+Current index: 39
+Predicted r: 0.855, Covariance sum: 14.5
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 0.748 s.
+Gate Predicted, x: 3.95, y: -10.1, z: -3.21, psi: -66.9 deg
+Drone hasn't reached the gate yet. Current cost: 31.5659
+Current index: 40
+Predicted r: 1.43, Covariance sum: 15.2
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 1.18 s.
+Gate Predicted, x: 4.62, y: -10.5, z: -3.18, psi: -53.1 deg
+Drone hasn't reached the gate yet. Current cost: 88.3918
+Current index: 41
+Predicted r: 2.05, Covariance sum: 8.82
+Brightness: 3.03, Contast: 3.14, Saturation: 2.34
+MP algorithm: min_vel
+Estimated time of arrival: 1.66 s.
+Gate Predicted, x: 4.31, y: -11.7, z: -3.64, psi: -75.0 deg
+Drone hasn't reached the gate yet. Current cost: 124.506
+Current index: 42
+Predicted r: 2.18, Covariance sum: 2.76
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.75 s.
+Gate Predicted, x: 5.6, y: -11.4, z: -3.7, psi: -52.6 deg
+Drone hasn't reached the gate yet. Current cost: 132.253
+Current index: 43
+Predicted r: 1.79, Covariance sum: 1.24
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.46 s.
+Gate Predicted, x: 5.04, y: -12.1, z: -2.83, psi: -31.7 deg
+Drone hasn't reached the gate yet. Current cost: 79.3025
+Current index: 44
+Predicted r: 1.85, Covariance sum: 0.728
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.5 s.
+Gate Predicted, x: 5.83, y: -11.9, z: -3.99, psi: -32.3 deg
+Drone hasn't reached the gate yet. Current cost: 95.5475
+Current index: 45
+Predicted r: 1.74, Covariance sum: 1.22
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.42 s.
+Gate Predicted, x: 6.1, y: -12.2, z: -3.29, psi: -37.3 deg
+Drone hasn't reached the gate yet. Current cost: 88.8991
+Current index: 46
+Predicted r: 1.36, Covariance sum: 9.92
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.14 s.
+Gate Predicted, x: 6.04, y: -12.2, z: -3.69, psi: -25.3 deg
+Drone hasn't reached the gate yet. Current cost: 47.8235
+Current index: 47
+Predicted r: 1.46, Covariance sum: 21.1
+Brightness: 0.878, Contast: 0.137, Saturation: 0.546
+MP algorithm: min_vel
+Estimated time of arrival: 1.21 s.
+Gate Predicted, x: 6.48, y: -12.3, z: -3.36, psi: -32.1 deg
+Drone hasn't reached the gate yet. Current cost: 65.1574
+Current index: 48
+Predicted r: 1.64, Covariance sum: 35.1
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 1.34 s.
+Gate Predicted, x: 6.79, y: -12.7, z: -3.73, psi: -21.9 deg
+Drone hasn't reached the gate yet. Current cost: 76.7443
+Current index: 49
+Predicted r: 0.127, Covariance sum: 29.2
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 0.197 s.
+Gate Predicted, x: 5.86, y: -12.0, z: -3.49, psi: 16.0 deg
+Drone hasn't reached the gate yet. Current cost: 1.10579
+Current index: 50
+Predicted r: 3.47, Covariance sum: 12.8
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 2.74 s.
+Gate Predicted, x: 8.71, y: -13.9, z: -3.72, psi: -25.5 deg
+Drone hasn't reached the gate yet. Current cost: 292.189
+Current index: 51
+Predicted r: 1.99, Covariance sum: 3.33
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 1.61 s.
+Gate Predicted, x: 8.29, y: -13.3, z: -3.52, psi: -30.5 deg
+Drone hasn't reached the gate yet. Current cost: 78.7055
+Current index: 52
+Predicted r: 2.12, Covariance sum: 1.29
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 1.71 s.
+Gate Predicted, x: 8.69, y: -13.9, z: -3.48, psi: -10.8 deg
+Drone hasn't reached the gate yet. Current cost: 116.4
+Current index: 53
+Predicted r: 3.04, Covariance sum: 1.84
+Brightness: 2.63, Contast: 2.84, Saturation: 3.64
+MP algorithm: min_vel
+Estimated time of arrival: 2.4 s.
+Gate Predicted, x: 9.94, y: -14.3, z: -4.29, psi: -14.7 deg
+Drone hasn't reached the gate yet. Current cost: 226.247
+Current index: 54
+Predicted r: 1.26, Covariance sum: 0.987
+Brightness: 0.803, Contast: 0.0576, Saturation: 0.61
+MP algorithm: min_vel
+Estimated time of arrival: 1.06 s.
+Gate Predicted, x: 9.07, y: -13.9, z: -3.8, psi: -5.25 deg
+Drone hasn't reached the gate yet. Current cost: 35.6462
+Current index: 55
+Predicted r: 1.17, Covariance sum: 1.53
+Brightness: 0.803, Contast: 0.0576, Saturation: 0.61
+MP algorithm: min_vel
+Estimated time of arrival: 0.986 s.
+Gate Predicted, x: 9.17, y: -14.2, z: -3.63, psi: 9.58 deg
+Drone hasn't reached the gate yet. Current cost: 38.9275
+Current index: 56
+Predicted r: 1.08, Covariance sum: 1.29
+Brightness: 0.803, Contast: 0.0576, Saturation: 0.61
+MP algorithm: min_vel
+Estimated time of arrival: 0.918 s.
+Gate Predicted, x: 9.41, y: -13.6, z: -4.23, psi: -21.9 deg
+Drone has finished the lap. Current cost: 31.1081
+Current index: 11
+Predicted r: 3.26, Covariance sum: 0.0186
+Brightness: 0.73, Contast: 0.806, Saturation: 0.411
+MP algorithm: min_acc
+Estimated time of arrival: 4.0 s.
+Gate Predicted, x: 0.124, y: -3.32, z: -2.39, psi: -71.7 deg

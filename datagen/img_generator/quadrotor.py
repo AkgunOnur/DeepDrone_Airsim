@@ -78,6 +78,7 @@ def spherical_to_cartesian(state, waypoint_body):
 def world_to_body(state, waypoint_world):
     psi, theta, phi = state[5], state[4], state[3]
     rot = R.from_euler('zyx', [[psi, theta, phi]], degrees=False).as_dcm()
+    rot = rot.reshape(3,3)
     # R = np.array([[cos(theta)*cos(psi), sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi), cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi)],
     #               [cos(theta)*sin(psi), sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi), cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi)],
     #               [-sin(theta), sin(phi)*cos(theta), cos(phi)*cos(theta)]])
@@ -295,29 +296,14 @@ class Quadrotor:
             U = self.backstepping(A1, A2, A3, A4, A5, A6, U0, current_traj)
         return U
 
-    def bring_quad_to_des(self, des_traj, dtau, cont="Backstepping_4"):
-        #des_traj = [x,y,z,yaw]
-        x,y,z,yaw = des_traj
 
-        ref_traj = [x, y, z, 0, 0, 0, 
-                    0, 0, 0, 0, 0,
-                    0, 0, yaw, 0, 0]
-        self.U = self.get_control_input(cont, ref_traj)
-        sol = integrate.solve_ivp(fun=self.model_dynamics, t_span=(0, dtau), y0=self.state)
-        self.state = sol.y[:,-1]
-
-
-    def calculate_cost(self, target, final_target=None, off_road = False, final_calculation = False):
+    def calculate_cost(self, target, final_target=None, final_calculation = False):
         xd, yd, zd, psid = target
         
 
         position_tracking_error = (xd-self.state[0])**2 + (yd-self.state[1])**2 + (zd-self.state[2])**2
         angular_error = (np.abs(psid-self.state[5])-np.pi/2)**2 #in perfect conditions, difference between yaw angles of gate and drone should be pi/2
         cont_input = self.U[0]**2 + self.U[1]**2 + self.U[2]**2 + self.U[3]**2
-
-        if off_road:
-            self.costValue = 1e9
-            return
         
         if final_calculation:
             self.costValue += (self.coeff_pos*position_tracking_error + 
@@ -329,11 +315,7 @@ class Quadrotor:
                             self.coeff_angle*angular_error + 
                             self.coeff_control*cont_input +
                             self.coeff_final_pos*pos_final_error)
-
-        self.costValue = self.costValue
-                
-
-        
+                        
 
 
 

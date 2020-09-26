@@ -1,4 +1,152 @@
-# def fly_drone(self, f, gate_index, method, pos_ranges, angles_start):
+def test_collision():
+    phi = - np.pi/9
+    theta =  np.pi/8
+    psi = pi/2
+    print "\nDrone Pos x={0:.3}, y={1:.3}, z={2:.3}".format(self.track[0].position.x_val, self.track[0].position.y_val, self.track[0].position.z_val)
+    quad_pose = [self.track[0].position.x_val, self.track[0].position.y_val, self.track[0].position.z_val, -phi, -theta, psi]
+    self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+    time.sleep(1)
+    self.check_collision()
+
+    rot_matrix = Rotation.from_quat([self.track[0].orientation.x_val, self.track[0].orientation.y_val, 
+                                  self.track[0].orientation.z_val, self.track[0].orientation.w_val]).as_dcm().reshape(3,3)
+    gate_x_range = [0.5, -0.75]
+    gate_z_range = [0.5, -0.75]
+    edge_ind = 0
+    #print "\nGate Ind: {0}, Gate x={1:.3}, y={2:.3}, z={3:.3}".format(i+1, self.track[i].position.x_val, self.track[i].position.y_val, self.track[i].position.z_val)
+    gate_pos = np.array([self.track[0].position.x_val, self.track[0].position.y_val, self.track[0].position.z_val])
+    gate_edge_list = []
+    for x_rng in gate_x_range:
+        gate_edge_range = np.array([x_rng, 0., 0.])
+        gate_edge_world = np.dot(rot_matrix, gate_edge_range.reshape(-1,1)).ravel()
+        gate_edge_point = np.array([gate_pos[0]+gate_edge_world[0], gate_pos[1]+gate_edge_world[1], gate_pos[2]+gate_edge_world[2]])
+        print "\nDrone Pos x={0:.3}, y={1:.3}, z={2:.3}".format(gate_edge_point[0], gate_edge_point[1], gate_edge_point[2])
+        self.quad.state = [gate_edge_point[0], gate_edge_point[1], gate_edge_point[2], phi, theta, psi, 0., 0., 0., 0., 0., 0.]
+        quad_pose = [gate_edge_point[0], gate_edge_point[1], gate_edge_point[2], -phi, -theta, psi]
+        self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+        self.check_collision()
+        time.sleep(5)
+        
+
+    for z_rng in gate_z_range:
+        gate_edge_range = np.array([0., 0., z_rng])
+        gate_edge_world = np.dot(rot_matrix, gate_edge_range.reshape(-1,1)).ravel()
+        gate_edge_point = np.array([gate_pos[0]+gate_edge_world[0], gate_pos[1]+gate_edge_world[1], gate_pos[2]+gate_edge_world[2]])
+        edge_ind += 1
+        print "\nDrone Pos x={0:.3}, y={1:.3}, z={2:.3}".format(gate_edge_point[0], gate_edge_point[1], gate_edge_point[2])
+        self.quad.state = [gate_edge_point[0], gate_edge_point[1], gate_edge_point[2], phi, theta, psi, 0., 0., 0., 0., 0., 0.]
+        quad_pose = [gate_edge_point[0], gate_edge_point[1], gate_edge_point[2], -phi, -theta, psi]
+        self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+        self.check_collision()
+        time.sleep(5) 
+
+
+
+def check_collision(self, max_distance = 0.15):
+
+        drone_x_range = [.1, -.1]
+        drone_y_range = [.1, -.1]
+        # drone_z_range = [.05, -.05]
+        rot_matrix = R.from_euler('ZYX',[self.quad.state[5], self.quad.state[4], self.quad.state[3]],degrees=False).as_dcm()
+        drone_pos = np.array([self.quad.state[0], self.quad.state[1], self.quad.state[2]])
+        edge_ind = 0
+
+        eps = 0.1
+
+        for i, line in enumerate(self.line_list):
+            edge_i, edge_j = line[0], line[1]
+            same_point_ind = abs(edge_i - edge_j) <= eps
+            diff_point_ind = abs(edge_i - edge_j) > eps
+            edge_upper_limit = edge_i[same_point_ind] + max_distance
+            edge_lower_limit = edge_i[same_point_ind] - max_distance
+            
+            on_same_line_cond = (edge_lower_limit < drone_pos[same_point_ind]) & (drone_pos[same_point_ind] < edge_upper_limit)
+            if np.all(on_same_line_cond):
+                if (edge_i[diff_point_ind] <= drone_pos[diff_point_ind] <= edge_j[diff_point_ind]) or \
+                   (edge_j[diff_point_ind] <= drone_pos[diff_point_ind] <= edge_i[diff_point_ind]):
+                    print "Collision detected!"
+                    print "Ind: {0}, Drone center x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_pos[0], drone_pos[1], drone_pos[2])
+
+                    return True
+
+        for x_rng in drone_x_range:
+            for y_rng in drone_y_range:
+                for z_rng in drone_z_range:
+                    drone_range = np.array([x_rng, y_rng, z_rng])
+                    drone_range_world = np.dot(rot_matrix, drone_range.reshape(-1,1)).ravel()
+                    drone_edge_point = np.array([drone_pos[0]+drone_range_world[0], drone_pos[1]+drone_range_world[1], drone_pos[2]+drone_range_world[2]])
+                    edge_ind += 1
+                    
+                    
+                    for i, line in enumerate(self.line_list):
+                        edge_i, edge_j = line[0], line[1]
+                        same_point_ind = abs(edge_i - edge_j) <= eps
+                        diff_point_ind = abs(edge_i - edge_j) > eps 
+                        edge_upper_limit = edge_i[same_point_ind] + max_distance
+                        edge_lower_limit = edge_i[same_point_ind] - max_distance
+                        
+                        on_same_line_cond = (edge_lower_limit < drone_edge_point[same_point_ind]) & (drone_edge_point[same_point_ind] < edge_upper_limit)
+                        if np.all(on_same_line_cond):
+                            if (edge_i[diff_point_ind] <= drone_edge_point[diff_point_ind] <= edge_j[diff_point_ind]) or \
+                               (edge_j[diff_point_ind] <= drone_edge_point[diff_point_ind] <= edge_i[diff_point_ind]):
+                                print "Collision detected!"
+                                print "Ind: {0}, Corner x={1:.3}, y={2:.3}, z={3:.3}".format(edge_ind, drone_edge_point[0], drone_edge_point[1], drone_edge_point[2])
+                                return True
+
+
+        return False
+
+
+
+
+
+def check_collision(self, max_distance = 0.15):
+
+    drone_x_range = [.1, -.1]
+    drone_y_range = [.1, -.1]
+    # drone_z_range = [.05, -.05]
+    rot_matrix = R.from_euler('ZYX',[self.quad.state[5], self.quad.state[4], self.quad.state[3]],degrees=False).as_dcm()
+    drone_pos = np.array([self.quad.state[0], self.quad.state[1], self.quad.state[2]])
+    edge_ind = 0
+
+    eps = 0.1
+
+
+    for i, line in enumerate(self.line_list):
+        distance = line.distance(Point3D(drone_pos[0], drone_pos[1], drone_pos[2])).evalf()
+        edge_i, edge_j, u_v = self.line_list_2[i]
+        distance_from_center = edge_i - drone_pos
+        distance_2 = np.linalg.norm(np.cross(distance_from_center, u_v)) / np.linalg.norm(u_v)
+        print "Edge: {0}, (Symbolic) Distance from the center: {1:.3}".format(i, distance) 
+        print "Edge: {0}, (Numeric) Distance from the center: {1:.3}".format(i, distance_2) 
+        if distance < max_distance:
+            print "Collision detected!"
+            #print "Index: {0}, Drone center x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_pos[0], drone_pos[1], drone_pos[2])
+
+            return True
+
+    # for x_rng in drone_x_range:
+    #     for y_rng in drone_y_range:
+    #         # for z_rng in drone_z_range:
+    #         drone_range = np.array([x_rng, y_rng, 0.])
+    #         drone_range_world = np.dot(rot_matrix, drone_range.reshape(-1,1)).ravel()
+    #         drone_edge_point = np.array([drone_pos[0]+drone_range_world[0], drone_pos[1]+drone_range_world[1], drone_pos[2]+drone_range_world[2]])
+    #         edge_ind += 1
+            
+            
+    #         for i, line in enumerate(self.line_list):
+    #             distance = line.distance(Point3D(drone_edge_point[0], drone_edge_point[1], drone_edge_point[2])).evalf()
+    #             #print "Edge: {0}, Distance from the center: {1:.3}".format(i, distance) 
+    #             if distance < max_distance:
+    #                 print "Collision detected!"
+    #                 print "Ind: {0}, Drone center x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_pos[0], drone_pos[1], drone_pos[2])
+
+    #                 return True
+    
+    #print "No Collision!"
+    return False
+
+    # def fly_drone(self, f, gate_index, method, pos_ranges, angles_start):
     #     pose_prediction = np.zeros((2000,4),dtype=np.float32)
     #     prediction_std = np.zeros((4,1),dtype=np.float32)
 
