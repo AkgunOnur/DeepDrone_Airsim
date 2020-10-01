@@ -60,10 +60,8 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 #            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_waypoint_timed", "pos_waypoint_interp"] 
 
 
-flight_columns = ['true_init_x','true_init_y','true_init_z', 'blur_coeff', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+flight_columns = ['true_init_x','true_init_y','true_init_z', 'jitter_coef', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
                   'r_std', 'phi_std', 'theta_std', 'psi_std', 'Tf', 'MP_Method', 'Cost', 'Status']
-
-mp_list = []
 
 flight_filename = 'files/data.csv'
 
@@ -220,6 +218,8 @@ class PoseSampler:
         self.direction = 0
         self.line_list = []
         self.gate_gate_distances = []
+        self.gate_gate_edge_lines = []
+        self.gate_edge_list = []
 
         self.circle_track = racing_utils.trajectory_utils.generate_gate_poses(num_gates=6,
                                                                  race_course_radius=self.race_course_radius,
@@ -244,6 +244,28 @@ class PoseSampler:
             gate_to_gate = np.linalg.norm([gate_1.position.x_val-gate_2.position.x_val, gate_1.position.y_val-gate_2.position.y_val, gate_1.position.z_val-gate_2.position.z_val])
             self.gate_gate_distances.append(gate_to_gate)
 
+        # for i in range(len(self.gate_edge_list) - 4):
+        #     edge_i = self.gate_edge_list[i]
+        #     edge_j = self.gate_edge_list[i+4]
+        #     u_v = abs(edge_i - edge_j)
+        #     current_list = [edge_i, edge_j, u_v]
+        #     self.gate_gate_edge_lines.append(current_list)
+
+        # for i in range(len(self.gate_gate_edge_lines)):
+        #     edge_i = np.array(self.gate_gate_edge_lines[i])
+        #     for j in range(len(self.gate_gate_edge_lines)):
+        #         edge_j = np.array(self.gate_gate_edge_lines[j])
+        #         if i != j and (i+j) != 3 and [i,j] not in check_list and [j,i] not in check_list:
+        #             # print "Index: " + str(ind) + " - " + str(i) + "/" + str(j)
+        #             # print "edge_i: " + str(edge_i) + " edge_j: " + str(edge_j)
+        #             u_v = abs(edge_i - edge_j)
+        #             current_list = [edge_i, edge_j, u_v]
+        #             self.line_list.append(current_list)
+        #             check_list.append([i,j])
+        #             check_list.append([j,i])
+        #             ind += 1
+
+
 
     def check_on_road(self):
         gate_drone_distances = []
@@ -263,6 +285,8 @@ class PoseSampler:
 
 
     def find_gate_edges(self):
+        self.gate_edge_list = []
+
         for i in range(len(self.track)):
             rot_matrix = Rotation.from_quat([self.track[i].orientation.x_val, self.track[i].orientation.y_val, 
                                       self.track[i].orientation.z_val, self.track[i].orientation.w_val]).as_dcm().reshape(3,3)
@@ -271,7 +295,7 @@ class PoseSampler:
             edge_ind = 0
             #print "\nGate Ind: {0}, Gate x={1:.3}, y={2:.3}, z={3:.3}".format(i+1, self.track[i].position.x_val, self.track[i].position.y_val, self.track[i].position.z_val)
             gate_pos = np.array([self.track[i].position.x_val, self.track[i].position.y_val, self.track[i].position.z_val])
-            gate_edge_list = []
+            
             check_list = []
             # print ""
             for x_rng in gate_x_range:
@@ -284,15 +308,15 @@ class PoseSampler:
                     # quad_pose = [gate_edge_point[0], gate_edge_point[1], gate_edge_point[2], 0., 0., 0.]
                     # self.client.simSetVehiclePose(QuadPose(quad_pose), True)
                     # time.sleep(3)
-                    gate_edge_list.append([gate_edge_point[0], gate_edge_point[1], gate_edge_point[2]])
+                    self.gate_edge_list.append([gate_edge_point[0], gate_edge_point[1], gate_edge_point[2]])
 
             ind = 0
             # print "\nFor Gate: " + str(i)
             # print "They are on the same line"
-            for i in range(len(gate_edge_list)):
-                edge_i = np.array(gate_edge_list[i])
-                for j in range(len(gate_edge_list)):
-                    edge_j = np.array(gate_edge_list[j])
+            for i in range(len(self.gate_edge_list)):
+                edge_i = np.array(self.gate_edge_list[i])
+                for j in range(len(self.gate_edge_list)):
+                    edge_j = np.array(self.gate_edge_list[j])
                     if i != j and (i+j) != 3 and [i,j] not in check_list and [j,i] not in check_list:
                         # print "Index: " + str(ind) + " - " + str(i) + "/" + str(j)
                         # print "edge_i: " + str(edge_i) + " edge_j: " + str(edge_j)
@@ -491,8 +515,9 @@ class PoseSampler:
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
-        self.find_gate_distances()
         self.find_gate_edges()
+        self.find_gate_distances()
+        
 
         # To check collision algorithm, comment it out
         # for i in range(100):
@@ -740,7 +765,7 @@ class PoseSampler:
                             if check_arrival: # drone arrives to the gate
                                 track_completed = True
                                 self.vel_sum = self.vel_sum / (ind + 1)
-                                self.test_costs[method] = self.Tf * self.quad.costValue / self.vel_sum
+                                self.test_costs[method] = self.Tf * self.quad.costValue
                                 print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_costs[method]) 
                                 if self.flight_log:
                                     f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_costs[method]))
@@ -751,7 +776,7 @@ class PoseSampler:
                         if (not track_completed) and (not fail_check) and (not collision_check) and (on_road): # drone didn't arrive or crash
                             self.vel_sum = self.vel_sum / Waypoint_length
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_costs[method] = self.Tf * self.quad.costValue / self.vel_sum
+                            self.test_costs[method] = self.Tf * self.quad.costValue
                             print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_costs[method])
                             if self.flight_log:
                                 f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_costs[method]))
@@ -992,7 +1017,7 @@ class PoseSampler:
                             track_completed = True
                             self.vel_sum = self.vel_sum / (ind + 1)
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_cost = self.Tf * self.quad.costValue / self.vel_sum # time * cost / velocity_sum
+                            self.test_cost = self.Tf * self.quad.costValue # time * cost
                             print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_cost) 
                             if self.flight_log:
                                 f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_cost))
@@ -1002,14 +1027,14 @@ class PoseSampler:
                     if (not track_completed) and (not fail_check) and (not collision_check) and on_road: # drone didn't arrive or crash or collide
                         self.vel_sum = self.vel_sum / Waypoint_length
                         #print "Velocity Sum (Normalized): ", self.vel_sum
-                        self.test_cost = self.Tf * self.quad.costValue / self.vel_sum # time * cost / velocity_sum
+                        self.test_cost = self.Tf * self.quad.costValue # time * cost 
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost)
                         if self.flight_log:
                             f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost))
 
 
                     self.write_stats(flight_columns,
-                        [pos0[0], pos0[1], pos0[2], self.blur_coeff, covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
+                        [pos0[0], pos0[1], pos0[2], (self.brightness+self.contrast+self.saturation), covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
                          prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.test_cost, self.drone_status], flight_filename)
 
                     if track_completed or fail_check or collision_check or not on_road: # drone arrived to the gate or crashed or collided                      
@@ -1097,7 +1122,6 @@ class PoseSampler:
         if mode == "DATA_COLLECTION":
             self.collect_data(MP_list)
         elif mode == "TEST":    
-            
             self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/mp_classifier_best_model.pt'))
             self.time_regressor.load_state_dict(torch.load(self.base_path + 'classifier_files/time_regressor_best_model.pt'))
             self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
