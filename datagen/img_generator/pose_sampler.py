@@ -60,8 +60,8 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 #            "min_jerk_full_stop", "min_snap_full_stop", "pos_waypoint_arrived","pos_waypoint_timed", "pos_waypoint_interp"] 
 
 
-flight_columns = ['true_init_x','true_init_y','true_init_z', 'jitter_coef', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'diff_phi', 'diff_theta', 'diff_psi', 
-                  'r_std', 'phi_std', 'theta_std', 'psi_std', 'Tf', 'MP_Method', 'Cost', 'Status']
+flight_columns = ['true_init_x','true_init_y','true_init_z', 'noise_coeff', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'v_x', 'v_y', 'v_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+                  'phi_dot', 'theta_dot', 'psi_dot', 'r_var', 'phi_var', 'theta_var', 'psi_var', 'Tf', 'MP_Method', 'Cost', 'Status']
 
 flight_filename = 'files/data.csv'
 
@@ -186,7 +186,7 @@ class PoseSampler:
         self.saturation = 0.
         self.blur_coeff = 0.
         self.blur_range = 0
-        self.period_denum = 12.
+        self.period_denum = 30.
 
         self.transformation = transforms.Compose([
                             transforms.Resize([200, 200]),
@@ -201,12 +201,12 @@ class PoseSampler:
         quat4 = R.from_euler('ZYX',[60.,0.,0.],degrees=True).as_quat()
         quat5 = R.from_euler('ZYX',[90.,0.,0.],degrees=True).as_quat()
 
-        self.drone_init = Pose(Vector3r(0.,0.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
-        self.gate = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-                     Pose(Vector3r(2.,-8.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-                     Pose(Vector3r(4.,-10.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3])),
-                     Pose(Vector3r(6.,-12.,-3.5), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3])),
-                     Pose(Vector3r(9.,-14.,-4.), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
+        self.drone_init = Pose(Vector3r(0.,30.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
+        self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+                     Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
+                     #Pose(Vector3r(6.,-10.,-3.5), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
+                     #Pose(Vector3r(9.,-20.,-4.), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -334,7 +334,7 @@ class PoseSampler:
 
         return output.item() # if mode is regression
 
-    def check_collision(self, max_distance = 0.15):
+    def check_collision(self, max_distance = 0.09):
         distance_list = []
         for i in range(len(self.track)):
             gate = self.track[i]
@@ -395,16 +395,13 @@ class PoseSampler:
 
     def isThereAnyGate(self, img_rgb):
         # loop over the boundaries
-        lower, upper = [100, 17, 15], [200, 50, 56]
-        # create NumPy arrays from the boundaries
-        lower = np.array(lower, dtype = "uint8")
-        upper = np.array(upper, dtype = "uint8")
-        # find the colors within the specified boundaries and apply
-        # the mask
-        mask = cv2.inRange(img_rgb, lower, upper)
-        output = cv2.bitwise_and(img_rgb, img_rgb, mask = mask)
+        low_red = np.array([161, 155, 84])
+        high_red = np.array([179, 255, 255])
+        hsv_frame = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+        red_mask = cv2.inRange(img_rgb, low_red, high_red)
+        red = cv2.bitwise_and(img_rgb, img_rgb, mask=red_mask)
 
-        if output.any():
+        if red.any():
             #print "there is a gate on the frame!"
             return True
 
@@ -501,12 +498,14 @@ class PoseSampler:
         self.psid_pr = 0.
         self.psid_dot_pr = 0.
 
-        
-
         track_completed = False
         fail_check = False
         collision_check = False
         init_start = True
+
+        covariance_sum = 0.
+        prediction_std = [0., 0., 0., 0.]
+        sign_coeff = 0. 
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
@@ -533,11 +532,30 @@ class PoseSampler:
             image = self.transformation(img)
             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
+            if self.curr_idx % 20 == 0 and self.curr_idx != 0:
+                noise_on = True
+            elif self.curr_idx % 5 == 0:
+                noise_on = False
 
             with torch.no_grad():   
                 # Determine Gat location with Neural Networks
                 pose_gate_body = self.Dronet(image)
+                predicted_r = np.copy(pose_gate_body[0][0])
 
+                if predicted_r < 3.0:
+                    self.period_denum = 3.0
+                else:
+                    self.period_denum = 30.0
+
+                if noise_on:
+                    noise_coeff = np.random.uniform(0.5, 1.5) 
+                    sign_coeff = np.random.choice([-1,1])
+                else:
+                    noise_coeff = 0.
+
+
+                pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
+                pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
                 pose_gate_body = np.asarray(pose_gate_body.reshape(-1,1).to('cpu')).reshape(-1,1)
                 pose_prediction[self.curr_idx] = pose_gate_body.ravel()
                 
@@ -546,24 +564,24 @@ class PoseSampler:
                 #     pose_prediction[self.curr_idx][i] = num.item()
 
 
-                if self.curr_idx % 12 == 0:
-                    self.brightness = random.uniform(30.,40.)
-                    self.contrast = random.uniform(30.,40.)
-                    self.saturation = random.uniform(30.,40.)
-                    self.transformation = transforms.Compose([
-                            transforms.Resize([200, 200]),
-                            #transforms.Lambda(self.gaussian_blur),
-                            transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-                            transforms.ToTensor()])
-                elif self.curr_idx % 6 == 0:
-                    self.brightness = random.uniform(0.,1.)
-                    self.contrast = random.uniform(0.,1.)
-                    self.saturation = random.uniform(0.,1.)
-                    self.transformation = transforms.Compose([
-                            transforms.Resize([200, 200]),
-                            #transforms.Lambda(self.gaussian_blur),
-                            transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-                            transforms.ToTensor()])
+                # if self.curr_idx % 12 == 0:
+                #     self.brightness = random.uniform(30.,40.)
+                #     self.contrast = random.uniform(30.,40.)
+                #     self.saturation = random.uniform(30.,40.)
+                #     self.transformation = transforms.Compose([
+                #             transforms.Resize([200, 200]),
+                #             #transforms.Lambda(self.gaussian_blur),
+                #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                #             transforms.ToTensor()])
+                # elif self.curr_idx % 6 == 0:
+                #     self.brightness = random.uniform(0.,1.)
+                #     self.contrast = random.uniform(0.,1.)
+                #     self.saturation = random.uniform(0.,1.)
+                #     self.transformation = transforms.Compose([
+                #             transforms.Resize([200, 200]),
+                #             #transforms.Lambda(self.gaussian_blur),
+                #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                #             transforms.ToTensor()])
 
                 if self.curr_idx >= 11:
                     pose_gate_cov = self.lstmR(torch.from_numpy(pose_prediction[self.curr_idx-11:self.curr_idx+1].reshape(1,12,4)).to(self.device))
@@ -592,21 +610,23 @@ class PoseSampler:
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
                     #yawf = Rotation.from_quat([self.track[self.current_gate].orientation.x_val, self.track[self.current_gate].orientation.y_val, 
                     #                   self.track[self.current_gate].orientation.z_val, self.track[self.current_gate].orientation.w_val]).as_euler('ZYX',degrees=False)[0] - np.pi/2
-
+                    
                     print "\nCurrent index: {0}".format(self.curr_idx)
-                    print "Predicted r: {0:.3}, Variance r: {1:.3}".format(pose_gate_body[0][0], prediction_std[0])
-                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)
-                    print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
+                    print "Final r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum)
+                    #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
+                    print "MP algorithm: " + method 
+                    print "Estimated time of arrival: {0:.3} s.".format(self.Tf)                       
+                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)            
                     #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
-                        f.write("\nPredicted r: {0:.3}, Variance r: {1:.3}".format(pose_gate_body[0][0], prediction_std[0]))
+                        f.write("\nFinal r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum))
+                        #f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
+                        f.write("\nMP algorithm: " + method)
+                        f.write("\nEstimated time of arrival: {0:.3} s.".format(self.Tf))
                         f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
-                        f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
-                        #f.write("\nVariance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]))
-                        #f.write("\nBlur coefficient: {0:.3}/{1:.3}. Variance sum: {2:.3}".format(self.blur_coeff, self.blur_range, covariance_sum))
 
-                    min_jerk_check = False
+
                     if use_model:
                         #true_init_x, true_init_y, true_init_z, blur_coeff, var_sum, diff_x, diff_y, diff_z, diff_phi, diff_theta, diff_psi, r_std, phi_std, theta_std, psi_std, Tf, MP_Method, Cost
                         #[arr[i][5],arr[i][6],arr[i][7],arr[i][8],arr[i][9],arr[i][10], arr[i][4],arr[i][11],arr[i][12],arr[i][13],arr[i][14],int(arr[i][16])]
@@ -638,9 +658,6 @@ class PoseSampler:
                                 f.write("\nDrone is in Safe Mode")
 
                         
-
-                        if labels_dict[mp_method] == 5: #min_jerk
-                            min_jerk_check = True
                             
                     else:
                         self.trajSelect[0] = self.MP_methods[method]
@@ -652,22 +669,14 @@ class PoseSampler:
                         if self.flight_log:
                             f.write("\nPrediction mode is off. MP algorithm: " + method)
                             f.write("\nEstimated time of arrival: " + str(self.Tf) + " s.")
-
-                        if method == "min_jerk":
-                            min_jerk_check = True
                             
                     
                     if self.trajSelect[0] != -1:
-                        velf = [float(posf[0]-pos0[0])/self.Tf, float(posf[1]-pos0[1])/self.Tf, float(posf[2]-pos0[2])/self.Tf]
                         time_list = np.hstack((0., self.Tf)).astype(float)
                         waypoint_list = np.vstack((pos0, posf)).astype(float)
                         yaw_list = np.hstack((yaw0, yawf)).astype(float)
 
                         self.test_arrival_time[method] += self.Tf
-
-                        if min_jerk_check:
-                            mp_algorithm = MyTraj(gravity = -9.81)
-                            traj = mp_algorithm.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
 
                         newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
@@ -689,8 +698,7 @@ class PoseSampler:
                             self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
 
                             pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
-                            if min_jerk_check:
-                                pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
+
                             xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
                             xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
                             xd_ddot, yd_ddot, zd_ddot = acc_des[0], acc_des[1], acc_des[2]
@@ -783,7 +791,7 @@ class PoseSampler:
             f.close()
 
 
-    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 150):
+    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 250):
         x_offset, y_offset, z_offset = pos_offset
         phi_start, theta_start, gate_psi, psi_start = angle_start
 
@@ -811,28 +819,34 @@ class PoseSampler:
         init_start = True
         collision_check = False
 
+        noise_on = False
+
+        covariance_sum = 0.
+        prediction_std = [0., 0., 0., 0.]
+        sign_coeff = 0.
+
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
         while((not track_completed) and (not fail_check)):
 
-            if self.curr_idx % 12 == 0:
-                self.brightness = random.uniform(30.,40.)
-                self.contrast = random.uniform(30.,40.)
-                self.saturation = random.uniform(30.,40.)
-                self.transformation = transforms.Compose([
-                        transforms.Resize([200, 200]),
-                        #transforms.Lambda(self.gaussian_blur),
-                        transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-                        transforms.ToTensor()])
-            elif self.curr_idx % 6 == 0:
-                self.brightness = random.uniform(0.,1.)
-                self.contrast = random.uniform(0.,1.)
-                self.saturation = random.uniform(0.,1.)
-                self.transformation = transforms.Compose([
-                        transforms.Resize([200, 200]),
-                        #transforms.Lambda(self.gaussian_blur),
-                        transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-                        transforms.ToTensor()])
+            # if self.curr_idx % 12 == 0:
+            #     self.brightness = random.uniform(30.,40.)
+            #     self.contrast = random.uniform(30.,40.)
+            #     self.saturation = random.uniform(30.,40.)
+            #     self.transformation = transforms.Compose([
+            #             transforms.Resize([200, 200]),
+            #             #transforms.Lambda(self.gaussian_blur),
+            #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+            #             transforms.ToTensor()])
+            # elif self.curr_idx % 6 == 0:
+            #     self.brightness = random.uniform(0.,1.)
+            #     self.contrast = random.uniform(0.,1.)
+            #     self.saturation = random.uniform(0.,1.)
+            #     self.transformation = transforms.Compose([
+            #             transforms.Resize([200, 200]),
+            #             #transforms.Lambda(self.gaussian_blur),
+            #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+            #             transforms.ToTensor()])
 
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
             #if len(image_response.image_data_uint8) == image_response.width * image_response.height * 3:
@@ -845,11 +859,33 @@ class PoseSampler:
             image = self.transformation(img)
             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
-            
+            if self.curr_idx % 20 == 0 and self.curr_idx != 0:
+                noise_on = True
+            elif self.curr_idx % 5 == 0:
+                noise_on = False
 
             with torch.no_grad():   
                 # Determine Gat location with Neural Networks
                 pose_gate_body = self.Dronet(image)
+                predicted_r = np.copy(pose_gate_body[0][0])
+
+
+                if predicted_r < 3.0:
+                    self.period_denum = 3.0
+                else:
+                    self.period_denum = 30.0
+
+                if noise_on:
+                    noise_coeff = np.random.uniform(0.5, 1.5) 
+                    sign_coeff = np.random.choice([-1,1])
+                else:
+                    noise_coeff = 0.
+
+
+                pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
+
+                pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
+
                 
                 for i,num in enumerate(pose_gate_body.reshape(-1,1)):
                     #print(num, i , self.curr_idx)
@@ -860,13 +896,14 @@ class PoseSampler:
                     
                     for i, p_g_c in enumerate(pose_gate_cov.reshape(-1,1)):
                         prediction_std[i] = p_g_c.item()
-            
-                    # Gate ground truth values will be implemented
-                    pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
+
                     prediction_std = np.clip(prediction_std, 0, prediction_std)
                     prediction_std = prediction_std.ravel()
                     covariance_sum = np.sum(prediction_std)
 
+                    # Gate ground truth values will be implemented
+                    pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
+                    
                     self.trajSelect[0] = self.MP_methods[method]
                     self.trajSelect[1] = 2
                     self.trajSelect[2] = 0
@@ -887,24 +924,19 @@ class PoseSampler:
 
 
                     print "\nCurrent index: {0}".format(self.curr_idx)
-                    print "Predicted r: {0:.3}, Covariance sum: {1:.3}".format(pose_gate_body[0][0], covariance_sum)
-                    print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
+                    print "Final r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum)
+                    #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
                     print "MP algorithm: " + method 
                     print "Estimated time of arrival: {0:.3} s.".format(self.Tf)                       
                     print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)            
                     #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
-                        f.write("\nPredicted r: {0:.3}, Covariance sum: {1:.3}".format(pose_gate_body[0][0], covariance_sum))
-                        f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
+                        f.write("\nFinal r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum))
+                        #f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
                         f.write("\nMP algorithm: " + method)
                         f.write("\nEstimated time of arrival: {0:.3} s.".format(self.Tf))
                         f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
-                        
-
-                    if method == "min_jerk":
-                        mp_algorithm = MyTraj(gravity = -9.81)
-                        traj = mp_algorithm.givemetraj(pos0, vel0, acc0, posf, velf, accf, self.Tf)
                         
 
                     time_list = np.hstack((0., self.Tf)).astype(float)
@@ -929,8 +961,6 @@ class PoseSampler:
                     # Call for Controller
                     for ind, t_current in enumerate(t_list): 
                         pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
-                        if method == "min_jerk":
-                            pos_des, vel_des, acc_des = mp_algorithm.givemepoint(traj, t_current)
 
                         self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
 
@@ -959,7 +989,6 @@ class PoseSampler:
                         quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
                         self.client.simSetVehiclePose(QuadPose(quad_pose), True)
 
-
                         self.xd_ddot_pr = xd_ddot
                         self.yd_ddot_pr = yd_ddot
                         self.xd_dddot_pr = xd_dddot
@@ -970,7 +999,6 @@ class PoseSampler:
                         self.x_dot_pr = self.quad.state[6]
                         self.y_dot_pr = self.quad.state[7]
                         self.z_dot_pr = self.quad.state[8]
-
 
                         if collision_check:
                             self.drone_status = "COLLISION"
@@ -991,10 +1019,10 @@ class PoseSampler:
                         elif not anyGate:
                             self.drone_status = "OFF_ROAD"
                             self.quad.costValue = 1e12
-                            self.test_costs[method] = self.quad.costValue
-                            print "Drone has been out of the path! Current cost: {0:.6}".format(self.test_costs[method])
+                            self.test_cost = self.quad.costValue
+                            print "Drone has been out of the path! Current cost: {0:.6}".format(self.test_cost)
                             if self.flight_log:
-                                f.write("\nDrone has been out of the path! Current cost: {0:.6}".format(self.test_costs[method]))
+                                f.write("\nDrone has been out of the path! Current cost: {0:.6}".format(self.test_cost))
                             break 
 
                         check_arrival = self.check_completion(quad_pose)
@@ -1020,8 +1048,9 @@ class PoseSampler:
 
 
                     self.write_stats(flight_columns,
-                        [pos0[0], pos0[1], pos0[2], (self.brightness+self.contrast+self.saturation), covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -phi_start, -theta_start, yawf-yaw0,
-                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.test_cost, self.drone_status], flight_filename)
+                        [pos0[0], pos0[1], pos0[2], noise_coeff, covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], 
+                        self.quad.state[6], self.quad.state[7], self.quad.state[8], -phi_start, -theta_start, yawf-yaw0, self.quad.state[9], self.quad.state[10], self.quad.state[11],
+                        prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.test_cost, self.drone_status], flight_filename)
 
                     if track_completed or fail_check or collision_check or not anyGate: # drone arrived to the gate or crashed or collided                      
                         break
