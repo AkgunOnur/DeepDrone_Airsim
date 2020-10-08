@@ -86,7 +86,7 @@ class PoseSampler:
         self.mp_classifier = Net()
         self.t_or_s_classifier = Net()
         self.speed_regressor = Net_Regressor()
-        self.time_regressor = Net_Regressor()
+        self.time_regressor = None
         self.mp_scaler = None
         self.t_or_s_scaler = None
         self.speed_scaler = None
@@ -120,11 +120,14 @@ class PoseSampler:
         self.test_states = {"MAX":[], "DICE" :[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_jerk_full_stop":[]}
         self.test_costs = {"MAX":0., "DICE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
         self.test_arrival_time = {"MAX":0., "DICE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
+        self.test_modes = ["MAX", "DICE", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
+        self.test_safe_counter = {"MAX":0, "DICE" :0, "min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}
+        # self.test_modes = ["MAX", "min_vel"]
         self.time_coeff = 0.
         self.quad_period = 0.
         self.drone_status = ""
 
-        pickle.dump(self.test_states, open(self.base_path + "files/test_states.pkl","wb"), protocol=2)
+        # pickle.dump(self.test_states, open(self.base_path + "files/test_states.pkl","wb"), protocol=2)
 
         #----- Motion planning parameters -----------------------------
         self.MP_methods = {"pos_waypoint_timed":1, "pos_waypoint_interp":2, "min_vel":3, "min_acc":4, "min_jerk":5, "min_snap":6,
@@ -328,13 +331,13 @@ class PoseSampler:
             return pred.item()
 
         elif method=="DICE" and isClassifier:
-            probs = softmax(outputs).cpu().detach().numpy()[0]
-            pred_index = np.random.choice([0, 1, 2, 3], 1, p=probs)[0]
+            probs = softmax(output).cpu().detach().numpy()[0]
+            pred_index = np.random.choice([0, 1, 2, 3, 4], 1, p=probs)[0]
             return pred_index
 
         return output.item() # if mode is regression
 
-    def check_collision(self, max_distance = 0.09):
+    def check_collision(self, max_distance = 0.07):
         distance_list = []
         for i in range(len(self.track)):
             gate = self.track[i]
@@ -354,37 +357,37 @@ class PoseSampler:
             edge_ind = 0
 
             #Collision check for drone's centroid
-            # for i, line in enumerate(self.line_list):
-            #     edge_i, edge_j, u_v = line
-            #     distance_from_center = edge_i - drone_pos
-            #     distance = np.linalg.norm(np.cross(distance_from_center, u_v)) / np.linalg.norm(u_v)
-            #     #print "Edge: {0}, (Numeric) Distance from the center: {1:.3}".format(i, distance) 
-            #     if distance < max_distance:
-            #         print "Collision detected!"
-            #         print "Index: {0}, Drone center x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_pos[0], drone_pos[1], drone_pos[2])
+            for i, line in enumerate(self.line_list):
+                edge_i, edge_j, u_v = line
+                distance_from_center = edge_i - drone_pos
+                distance = np.linalg.norm(np.cross(distance_from_center, u_v)) / np.linalg.norm(u_v)
+                #print "Edge: {0}, (Numeric) Distance from the center: {1:.3}".format(i, distance) 
+                if distance < max_distance:
+                    print "Collision detected!"
+                    print "Index: {0}, Drone center x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_pos[0], drone_pos[1], drone_pos[2])
 
-            #         return True
+                    return True
 
             # Collision check for Drone's corner points
-            for x_rng in drone_x_range:
-                for y_rng in drone_y_range:
-                    # for z_rng in drone_z_range:
-                    drone_range = np.array([x_rng, y_rng, 0.])
-                    drone_range_world = np.dot(rot_matrix.T, drone_range.reshape(-1,1)).ravel()
-                    drone_edge_point = np.array([drone_pos[0]+drone_range_world[0], drone_pos[1]+drone_range_world[1], drone_pos[2]+drone_range_world[2]])
-                    edge_ind += 1
+            # for x_rng in drone_x_range:
+            #     for y_rng in drone_y_range:
+            #         # for z_rng in drone_z_range:
+            #         drone_range = np.array([x_rng, y_rng, 0.])
+            #         drone_range_world = np.dot(rot_matrix.T, drone_range.reshape(-1,1)).ravel()
+            #         drone_edge_point = np.array([drone_pos[0]+drone_range_world[0], drone_pos[1]+drone_range_world[1], drone_pos[2]+drone_range_world[2]])
+            #         edge_ind += 1
                     
                     
-                    for i, line in enumerate(self.line_list):
-                        edge_i, edge_j, u_v = line
-                        distance_from_center = edge_i - drone_edge_point
-                        distance = np.linalg.norm(np.cross(distance_from_center, u_v)) / np.linalg.norm(u_v)
-                        #print "Edge: {0}, (Numeric) Distance from the center: {1:.3}".format(i, distance) 
-                        if distance < max_distance:
-                            print "Collision detected!"
-                            print "Index: {0}, Drone corner x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_edge_point[0], drone_edge_point[1], drone_edge_point[2])
+            #         for i, line in enumerate(self.line_list):
+            #             edge_i, edge_j, u_v = line
+            #             distance_from_center = edge_i - drone_edge_point
+            #             distance = np.linalg.norm(np.cross(distance_from_center, u_v)) / np.linalg.norm(u_v)
+            #             #print "Edge: {0}, (Numeric) Distance from the center: {1:.3}".format(i, distance) 
+            #             if distance < max_distance:
+            #                 print "Collision detected!"
+            #                 print "Index: {0}, Drone corner x={1:.3}, y={2:.3}, z={3:.3}".format(i, drone_edge_point[0], drone_edge_point[1], drone_edge_point[2])
 
-                            return True
+            #                 return True
             
             # print "No Collision!"
             return False
@@ -466,8 +469,11 @@ class PoseSampler:
         check_arrival = False
 
 
-        if ((abs(xd)-abs(x) <= eps) and (abs(yd)-abs(y) <= eps) and (abs(zd)-abs(z) <= eps)):
+        if ( (abs(abs(xd)-abs(x)) <= eps) and (abs(abs(yd)-abs(y)) <= eps) and (abs(abs(zd)-abs(z)) <= eps)):
             self.quad.calculate_cost(target=target, final_calculation=True)
+            print "Arrived!"
+            print "Drone x: {0:.4}, y:{1:.4}, z:{2:.4}".format(x,y,z)
+            print "Gate x: {0:.4}, y:{1:.4}, z:{2:.4}".format(xd,yd,zd)
             check_arrival = True
 
         return check_arrival
@@ -545,7 +551,7 @@ class PoseSampler:
                 if predicted_r < 3.0:
                     self.period_denum = 3.0
                 else:
-                    self.period_denum = 30.0
+                    self.period_denum = 10.0
 
                 if noise_on:
                     noise_coeff = np.random.uniform(0.5, 1.5) 
@@ -600,11 +606,7 @@ class PoseSampler:
 
                     pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
                     vel0 = [self.quad.state[6], self.quad.state[7], self.quad.state[8]]
-                    acc0 = [0.,0.,0.]
-                    posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
-
-                    
-                    accf = [0.,0.,0.]
+                    posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]                    
                     yaw0 = self.quad.state[5]
                     yaw_diff = pose_gate_body[3][0]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
@@ -614,10 +616,6 @@ class PoseSampler:
                     print "\nCurrent index: {0}".format(self.curr_idx)
                     print "Final r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum)
                     #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
-                    print "MP algorithm: " + method 
-                    print "Estimated time of arrival: {0:.3} s.".format(self.Tf)                       
-                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)            
-                    #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
                         f.write("\nFinal r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum))
@@ -628,16 +626,17 @@ class PoseSampler:
 
 
                     if use_model:
-                        #true_init_x, true_init_y, true_init_z, blur_coeff, var_sum, diff_x, diff_y, diff_z, diff_phi, diff_theta, diff_psi, r_std, phi_std, theta_std, psi_std, Tf, MP_Method, Cost
-                        #[arr[i][5],arr[i][6],arr[i][7],arr[i][8],arr[i][9],arr[i][10], arr[i][4],arr[i][11],arr[i][12],arr[i][13],arr[i][14],int(arr[i][16])]
-                    
-                        X_test = np.array([posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], -self.quad.state[3], -self.quad.state[4], yawf-yaw0,
-                                         covariance_sum, prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
+                        # flight_columns = ['true_init_x','true_init_y','true_init_z', 'noise_coeff', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'v_x', 'v_y', 'v_z', 'diff_phi', 'diff_theta', 'diff_psi', 
+                        #                     'phi_dot', 'theta_dot', 'psi_dot', 'r_var', 'phi_var', 'theta_var', 'psi_var', 'Tf', 'MP_Method', 'Cost', 'Status']
 
-                        X_mp_test = self.mp_scaler.transform(X_test)
-                        X_time_test = self.time_scaler.transform(X_test)
+                        X_test = np.array([covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], self.quad.state[6], self.quad.state[7], self.quad.state[8], 
+                                -self.quad.state[3], -self.quad.state[4], yawf-yaw0, self.quad.state[9], self.quad.state[10], self.quad.state[11],
+                                 prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
 
-                        mp_method = self.predict(X_mp_test, model=self.mp_classifier, isClassifier=True)
+                        # X_mp_test = self.mp_scaler.transform(X_test)
+                        # X_time_test = self.time_scaler.transform(X_test)
+
+                        mp_method = self.predict(X_test, model=self.mp_classifier, isClassifier=True, method=method)
 
                         self.trajSelect[0] = labels_dict[mp_method] 
                         self.trajSelect[1] = 2
@@ -646,14 +645,15 @@ class PoseSampler:
                         if self.trajSelect[0] != -1:
                             print "Predicted MP Algorithm: ", self.MP_names[int(self.trajSelect[0])]
 
-                            self.Tf = self.predict(X_time_test, model=self.time_regressor, isClassifier=False)
+                            #self.Tf = self.time_regressor.predict(X_test)[0]
+                            self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
                             print "Time based trajectory, T: {0:.3}".format(self.Tf)
-                            print "Predicted Time Length: {0:.3}".format(self.Tf)
                             if self.flight_log:
                                 f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
                                 f.write("\nPredicted Time Length: {0:.3}".format(self.Tf))
                         else:
                             print "Drone is in Safe Mode"
+                            self.test_safe_counter[method] += 1
                             if self.flight_log:
                                 f.write("\nDrone is in Safe Mode")
 
@@ -664,8 +664,8 @@ class PoseSampler:
                         self.trajSelect[1] = 2
                         self.trajSelect[2] = 0
                         self.Tf = self.time_coeff*abs(pose_gate_body[0][0])
-                        #print "Prediction mode is off. MP algorithm: " + method 
-                        #print "Estimated time of arrival: " + str(self.Tf) + " s."
+                        print "Prediction mode is off. MP algorithm: " + method 
+                        print "Estimated time of arrival: " + str(self.Tf) + " s."
                         if self.flight_log:
                             f.write("\nPrediction mode is off. MP algorithm: " + method)
                             f.write("\nEstimated time of arrival: " + str(self.Tf) + " s.")
@@ -676,7 +676,7 @@ class PoseSampler:
                         waypoint_list = np.vstack((pos0, posf)).astype(float)
                         yaw_list = np.hstack((yaw0, yawf)).astype(float)
 
-                        self.test_arrival_time[method] += self.Tf
+                        self.test_arrival_time[method] += (self.Tf / self.period_denum)
 
                         newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
@@ -690,12 +690,12 @@ class PoseSampler:
                             t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
                                             
                         
-                        self.vel_sum = 0.
+                        #self.vel_sum = 0.
                         self.quad.costValue = 0.
                         # Call for Controller
                         for ind, t_current in enumerate(t_list): 
 
-                            self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
+                            #self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
 
                             pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
 
@@ -718,6 +718,7 @@ class PoseSampler:
                                              psid, psid_dot, psid_ddot]
 
                             fail_check = self.quad.simulate(self.dtau, current_traj, final_target, prediction_std)
+
                             if ind % self.collision_check_interval == 0:   
                                 collision_check = self.check_collision()
                             
@@ -764,22 +765,22 @@ class PoseSampler:
 
                             if check_arrival: # drone arrives to the gate
                                 track_completed = True
-                                self.vel_sum = self.vel_sum / (ind + 1)
-                                self.test_costs[method] = self.Tf * self.quad.costValue
-                                print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_costs[method]) 
+                                #self.vel_sum = self.vel_sum / (ind + 1)
+                                self.test_costs[method] += (self.Tf * self.quad.costValue / self.period_denum)
+                                print "Drone has finished the lap. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum) 
                                 if self.flight_log:
-                                    f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_costs[method]))
+                                    f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum))
                                 break        
                             
 
 
                         if (not track_completed) and (not fail_check) and (not collision_check) and (anyGate): # drone didn't arrive or crash
-                            self.vel_sum = self.vel_sum / Waypoint_length
+                            #self.vel_sum = self.vel_sum / Waypoint_length
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_costs[method] = self.Tf * self.quad.costValue
-                            print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_costs[method])
+                            self.test_costs[method] += (self.Tf * self.quad.costValue / self.period_denum)
+                            print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum)
                             if self.flight_log:
-                                f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_costs[method]))
+                                f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum))
 
 
                         if track_completed or fail_check or collision_check or not anyGate: # drone arrived to the gate or crashed or collided                      
@@ -955,7 +956,7 @@ class PoseSampler:
                         t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
 
 
-                    self.vel_sum = 0.
+                    #self.vel_sum = 0.
                     self.quad.costValue = 0.
                     self.drone_status = "SUCCESS"
                     # Call for Controller
@@ -1029,7 +1030,7 @@ class PoseSampler:
 
                         if check_arrival: # drone arrives to the gate
                             track_completed = True
-                            self.vel_sum = self.vel_sum / (ind + 1)
+                            #self.vel_sum = self.vel_sum / (ind + 1)
                             #print "Velocity Sum (Normalized): ", self.vel_sum
                             self.test_cost = self.Tf * self.quad.costValue # time * cost
                             print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_cost) 
@@ -1039,7 +1040,7 @@ class PoseSampler:
 
 
                     if (not track_completed) and (not fail_check) and (not collision_check) and anyGate: # drone didn't arrive or crash or collide
-                        self.vel_sum = self.vel_sum / Waypoint_length
+                        #self.vel_sum = self.vel_sum / Waypoint_length
                         #print "Velocity Sum (Normalized): ", self.vel_sum
                         self.test_cost = self.Tf * self.quad.costValue # time * cost 
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost)
@@ -1115,6 +1116,7 @@ class PoseSampler:
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
         #min_vel, min_acc, min_jerk, pos_waypoint_interp, min_acc_stop, min_jerk_full_stop
         MP_list = ["min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
+        #MP_list = ["min_vel"]
 
         if self.with_gate:
             # gate_name = "gate_0"
@@ -1139,18 +1141,41 @@ class PoseSampler:
         if mode == "DATA_COLLECTION":
             self.collect_data(MP_list)
         elif mode == "TEST":    
-            # self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/mp_classifier_best_model.pt'))
-            # self.time_regressor.load_state_dict(torch.load(self.base_path + 'classifier_files/time_regressor_best_model.pt'))
+            self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/classifier_best.pt'))
+            self.time_regressor = load(self.base_path + 'classifier_files/dt_regressor.sav')
+            self.time_coeff = 0.6
             # self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
             # self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
-            #self.test_algorithm(use_model = True)
-
+            print "\n>>> PREDICTION MODE: DICE"
+            self.test_algorithm(use_model=True, method="DICE")
+            print "\n>>> PREDICTION MODE: MAX"
+            self.test_algorithm(use_model=True, method="MAX")
+            
             for method in MP_list:
-                print "\n >>> TEST MODE: " + method
-                self.time_coeff = 0.7
+                print "\n>>> TEST MODE: " + method
                 self.test_algorithm(method = method)
 
-            pickle.dump(self.test_states, open(self.base_path + "files/test_states.pkl","wb"), protocol=2)
+            pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter], open(self.base_path + "files/test_variables.pkl","wb"), protocol=2)
+        elif mode == "VISUALIZATION":
+            self.visualize_drone()
+        else:
+            print "There is no such a mode called " + "'" + mode + "'"
+
+
+
+    def visualize_drone(self):
+        test_states, test_arrival_time, test_costs, test_safe_counter = pickle.load(open(self.base_path + "files/test_variables.pkl", "rb"))
+        for mode in self.test_modes:
+            print "\nDrone flies using the algorithm, ", mode
+            self.client.simSetVehiclePose(self.drone_init, True)
+            state_list = test_states[mode]
+            for state in state_list:
+                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
+                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                time.sleep(0.001)
+            print "Time of arrival is {0:.6} s.".format(test_arrival_time[mode])
+            print "Total cost is {0:.6}".format(test_costs[mode])
+            print "How many times has the drone been in safe mode: " + str(test_safe_counter[mode])
                     
         
 
