@@ -321,7 +321,7 @@ class Quadrotor:
 
     def simulate(self, dtau, current_traj, final_target, std_list, method="Backstepping_3"):
     #     states: [x,y,z,phi,theta,psi,x_dot,y_dot,z_dot,phi_dot,theta_dot,psi_dot]
-        r_std, phi_std, theta_std, psi_std = std_list
+        r_std, phi_std, theta_std, psi_std = std_list[0], std_list[1], std_list[2], std_list[3]
         fail_check = False
 
         ## Add noise, if you wish ##
