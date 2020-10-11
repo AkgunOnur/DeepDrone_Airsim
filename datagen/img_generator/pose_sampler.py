@@ -204,12 +204,17 @@ class PoseSampler:
         quat4 = R.from_euler('ZYX',[60.,0.,0.],degrees=True).as_quat()
         quat5 = R.from_euler('ZYX',[90.,0.,0.],degrees=True).as_quat()
 
-        self.drone_init = Pose(Vector3r(0.,30.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
-        self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-                     Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-                     Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
-                     #Pose(Vector3r(6.,-10.,-3.5), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
+        self.drone_init = Pose(Vector3r(0.,10.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
+        self.gate = [Pose(Vector3r(0.,2.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+                     Pose(Vector3r(2.,-5.,-2.4), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(4.,-13.,-3.1), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3])),
+                     Pose(Vector3r(7.,-20.,-3.75), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
                      #Pose(Vector3r(9.,-20.,-4.), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
+
+        # Previous gates
+        # self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+        #              Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+        #              Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -225,7 +230,7 @@ class PoseSampler:
         self.gate_gate_edge_lines = []
         self.gate_edge_list = []
         self.gate_edge_distances = []
-        self.collision_check_interval = 20
+        self.collision_check_interval = 15
 
         self.circle_track = racing_utils.trajectory_utils.generate_gate_poses(num_gates=6,
                                                                  race_course_radius=self.race_course_radius,
@@ -467,7 +472,7 @@ class PoseSampler:
             time.sleep(5) 
 
 
-    def check_completion(self, quad_pose, eps=0.4):
+    def check_completion(self, quad_pose, eps=0.45):
         x, y, z = quad_pose[0], quad_pose[1], quad_pose[2]
 
         xd = self.track[-1].position.x_val
@@ -482,9 +487,6 @@ class PoseSampler:
 
         if ( (abs(abs(xd)-abs(x)) <= eps) and (abs(abs(yd)-abs(y)) <= eps) and (abs(abs(zd)-abs(z)) <= eps)):
             self.quad.calculate_cost(target=target, final_calculation=True)
-            print "Arrived!"
-            print "Drone x: {0:.4}, y:{1:.4}, z:{2:.4}".format(x,y,z)
-            print "Gate x: {0:.4}, y:{1:.4}, z:{2:.4}".format(xd,yd,zd)
             check_arrival = True
 
         return check_arrival
@@ -627,6 +629,9 @@ class PoseSampler:
                     covariance_list.append(covariance_sum)
                     if self.curr_idx >= (11 + cov_rep_num):
                         covariance_sum = np.sum(covariance_list[-cov_rep_num:]) / float(cov_rep_num)
+
+                    if covariance_sum > 20.:
+                        anyGate = False
 
                     # Gate ground truth values will be implemented
                     pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
@@ -784,7 +789,7 @@ class PoseSampler:
                                 if self.flight_log:
                                     f.write("\nDrone has crashed! Current cost: {0:.6}".format(self.test_costs[method]))
                                 break
-                            elif not anyGate or covariance_sum > 20.:
+                            elif not anyGate:
                                 self.quad.costValue = 1e12
                                 self.test_costs[method] = self.quad.costValue
                                 print "Drone has been out of the path! Current cost: {0:.6}".format(self.test_costs[method])
@@ -823,7 +828,7 @@ class PoseSampler:
             f.close()
 
 
-    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 250):
+    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 300):
         x_offset, y_offset, z_offset = pos_offset
         phi_start, theta_start, gate_psi, psi_start = angle_start
 
@@ -950,6 +955,9 @@ class PoseSampler:
                     if self.curr_idx >= (11 + cov_rep_num):
                         covariance_sum = np.sum(covariance_list[-cov_rep_num:]) / float(cov_rep_num)
 
+                    if covariance_sum > 20.:
+                        anyGate = False
+
                     # Gate ground truth values will be implemented
                     pose_gate_body = pose_gate_body.numpy().reshape(-1,1)
                     
@@ -1064,7 +1072,7 @@ class PoseSampler:
                             if self.flight_log:
                                 f.write("\nDrone has crashed! Current cost: {0:.6}".format(self.test_cost))
                             break 
-                        elif not anyGate or covariance_sum > 20.:
+                        elif not anyGate:
                             self.drone_status = "OFF_ROAD"
                             self.quad.costValue = 1e12
                             self.test_cost = self.quad.costValue
