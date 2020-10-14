@@ -117,12 +117,20 @@ class PoseSampler:
         # self.model.load_state_dict(torch.load('best_model.pt'))
         # self.model.eval()
         self.state0 = [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
-        self.test_states = {"MAX":[], "DICE" :[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_jerk_full_stop":[]}
-        self.test_costs = {"MAX":0., "DICE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
-        self.test_arrival_time = {"MAX":0., "DICE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
-        self.test_modes = ["MAX", "DICE", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
-        self.test_safe_counter = {"MAX":0, "DICE" :0, "min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}
+        self.test_states = {"MAX_SAFE":[], "MAX_NO_SAFE":[], "DICE_SAFE" :[], "DICE_NO_SAFE" :[], "min_vel":[], "min_acc":[], "min_jerk":[], "min_jerk_full_stop":[]}
+        self.test_costs = {"MAX_SAFE":0., "MAX_NO_SAFE":0., "DICE_SAFE" :0., "DICE_NO_SAFE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
+        self.test_arrival_time = {"MAX_SAFE":0., "MAX_NO_SAFE":0., "DICE_SAFE" :0., "DICE_NO_SAFE" :0., "min_vel":0., "min_acc":0., "min_jerk":0., "min_jerk_full_stop":0.}
+        self.test_modes = ["MAX_SAFE", "MAX_NO_SAFE", "DICE_SAFE", "DICE_NO_SAFE", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
+        self.test_safe_counter = {"MAX_SAFE":0., "MAX_NO_SAFE":0., "DICE_SAFE" :0., "DICE_NO_SAFE" :0., "min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}
         # self.test_modes = ["MAX", "min_vel"]
+        self.test_distribution_on_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "MAX_NO_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_NO_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}}
+        self.test_distribution_off_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "MAX_NO_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_NO_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}}
         self.time_coeff = 0.
         self.quad_period = 0.
         self.drone_status = ""
@@ -204,17 +212,17 @@ class PoseSampler:
         quat4 = R.from_euler('ZYX',[60.,0.,0.],degrees=True).as_quat()
         quat5 = R.from_euler('ZYX',[90.,0.,0.],degrees=True).as_quat()
 
-        self.drone_init = Pose(Vector3r(0.,10.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
-        self.gate = [Pose(Vector3r(0.,2.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-                     Pose(Vector3r(2.,-5.,-2.4), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-                     Pose(Vector3r(4.,-13.,-3.1), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3])),
-                     Pose(Vector3r(7.,-20.,-3.75), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
-                     #Pose(Vector3r(9.,-20.,-4.), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
+        self.drone_init = Pose(Vector3r(0.,30.,-2), Quaternionr(quat0[0],quat0[1],quat0[2],quat0[3]))
+        # self.gate = [Pose(Vector3r(0.,2.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+        #              Pose(Vector3r(2.,-5.,-2.4), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+        #              Pose(Vector3r(4.,-13.,-3.1), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3])),
+        #              Pose(Vector3r(7.,-20.,-3.75), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
+        #              #Pose(Vector3r(9.,-20.,-4.), Quaternionr(quat5[0],quat5[1],quat5[2],quat5[3]))]
 
         # Previous gates
-        # self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-        #              Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-        #              Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
+        self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
+                     Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -333,17 +341,17 @@ class PoseSampler:
         return image_blur
         
 
-    def predict(self, X, model, isClassifier=True, method="MAX"):
+    def predict(self, X, model, isClassifier=True, method="MAX_SAFE"):
         model.eval()  # Set model to evaluation mode
         softmax = nn.Softmax(dim=1)
         X_tensor = torch.from_numpy(X).to(self.device)
         output = model(X_tensor.float())
      
-        if method=="MAX" and isClassifier:
+        if (method=="MAX_SAFE" or method == "MAX_NO_SAFE") and isClassifier:
             _, pred = torch.max(output, 1)
             return pred.item()
 
-        elif method=="DICE" and isClassifier:
+        elif (method=="DICE_SAFE" or method == "DICE_NO_SAFE") and isClassifier:
             probs = softmax(output).cpu().detach().numpy()[0]
             pred_index = np.random.choice([0, 1, 2, 3, 4], 1, p=probs)[0]
             return pred_index
@@ -492,7 +500,7 @@ class PoseSampler:
         return check_arrival
 
 
-    def test_algorithm(self, method = "MAX", use_model = False):
+    def test_algorithm(self, method = "MAX", use_model = False, safe_mode = True):
         pose_prediction = np.zeros((1000,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
         labels_dict = {0:3, 1:4, 2:5, 3:10, 4:-1}
@@ -527,6 +535,7 @@ class PoseSampler:
         sign_coeff = 0. 
         covariance_list = []
         cov_rep_num = 5
+        anyGate = True
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
@@ -576,7 +585,7 @@ class PoseSampler:
             img1d = np.fromstring(image_response.image_data_uint8, dtype=np.uint8)  # get numpy array
             img_rgb = img1d.reshape(image_response.height, image_response.width, 3)  # reshape array to 4 channel image array H X W X 3
             img_rgb = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB)
-            anyGate = self.isThereAnyGate(img_rgb)
+            # anyGate = self.isThereAnyGate(img_rgb)
             #cv2.imwrite(os.path.join(self.base_path, 'images', "frame" + str(self.curr_idx).zfill(len(str(self.num_samples))) + '.png'), img_rgb)
             img =  Image.fromarray(img_rgb)
             image = self.transformation(img)
@@ -596,9 +605,9 @@ class PoseSampler:
                 if predicted_r < 3.0:
                     self.period_denum = 6.0
                 elif predicted_r < 5.0:
-                    self.period_denum = 20.0
+                    self.period_denum = 10.0
                 else:
-                    self.period_denum = 30.0
+                    self.period_denum = 10.0
 
 
                 if noise_on:
@@ -666,10 +675,10 @@ class PoseSampler:
                         #                     'phi_dot', 'theta_dot', 'psi_dot', 'r_var', 'phi_var', 'theta_var', 'psi_var', 'Tf', 'MP_Method', 'Cost', 'Status']
 
                         X_test = np.array([covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], self.quad.state[6], self.quad.state[7], self.quad.state[8], 
-                                -self.quad.state[3], -self.quad.state[4], yawf-yaw0, self.quad.state[9], self.quad.state[10], self.quad.state[11],
-                                 prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
+                                        -self.quad.state[3], -self.quad.state[4], yawf-yaw0, self.quad.state[9], self.quad.state[10], self.quad.state[11],
+                                         prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3]]).reshape(1,-1)
 
-                        # X_mp_test = self.mp_scaler.transform(X_test)
+                        # X_test = self.mp_scaler.transform(X_test)
                         # X_time_test = self.time_scaler.transform(X_test)
 
                         mp_method = self.predict(X_test, model=self.mp_classifier, isClassifier=True, method=method)
@@ -687,13 +696,26 @@ class PoseSampler:
                             if self.flight_log:
                                 f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
                                 f.write("\nPredicted Time Length: {0:.3}".format(self.Tf))
-                        else:
-                            print "Drone is in Safe Mode"
-                            self.test_safe_counter[method] += 1
-                            if self.flight_log:
-                                f.write("\nDrone is in Safe Mode")
+                        else: # in case of safe mode
+                            if safe_mode:
+                                print "Drone is in Safe Mode"
+                                self.test_safe_counter[method] += 1
+                                if self.flight_log:
+                                    f.write("\nDrone is in Safe Mode")
+                            else:
+                                mp_method = np.random.choice([0,1,2,3], p=[.25,.25,.25,.25])
+                                self.trajSelect[0] = labels_dict[mp_method] 
+                                self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
+                                print "Drone should've be in safe mode, but the chosen algorithm: ", self.MP_names[int(self.trajSelect[0])]
+                                print "Time based trajectory, T: {0:.3}".format(self.Tf)
+                                if self.flight_log:
+                                    f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
+                                    f.write("\nPredicted Time Length: {0:.3}".format(self.Tf))
 
-                        
+                        if noise_coeff == 0.:
+                            self.test_distribution_off_noise[method][self.MP_names[int(self.trajSelect[0])]] += 1
+                        else:
+                            self.test_distribution_on_noise[method][self.MP_names[int(self.trajSelect[0])]] += 1
                             
                     else:
                         self.trajSelect[0] = self.MP_methods[method]
@@ -1203,19 +1225,23 @@ class PoseSampler:
         elif mode == "TEST":    
             self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/classifier_best.pt'))
             self.time_regressor = load(self.base_path + 'classifier_files/dt_regressor.sav')
-            self.time_coeff = 0.6
-            # self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
-            # self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
-            print "\n>>> PREDICTION MODE: DICE"
-            self.test_algorithm(use_model=True, method="DICE")
-            print "\n>>> PREDICTION MODE: MAX"
-            self.test_algorithm(use_model=True, method="MAX")
+            self.time_coeff = 0.7
+            #self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
+            #self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
+            print "\n>>> PREDICTION MODE: DICE, SAFE MODE: ON"
+            self.test_algorithm(use_model=True, method="DICE_SAFE", safe_mode = True)
+            print "\n>>> PREDICTION MODE: DICE, SAFE MODE: OFF"
+            self.test_algorithm(use_model=True, method="DICE_NO_SAFE", safe_mode = False)
+            print "\n>>> PREDICTION MODE: MAX, SAFE MODE: ON"
+            self.test_algorithm(use_model=True, method="MAX_SAFE", safe_mode = True)
+            print "\n>>> PREDICTION MODE: MAX, SAFE MODE: OFF"
+            self.test_algorithm(use_model=True, method="MAX_NO_SAFE", safe_mode = False)
             
             for method in MP_list:
                 print "\n>>> TEST MODE: " + method
                 self.test_algorithm(method = method)
 
-            pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter], open(self.base_path + "files/test_variables.pkl","wb"), protocol=2)
+            pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter, self.test_distribution_on_noise, self.test_distribution_off_noise], open(self.base_path + "files/test_variables.pkl","wb"), protocol=2)
         elif mode == "VISUALIZATION":
             self.visualize_drone()
         else:
@@ -1224,7 +1250,7 @@ class PoseSampler:
 
 
     def visualize_drone(self):
-        test_states, test_arrival_time, test_costs, test_safe_counter = pickle.load(open(self.base_path + "files/test_variables.pkl", "rb"))
+        test_states, test_arrival_time, test_costs, test_safe_counter, test_distribution_on_noise, test_distribution_off_noise = pickle.load(open(self.base_path + "files/test_variables.pkl", "rb"))
         for mode in self.test_modes:
             print "\nDrone flies using the algorithm, ", mode
             self.client.simSetVehiclePose(self.drone_init, True)
@@ -1233,12 +1259,27 @@ class PoseSampler:
                 quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
                 self.client.simSetVehiclePose(QuadPose(quad_pose), True)
                 time.sleep(0.001)
+                
+            if test_costs[mode] == 1e12:
+                print "Drone has failed to complete the path!"
+            else:
+                print "Drone has completed the path successfully!"
             print "Time of arrival is {0:.6} s.".format(test_arrival_time[mode])
             print "Total cost is {0:.6}".format(test_costs[mode])
-            print "How many times has the drone been in safe mode: " + str(test_safe_counter[mode])
-                    
-        
+            print "Drone has been in safe mode: {0} times".format(test_safe_counter[mode])
 
+            if mode == "DICE_SAFE" or mode == "DICE_NO_SAFE" or mode == "MAX_SAFE" or mode == "MAX_NO_SAFE":
+                sum_val = float(np.sum(test_distribution_on_noise[mode].values()))
+                for sub_mode in test_distribution_on_noise[mode]:
+                    current_val = test_distribution_on_noise[mode][sub_mode]
+                    print "In noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+
+                sum_val = float(np.sum(test_distribution_off_noise[mode].values()))
+                for sub_mode in test_distribution_off_noise[mode]:
+                    current_val = test_distribution_off_noise[mode][sub_mode]
+                    print "In non noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+
+                    
     def configureEnvironment(self):
         for gate_object in self.client.simListSceneObjects(".*[Gg]ate.*"):
             self.client.simDestroyObject(gate_object)
