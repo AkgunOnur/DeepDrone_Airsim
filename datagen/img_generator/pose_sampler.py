@@ -123,13 +123,13 @@ class PoseSampler:
         self.test_modes = ["MAX_SAFE", "MAX_NO_SAFE", "DICE_SAFE", "DICE_NO_SAFE", "min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
         self.test_safe_counter = {"MAX_SAFE":0., "MAX_NO_SAFE":0., "DICE_SAFE" :0., "DICE_NO_SAFE" :0., "min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}
         # self.test_modes = ["MAX", "min_vel"]
-        self.test_distribution_on_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+        self.test_distribution_on_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0, "safe_mode":0}, 
                                            "MAX_NO_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
-                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0, "safe_mode":0}, 
                                            "DICE_NO_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}}
-        self.test_distribution_off_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+        self.test_distribution_off_noise = {"MAX_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0, "safe_mode":0}, 
                                            "MAX_NO_SAFE":{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
-                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}, 
+                                           "DICE_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0, "safe_mode":0}, 
                                            "DICE_NO_SAFE" :{"min_vel":0, "min_acc":0, "min_jerk":0, "min_jerk_full_stop":0}}
         self.time_coeff = 0.
         self.quad_period = 0.
@@ -142,7 +142,7 @@ class PoseSampler:
                               "min_acc_stop":7, "min_jerk_stop":8, "min_snap_stop":9, "min_jerk_full_stop":10, "min_snap_full_stop":11,
                               "pos_waypoint_arrived":12}
         self.MP_names = ["hover", "pos_waypoint_timed", "pos_waypoint_interp", "min_vel", "min_acc", "min_jerk", "min_snap",
-                         "min_acc_stop", "min_jerk_stop", "min_snap_stop", "min_jerk_full_stop", "min_snap_full_stop","pos_waypoint_arrived"]
+                         "min_acc_stop", "min_jerk_stop", "min_snap_stop", "min_jerk_full_stop", "min_snap_full_stop","safe_mode"]
         self.MP_cost = {"pos_waypoint_timed":1e9, "pos_waypoint_interp":1e9, "min_vel":1e9, "min_acc":1e9, "min_jerk":1e9, "min_snap":1e9,
                         "min_acc_stop":1e9, "min_jerk_stop":1e9, "min_snap_stop":1e9, "min_jerk_full_stop":1e9, "min_snap_full_stop":1e9,
                         "pos_waypoint_arrived":1e9}
@@ -607,7 +607,7 @@ class PoseSampler:
                 elif predicted_r < 5.0:
                     self.period_denum = 10.0
                 else:
-                    self.period_denum = 10.0
+                    self.period_denum = 15.0
 
 
                 if noise_on:
@@ -687,11 +687,10 @@ class PoseSampler:
                         self.trajSelect[1] = 2
                         self.trajSelect[2] = 0
 
+                        #self.Tf = self.time_regressor.predict(X_test)[0]
+                        self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
                         if self.trajSelect[0] != -1:
                             print "Predicted MP Algorithm: ", self.MP_names[int(self.trajSelect[0])]
-
-                            #self.Tf = self.time_regressor.predict(X_test)[0]
-                            self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
                             print "Time based trajectory, T: {0:.3}".format(self.Tf)
                             if self.flight_log:
                                 f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
@@ -705,7 +704,6 @@ class PoseSampler:
                             else:
                                 mp_method = np.random.choice([0,1,2,3], p=[.25,.25,.25,.25])
                                 self.trajSelect[0] = labels_dict[mp_method] 
-                                self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
                                 print "Drone should've be in safe mode, but the chosen algorithm: ", self.MP_names[int(self.trajSelect[0])]
                                 print "Time based trajectory, T: {0:.3}".format(self.Tf)
                                 if self.flight_log:
@@ -1242,6 +1240,8 @@ class PoseSampler:
                 self.test_algorithm(method = method)
 
             pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter, self.test_distribution_on_noise, self.test_distribution_off_noise], open(self.base_path + "files/test_variables.pkl","wb"), protocol=2)
+        
+
         elif mode == "VISUALIZATION":
             self.visualize_drone()
         else:
@@ -1250,34 +1250,51 @@ class PoseSampler:
 
 
     def visualize_drone(self):
-        test_states, test_arrival_time, test_costs, test_safe_counter, test_distribution_on_noise, test_distribution_off_noise = pickle.load(open(self.base_path + "files/test_variables.pkl", "rb"))
-        for mode in self.test_modes:
-            print "\nDrone flies using the algorithm, ", mode
-            self.client.simSetVehiclePose(self.drone_init, True)
-            state_list = test_states[mode]
-            for state in state_list:
-                quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
-                self.client.simSetVehiclePose(QuadPose(quad_pose), True)
-                time.sleep(0.001)
-                
-            if test_costs[mode] == 1e12:
-                print "Drone has failed to complete the path!"
-            else:
-                print "Drone has completed the path successfully!"
-            print "Time of arrival is {0:.6} s.".format(test_arrival_time[mode])
-            print "Total cost is {0:.6}".format(test_costs[mode])
-            print "Drone has been in safe mode: {0} times".format(test_safe_counter[mode])
+        cost_list = []
+        time_list = []
+        for i in range(100):
+            time_dict = {}
+            cost_dict = {}
+            file_name = "files/test_variables_" + str(i) + ".pkl"
+            test_file = os.path.join(self.base_path, file_name)
 
-            if mode == "DICE_SAFE" or mode == "DICE_NO_SAFE" or mode == "MAX_SAFE" or mode == "MAX_NO_SAFE":
-                sum_val = float(np.sum(test_distribution_on_noise[mode].values()))
-                for sub_mode in test_distribution_on_noise[mode]:
-                    current_val = test_distribution_on_noise[mode][sub_mode]
-                    print "In noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+            if not os.path.exists(test_file):
+                break
+            print "\nCurrent file: test_variables_{0}.pkl".format(i)
+            test_states, test_arrival_time, test_costs, test_safe_counter, test_distribution_on_noise, test_distribution_off_noise = pickle.load(open(test_file, "rb"))
+            for mode in self.test_modes:
+                print "\nDrone flies using the algorithm, ", mode
+                self.client.simSetVehiclePose(self.drone_init, True)
+                state_list = test_states[mode]
+                for state in state_list:
+                    quad_pose = [state[0], state[1], state[2], -state[3], -state[4], state[5]]
+                    self.client.simSetVehiclePose(QuadPose(quad_pose), True)
+                    time.sleep(0.001)
+                    
+                if test_costs[mode] == 1e12:
+                    print "Drone has failed to complete the path!"
+                else:
+                    print "Drone has completed the path successfully!"
+                    cost_dict[mode] = test_costs[mode]
+                    time_dict[mode] = test_arrival_time[mode]
+                print "Time of arrival is {0:.6} s.".format(test_arrival_time[mode])
+                print "Total cost is {0:.6}".format(test_costs[mode])
+                print "Drone has been in safe mode: {0} times".format(test_safe_counter[mode])
 
-                sum_val = float(np.sum(test_distribution_off_noise[mode].values()))
-                for sub_mode in test_distribution_off_noise[mode]:
-                    current_val = test_distribution_off_noise[mode][sub_mode]
-                    print "In non noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+                if mode == "DICE_SAFE" or mode == "DICE_NO_SAFE" or mode == "MAX_SAFE" or mode == "MAX_NO_SAFE":
+                    sum_val = float(np.sum(test_distribution_on_noise[mode].values()))
+                    for sub_mode in test_distribution_on_noise[mode]:
+                        current_val = test_distribution_on_noise[mode][sub_mode]
+                        print "In noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+
+                    sum_val = float(np.sum(test_distribution_off_noise[mode].values()))
+                    for sub_mode in test_distribution_off_noise[mode]:
+                        current_val = test_distribution_off_noise[mode][sub_mode]
+                        print "In non noisy conditions, drone has been in mode, {0} {1} times, {2:.4}%".format(sub_mode, current_val, current_val/sum_val*100.)
+
+            cost_list.append(cost_dict)
+            time_list.append(time_dict)
+        pickle.dump([cost_list, time_list], open(self.base_path + "files/results.pkl","wb"), protocol=2)
 
                     
     def configureEnvironment(self):
