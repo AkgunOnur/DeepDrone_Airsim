@@ -552,32 +552,32 @@ class PoseSampler:
 
         while((not track_completed) and (not fail_check)):
 
-            # if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-            #     noise_on = True
-            # elif self.curr_idx % 15 == 0:
-            #     noise_on = False
+            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
+                noise_on = True
+            elif self.curr_idx % 15 == 0:
+                noise_on = False
 
-            # sign_coeff = 1.
-            # if noise_on:
-            #     self.brightness = random.uniform(200.,250.)
-            #     self.contrast = random.uniform(200.,250.)
-            #     self.saturation = random.uniform(200.,250.)
-            #     self.transformation = transforms.Compose([
-            #             transforms.Resize([200, 200]),
-            #             #transforms.Lambda(self.gaussian_blur),
-            #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-            #             transforms.ToTensor()])
-            # else:
-            #     self.brightness = 0.
-            #     self.contrast = 0.
-            #     self.saturation = 0.
-            #     self.transformation = transforms.Compose([
-            #             transforms.Resize([200, 200]),
-            #             #transforms.Lambda(self.gaussian_blur),
-            #             #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-            #             transforms.ToTensor()])
-                
-            # noise_coeff = self.brightness + self.contrast + self.saturation
+            sign_coeff = 1.
+            if noise_on:
+                self.brightness = random.uniform(2,4)
+                self.contrast = random.uniform(2,4)
+                self.saturation = random.uniform(0,0.1)
+                self.transformation = transforms.Compose([
+                        transforms.Resize([200, 200]),
+                       #transforms.Lambda(self.gaussian_blur),
+                        transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                        transforms.ToTensor()])
+            else:
+                self.brightness = 0.
+                self.contrast = 0.
+                self.saturation = 0.
+                self.transformation = transforms.Compose([
+                        transforms.Resize([200, 200]),
+                        #transforms.Lambda(self.gaussian_blur),
+                        #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                        transforms.ToTensor()])
+                 
+            noise_coeff = self.brightness + self.contrast + self.saturation
 
 
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
@@ -603,22 +603,22 @@ class PoseSampler:
 
 
                 if predicted_r < 3.0:
-                    self.period_denum = 6.0
+                    self.period_denum = 10.0
                 elif predicted_r < 5.0:
                     self.period_denum = 10.0
                 else:
-                    self.period_denum = 15.0
+                    self.period_denum = 10.0
 
 
-                if noise_on:
-                    noise_coeff = np.random.uniform(0.5, 1.5) 
-                    sign_coeff = np.random.choice([-1,1])
-                else:
-                    noise_coeff = 0.
+                # if noise_on:
+                #     noise_coeff = np.random.uniform(0.5, 1.5) 
+                #     sign_coeff = np.random.choice([-1,1])
+                # else:
+                #     noise_coeff = 0.
 
 
-                pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
-                pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
+                # pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
+                # pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
 
 
                 for i,num in enumerate(pose_gate_body.reshape(-1,1)):
@@ -659,11 +659,11 @@ class PoseSampler:
                     #                   self.track[self.current_gate].orientation.z_val, self.track[self.current_gate].orientation.w_val]).as_euler('ZYX',degrees=False)[0] - np.pi/2
                     
                     print "\nCurrent index: {0}".format(self.curr_idx)
-                    print "Final r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum)
+                    print "Predicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum)
                     #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
-                        f.write("\nFinal r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum))
+                        f.write("\nPredicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum))
                         #f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
                         f.write("\nMP algorithm: " + method)
                         f.write("\nEstimated time of arrival: {0:.3} s.".format(self.Tf))
@@ -699,6 +699,7 @@ class PoseSampler:
                             if safe_mode:
                                 print "Drone is in Safe Mode"
                                 self.test_safe_counter[method] += 1
+                                self.test_arrival_time[method] += 0.2
                                 if self.flight_log:
                                     f.write("\nDrone is in Safe Mode")
                             else:
@@ -743,7 +744,7 @@ class PoseSampler:
                             t_list = linspace(0, flight_period, num = Waypoint_length)
                             init_start = False
                         else:
-                            t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
+                            t_list = linspace(1.5*flight_period, 2.5*flight_period, num = Waypoint_length)
                                             
                         
                         #self.vel_sum = 0.
@@ -823,9 +824,9 @@ class PoseSampler:
                                 track_completed = True
                                 #self.vel_sum = self.vel_sum / (ind + 1)
                                 self.test_costs[method] += (self.Tf * self.quad.costValue / self.period_denum)
-                                print "Drone has finished the lap. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum) 
+                                print "By {0}, Drone has finished the lap in {1:.6} s. Current cost: {2:.6}".format(method, self.test_arrival_time[method], self.Tf * self.quad.costValue / self.period_denum) 
                                 if self.flight_log:
-                                    f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum))
+                                    f.write("\nBy {0}, Drone has finished the lap in {1:.6} s. Current cost: {2:.6}".format(method, self.test_arrival_time[method], self.Tf * self.quad.costValue / self.period_denum))
                                 break        
                             
 
@@ -889,32 +890,32 @@ class PoseSampler:
 
         while((not track_completed) and (not fail_check)):
 
-            # if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-            #     noise_on = True
-            # elif self.curr_idx % 15 == 0:
-            #     noise_on = False
+            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
+                noise_on = True
+            elif self.curr_idx % 15 == 0:
+                noise_on = False
 
-            # sign_coeff = 1.
-            # if noise_on:
-            #     self.brightness = random.uniform(200.,250.)
-            #     self.contrast = random.uniform(200.,250.)
-            #     self.saturation = random.uniform(200.,250.)
-            #     self.transformation = transforms.Compose([
-            #             transforms.Resize([200, 200]),
-            #             #transforms.Lambda(self.gaussian_blur),
-            #             transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-            #             transforms.ToTensor()])
-            # else:
-            #     self.brightness = 0.
-            #     self.contrast = 0.
-            #     self.saturation = 0.
-            #     self.transformation = transforms.Compose([
-            #             transforms.Resize([200, 200]),
-            #             #transforms.Lambda(self.gaussian_blur),
-            #             #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
-            #             transforms.ToTensor()])
-                
-            # noise_coeff = self.brightness + self.contrast + self.saturation
+            sign_coeff = 1.
+            if noise_on:
+                self.brightness = random.uniform(2,4)
+                self.contrast = random.uniform(2,4)
+                self.saturation = random.uniform(0,0.1)
+                self.transformation = transforms.Compose([
+                        transforms.Resize([200, 200]),
+                       #transforms.Lambda(self.gaussian_blur),
+                        transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                        transforms.ToTensor()])
+            else:
+                self.brightness = 0.
+                self.contrast = 0.
+                self.saturation = 0.
+                self.transformation = transforms.Compose([
+                        transforms.Resize([200, 200]),
+                        #transforms.Lambda(self.gaussian_blur),
+                        #transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
+                        transforms.ToTensor()])
+                 
+            noise_coeff = self.brightness + self.contrast + self.saturation
 
             image_response = self.client.simGetImages([airsim.ImageRequest('0', airsim.ImageType.Scene, False, False)])[0]
             #if len(image_response.image_data_uint8) == image_response.width * image_response.height * 3:
@@ -939,22 +940,22 @@ class PoseSampler:
 
 
                 if predicted_r < 3.0:
-                    self.period_denum = 6.0
+                    self.period_denum = 10.0
                 elif predicted_r < 5.0:
-                    self.period_denum = 20.0
+                    self.period_denum = 10.0
                 else:
-                    self.period_denum = 30.0
+                    self.period_denum = 10.0
 
 
-                if noise_on:
-                    noise_coeff = np.random.uniform(0.5, 1.5) 
-                    sign_coeff = np.random.choice([-1,1])
-                else:
-                    noise_coeff = 0.
+                # if noise_on:
+                #     noise_coeff = np.random.uniform(0.5, 1.5) 
+                #     sign_coeff = np.random.choice([-1,1])
+                # else:
+                #     noise_coeff = 0.
 
 
-                pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
-                pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
+                # pose_gate_body[0][0] += (sign_coeff*noise_coeff*pose_gate_body[0][0]) 
+                # pose_gate_body[0][0] = np.clip(pose_gate_body[0][0], 0.1, pose_gate_body[0][0])
 
                 
                 for i,num in enumerate(pose_gate_body.reshape(-1,1)):
@@ -1000,7 +1001,7 @@ class PoseSampler:
 
 
                     print "\nCurrent index: {0}".format(self.curr_idx)
-                    print "Final r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum)
+                    print "Predicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum)
                     #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
                     print "MP algorithm: " + method 
                     print "Estimated time of arrival: {0:.3} s.".format(self.Tf)                       
@@ -1008,7 +1009,7 @@ class PoseSampler:
                     #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
-                        f.write("\nFinal r: {0:.3}, Actual r: {1:.3}, Noise coeff: {2:.4}, Covariance sum: {3:.3}".format(pose_gate_body[0][0], predicted_r, sign_coeff*noise_coeff, covariance_sum))
+                        f.write("\nPredicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum))
                         #f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
                         f.write("\nMP algorithm: " + method)
                         f.write("\nEstimated time of arrival: {0:.3} s.".format(self.Tf))
@@ -1028,7 +1029,7 @@ class PoseSampler:
                         t_list = linspace(0, flight_period, num = Waypoint_length)
                         init_start = False
                     else:
-                        t_list = linspace(flight_period, 2*flight_period, num = Waypoint_length)
+                        t_list = linspace(1.5*flight_period, 2.5*flight_period, num = Waypoint_length)
 
 
                     #self.vel_sum = 0.
@@ -1239,7 +1240,7 @@ class PoseSampler:
                 print "\n>>> TEST MODE: " + method
                 self.test_algorithm(method = method)
 
-            pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter, self.test_distribution_on_noise, self.test_distribution_off_noise], open(self.base_path + "files/test_variables.pkl","wb"), protocol=2)
+            pickle.dump([self.test_states,self.test_arrival_time,self.test_costs, self.test_safe_counter, self.test_distribution_on_noise, self.test_distribution_off_noise], open(self.base_path + "files/test_variables_103.pkl","wb"), protocol=2)
         
 
         elif mode == "VISUALIZATION":
