@@ -3,7 +3,7 @@ import os
 
 base_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
 num_iterations = 100
-mode = "TEST"
+mode = "DATA_COLLECTION"
 flight_log = True
 
 def summarize_results(list_all = True):

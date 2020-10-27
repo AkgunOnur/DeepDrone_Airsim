@@ -221,8 +221,8 @@ class PoseSampler:
 
         # Previous gates
         self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-                     Pose(Vector3r(1.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-                     Pose(Vector3r(2.,0.,-3.), Quaternionr(quat3[0],quat3[1],quat3[2],quat3[3]))]
+                     Pose(Vector3r(4.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(10.,0.,-3.), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -536,6 +536,8 @@ class PoseSampler:
         covariance_list = []
         cov_rep_num = 5
         anyGate = True
+        noise_on = False
+        previous_idx = 0
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
@@ -552,10 +554,19 @@ class PoseSampler:
 
         while((not track_completed) and (not fail_check)):
 
-            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-                noise_on = True
-            elif self.curr_idx % 15 == 0:
-                noise_on = False
+            if noise_on:
+                if (self.curr_idx-previous_idx) >= 5:
+                    noise_on = False
+                    previous_idx = self.curr_idx
+            else:
+                if (self.curr_idx-previous_idx) >= 10 and self.curr_idx >= 15:
+                    noise_on = True
+                    previous_idx = self.curr_idx
+
+            # if self.curr_idx % 10 == 0 and self.curr_idx != 0 and self.curr_idx > 12:
+            #     noise_on = True
+            # elif self.curr_idx % 15 == 0:
+            #     noise_on = False
 
             sign_coeff = 1.
             if noise_on:
@@ -564,7 +575,7 @@ class PoseSampler:
                 self.saturation = random.uniform(0,0.1)
                 self.transformation = transforms.Compose([
                         transforms.Resize([200, 200]),
-                       #transforms.Lambda(self.gaussian_blur),
+                        #transforms.Lambda(self.gaussian_blur),
                         transforms.ColorJitter(brightness=self.brightness, contrast=self.contrast, saturation=self.saturation),
                         transforms.ToTensor()])
             else:
@@ -591,11 +602,6 @@ class PoseSampler:
             image = self.transformation(img)
             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
-            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-                noise_on = True
-            elif self.curr_idx % 15 == 0:
-                noise_on = False
-
             with torch.no_grad():   
                 # Determine Gat location with Neural Networks
                 pose_gate_body = self.Dronet(image)
@@ -603,11 +609,11 @@ class PoseSampler:
 
 
                 if predicted_r < 3.0:
-                    self.period_denum = 10.0
+                    self.period_denum = 3.0
                 elif predicted_r < 5.0:
-                    self.period_denum = 10.0
+                    self.period_denum = 3.0
                 else:
-                    self.period_denum = 10.0
+                    self.period_denum = 5.0
 
 
                 # if noise_on:
@@ -639,7 +645,7 @@ class PoseSampler:
                     if self.curr_idx >= (11 + cov_rep_num):
                         covariance_sum = np.sum(covariance_list[-cov_rep_num:]) / float(cov_rep_num)
 
-                    if covariance_sum > 20.:
+                    if covariance_sum > 10.:
                         anyGate = False
 
                     # Gate ground truth values will be implemented
@@ -744,7 +750,7 @@ class PoseSampler:
                             t_list = linspace(0, flight_period, num = Waypoint_length)
                             init_start = False
                         else:
-                            t_list = linspace(1.5*flight_period, 2.5*flight_period, num = Waypoint_length)
+                            t_list = linspace(0.75*flight_period, 1.75*flight_period, num = Waypoint_length)
                                             
                         
                         #self.vel_sum = 0.
@@ -823,10 +829,11 @@ class PoseSampler:
                             if check_arrival: # drone arrives to the gate
                                 track_completed = True
                                 #self.vel_sum = self.vel_sum / (ind + 1)
-                                self.test_costs[method] += (self.Tf * self.quad.costValue / self.period_denum)
-                                print "By {0}, Drone has finished the lap in {1:.6} s. Current cost: {2:.6}".format(method, self.test_arrival_time[method], self.Tf * self.quad.costValue / self.period_denum) 
+                                current_cost = (self.Tf/ self.period_denum)**2 * self.quad.costValue / 1e3
+                                self.test_costs[method] += current_cost
+                                print "By {0}, Drone has finished the lap in {1:.6} s. Total cost: {2:.6}".format(method, self.test_arrival_time[method], self.test_costs[method]) 
                                 if self.flight_log:
-                                    f.write("\nBy {0}, Drone has finished the lap in {1:.6} s. Current cost: {2:.6}".format(method, self.test_arrival_time[method], self.Tf * self.quad.costValue / self.period_denum))
+                                    f.write("\nBy {0}, Drone has finished the lap in {1:.6} s. Total cost: {2:.6}".format(method, self.test_arrival_time[method], self.test_costs[method]))
                                 break        
                             
 
@@ -834,10 +841,11 @@ class PoseSampler:
                         if (not track_completed) and (not fail_check) and (not collision_check) and (anyGate): # drone didn't arrive or crash
                             #self.vel_sum = self.vel_sum / Waypoint_length
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_costs[method] += (self.Tf * self.quad.costValue / self.period_denum)
-                            print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum)
+                            current_cost = (self.Tf/ self.period_denum)**2 * self.quad.costValue / 1e3
+                            self.test_costs[method] += current_cost
+                            print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(current_cost)
                             if self.flight_log:
-                                f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.Tf * self.quad.costValue / self.period_denum))
+                                f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(current_cost))
 
 
                         if track_completed or fail_check or collision_check or not anyGate: # drone arrived to the gate or crashed or collided                      
@@ -849,7 +857,7 @@ class PoseSampler:
             f.close()
 
 
-    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 300):
+    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 100):
         x_offset, y_offset, z_offset = pos_offset
         phi_start, theta_start, gate_psi, psi_start = angle_start
 
@@ -882,6 +890,7 @@ class PoseSampler:
         covariance_sum = 0.
         prediction_std = [0., 0., 0., 0.]
         sign_coeff = 0.
+        previous_idx = 0
 
         final_target = [self.track[-1].position.x_val, self.track[-1].position.y_val, self.track[-1].position.z_val]
 
@@ -890,10 +899,19 @@ class PoseSampler:
 
         while((not track_completed) and (not fail_check)):
 
-            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-                noise_on = True
-            elif self.curr_idx % 15 == 0:
-                noise_on = False
+            if noise_on:
+                if (self.curr_idx-previous_idx) >= 5:
+                    noise_on = False
+                    previous_idx = self.curr_idx
+            else:
+                if (self.curr_idx-previous_idx) >= 10 and self.curr_idx >= 15:
+                    noise_on = True
+                    previous_idx = self.curr_idx
+
+            # if self.curr_idx % 30 == 0 and self.curr_idx != 0:
+            #     noise_on = True
+            # elif self.curr_idx % 15 == 0:
+            #     noise_on = False
 
             sign_coeff = 1.
             if noise_on:
@@ -928,11 +946,6 @@ class PoseSampler:
             image = self.transformation(img)
             quad_pose = [self.quad.state[0], self.quad.state[1], self.quad.state[2], -self.quad.state[3], -self.quad.state[4], self.quad.state[5]]
 
-            if self.curr_idx % 30 == 0 and self.curr_idx != 0:
-                noise_on = True
-            elif self.curr_idx % 15 == 0:
-                noise_on = False
-
             with torch.no_grad():   
                 # Determine Gat location with Neural Networks
                 pose_gate_body = self.Dronet(image)
@@ -940,11 +953,11 @@ class PoseSampler:
 
 
                 if predicted_r < 3.0:
-                    self.period_denum = 10.0
+                    self.period_denum = 3.0
                 elif predicted_r < 5.0:
-                    self.period_denum = 10.0
+                    self.period_denum = 3.0
                 else:
-                    self.period_denum = 10.0
+                    self.period_denum = 5.0
 
 
                 # if noise_on:
@@ -976,7 +989,7 @@ class PoseSampler:
                     if self.curr_idx >= (11 + cov_rep_num):
                         covariance_sum = np.sum(covariance_list[-cov_rep_num:]) / float(cov_rep_num)
 
-                    if covariance_sum > 20.:
+                    if covariance_sum > 10.:
                         anyGate = False
 
                     # Gate ground truth values will be implemented
@@ -1029,7 +1042,7 @@ class PoseSampler:
                         t_list = linspace(0, flight_period, num = Waypoint_length)
                         init_start = False
                     else:
-                        t_list = linspace(1.5*flight_period, 2.5*flight_period, num = Waypoint_length)
+                        t_list = linspace(0.75*flight_period, 1.75*flight_period, num = Waypoint_length)
 
 
                     #self.vel_sum = 0.
@@ -1108,7 +1121,7 @@ class PoseSampler:
                             track_completed = True
                             #self.vel_sum = self.vel_sum / (ind + 1)
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_cost = self.Tf * self.quad.costValue / self.period_denum # time * cost
+                            self.test_cost = (self.Tf / self.period_denum)**2 * self.quad.costValue  # time * cost
                             print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_cost) 
                             if self.flight_log:
                                 f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_cost))
@@ -1118,7 +1131,7 @@ class PoseSampler:
                     if (not track_completed) and (not fail_check) and (not collision_check) and anyGate: # drone didn't arrive or crash or collide
                         #self.vel_sum = self.vel_sum / Waypoint_length
                         #print "Velocity Sum (Normalized): ", self.vel_sum
-                        self.test_cost = self.Tf * self.quad.costValue / self.period_denum # time * cost 
+                        self.test_cost = (self.Tf / self.period_denum)**2 * self.quad.costValue / 1e3 # time * cost 
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost)
                         if self.flight_log:
                             f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost))
@@ -1131,7 +1144,7 @@ class PoseSampler:
                     self.write_stats(flight_columns,
                         [pos0[0], pos0[1], pos0[2], noise_coeff, covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], 
                         vel0[0], vel0[1], vel0[2], -phi_start, -theta_start, yawf-yaw0, ang_vel0[0], ang_vel0[1], ang_vel0[2],
-                        prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf, method, self.test_cost, self.drone_status, self.curr_idx], flight_filename)
+                        prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf / self.period_denum, method, self.test_cost, self.drone_status, self.curr_idx], flight_filename)
 
                     if track_completed or fail_check or collision_check or not anyGate: # drone arrived to the gate or crashed or collided                      
                         break
@@ -1156,7 +1169,7 @@ class PoseSampler:
 
         for method in MP_list:
             #self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
-            self.time_coeff = 0.7
+            self.time_coeff = 1.5
             x_offset = pos_range*random.uniform(-1.0, 1.0)
             y_offset = pos_range*random.uniform(-1.0, 1.0)
             z_offset = pos_range*random.uniform(-1.0, 1.0)
@@ -1224,7 +1237,7 @@ class PoseSampler:
         elif mode == "TEST":    
             self.mp_classifier.load_state_dict(torch.load(self.base_path + 'classifier_files/classifier_best.pt'))
             self.time_regressor = load(self.base_path + 'classifier_files/dt_regressor.sav')
-            self.time_coeff = 0.7
+            self.time_coeff = 1.5
             #self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
             #self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
             print "\n>>> PREDICTION MODE: DICE, SAFE MODE: ON"
