@@ -61,7 +61,7 @@ CAM_FOV = 90.0*correction  # in degrees -- needs to be a bit smaller than 90 in 
 
 
 flight_columns = ['true_init_x','true_init_y','true_init_z', 'noise_coeff', 'var_sum', 'diff_x', 'diff_y', 'diff_z', 'v_x', 'v_y', 'v_z', 'diff_phi', 'diff_theta', 'diff_psi', 
-                  'phi_dot', 'theta_dot', 'psi_dot', 'r_var', 'phi_var', 'theta_var', 'psi_var', 'Tf', 'MP_Method', 'Cost', 'Status', 'curr_idx']
+                  'phi_dot', 'theta_dot', 'psi_dot', 'r_var', 'phi_var', 'theta_var', 'psi_var', 'Tf', 'v_average', 'MP_Method', 'Cost', 'Status', 'curr_idx']
 
 flight_filename = 'files/data.csv'
 
@@ -221,8 +221,8 @@ class PoseSampler:
 
         # Previous gates
         self.gate = [Pose(Vector3r(0.,20.,-2.), Quaternionr(quat1[0],quat1[1],quat1[2],quat1[3])),
-                     Pose(Vector3r(4.,10.,-2.5), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
-                     Pose(Vector3r(10.,0.,-3.), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
+                     Pose(Vector3r(4.,10.,-1), Quaternionr(quat2[0],quat2[1],quat2[2],quat2[3])),
+                     Pose(Vector3r(10.,0.,-1.5), Quaternionr(quat4[0],quat4[1],quat4[2],quat4[3]))]
 
         self.drone_init_2 = Pose(Vector3r(0.,0.,-2), Quaternionr(0., 0., -0.70710678, 0.70710678))
         self.gate_2 = [Pose(Vector3r(0.,-5.,-2.), Quaternionr(0., 0., 0., 1.)),
@@ -500,7 +500,7 @@ class PoseSampler:
         return check_arrival
 
 
-    def test_algorithm(self, method = "MAX", use_model = False, safe_mode = True):
+    def test_algorithm(self, method = "MAX", use_model = False, safe_mode = True, v_average = 1.):
         pose_prediction = np.zeros((1000,4),dtype=np.float32)
         prediction_std = np.zeros((4,1),dtype=np.float32)
         labels_dict = {0:3, 1:4, 2:5, 3:10, 4:-1}
@@ -555,7 +555,7 @@ class PoseSampler:
         while((not track_completed) and (not fail_check)):
 
             if noise_on:
-                if (self.curr_idx-previous_idx) >= 5:
+                if (self.curr_idx-previous_idx) >= 3:
                     noise_on = False
                     previous_idx = self.curr_idx
             else:
@@ -691,13 +691,13 @@ class PoseSampler:
 
                         self.trajSelect[0] = labels_dict[mp_method] 
                         self.trajSelect[1] = 2
-                        self.trajSelect[2] = 0
+                        self.trajSelect[2] = 1
 
                         #self.Tf = self.time_regressor.predict(X_test)[0]
-                        self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
+                        #self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) 
                         if self.trajSelect[0] != -1:
                             print "Predicted MP Algorithm: ", self.MP_names[int(self.trajSelect[0])]
-                            print "Time based trajectory, T: {0:.3}".format(self.Tf)
+                            #print "Time based trajectory, T: {0:.3}".format(self.Tf)
                             if self.flight_log:
                                 f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
                                 f.write("\nPredicted Time Length: {0:.3}".format(self.Tf))
@@ -712,7 +712,7 @@ class PoseSampler:
                                 mp_method = np.random.choice([0,1,2,3], p=[.25,.25,.25,.25])
                                 self.trajSelect[0] = labels_dict[mp_method] 
                                 print "Drone should've be in safe mode, but the chosen algorithm: ", self.MP_names[int(self.trajSelect[0])]
-                                print "Time based trajectory, T: {0:.3}".format(self.Tf)
+                                #print "Time based trajectory, T: {0:.3}".format(self.Tf)
                                 if self.flight_log:
                                     f.write("\nTime based trajectory, T: {0:.3}".format(self.Tf))
                                     f.write("\nPredicted Time Length: {0:.3}".format(self.Tf))
@@ -725,10 +725,10 @@ class PoseSampler:
                     else:
                         self.trajSelect[0] = self.MP_methods[method]
                         self.trajSelect[1] = 2
-                        self.trajSelect[2] = 0
-                        self.Tf = self.time_coeff*abs(pose_gate_body[0][0])
+                        self.trajSelect[2] = 1
+                        #self.Tf = self.time_coeff*abs(pose_gate_body[0][0])
                         print "Prediction mode is off. MP algorithm: " + method 
-                        print "Estimated time of arrival: " + str(self.Tf) + " s."
+                        #print "Estimated time of arrival: " + str(self.Tf) + " s."
                         if self.flight_log:
                             f.write("\nPrediction mode is off. MP algorithm: " + method)
                             f.write("\nEstimated time of arrival: " + str(self.Tf) + " s.")
@@ -739,9 +739,10 @@ class PoseSampler:
                         waypoint_list = np.vstack((pos0, posf)).astype(float)
                         yaw_list = np.hstack((yaw0, yawf)).astype(float)
 
+                        newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list, v_average=v_average) 
+                        self.Tf = newTraj.t_wps[1]
+                        print "Velocity based trajectory, T: {0:.3}".format(self.Tf)
                         self.test_arrival_time[method] += (self.Tf / self.period_denum)
-
-                        newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
                         flight_period = self.Tf / self.period_denum
                         Waypoint_length = flight_period // self.dtau
@@ -750,7 +751,10 @@ class PoseSampler:
                             t_list = linspace(0, flight_period, num = Waypoint_length)
                             init_start = False
                         else:
-                            t_list = linspace(0.75*flight_period, 1.75*flight_period, num = Waypoint_length)
+                            if self.trajSelect[0] == 3:
+                                t_list = linspace(0.*flight_period, 1.*flight_period, num = Waypoint_length)
+                            else:
+                                t_list = linspace(0.75*flight_period, 1.75*flight_period, num = 1*Waypoint_length)
                                             
                         
                         #self.vel_sum = 0.
@@ -829,7 +833,7 @@ class PoseSampler:
                             if check_arrival: # drone arrives to the gate
                                 track_completed = True
                                 #self.vel_sum = self.vel_sum / (ind + 1)
-                                current_cost = (self.Tf/ self.period_denum)**2 * self.quad.costValue / 1e3
+                                current_cost = self.quad.costValue / (v_average**2) / 1e3
                                 self.test_costs[method] += current_cost
                                 print "By {0}, Drone has finished the lap in {1:.6} s. Total cost: {2:.6}".format(method, self.test_arrival_time[method], self.test_costs[method]) 
                                 if self.flight_log:
@@ -841,7 +845,7 @@ class PoseSampler:
                         if (not track_completed) and (not fail_check) and (not collision_check) and (anyGate): # drone didn't arrive or crash
                             #self.vel_sum = self.vel_sum / Waypoint_length
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            current_cost = (self.Tf/ self.period_denum)**2 * self.quad.costValue / 1e3
+                            current_cost = self.quad.costValue / (v_average**2) / 1e3
                             self.test_costs[method] += current_cost
                             print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(current_cost)
                             if self.flight_log:
@@ -857,7 +861,7 @@ class PoseSampler:
             f.close()
 
 
-    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 100):
+    def fly_drone(self, f, method, pos_offset, angle_start, max_iteration = 100, v_average = 1.):
         x_offset, y_offset, z_offset = pos_offset
         phi_start, theta_start, gate_psi, psi_start = angle_start
 
@@ -900,7 +904,7 @@ class PoseSampler:
         while((not track_completed) and (not fail_check)):
 
             if noise_on:
-                if (self.curr_idx-previous_idx) >= 5:
+                if (self.curr_idx-previous_idx) >= 3:
                     noise_on = False
                     previous_idx = self.curr_idx
             else:
@@ -997,43 +1001,43 @@ class PoseSampler:
                     
                     self.trajSelect[0] = self.MP_methods[method]
                     self.trajSelect[1] = 2
-                    self.trajSelect[2] = 0
-                    self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) + 0.1
+                    self.trajSelect[2] = 1
+                    # self.Tf = self.time_coeff*abs(pose_gate_body[0][0]) + 0.1
                     
                     # Trajectory generate
                     waypoint_world = spherical_to_cartesian(self.quad.state, pose_gate_body)
                     pos0 = [self.quad.state[0], self.quad.state[1], self.quad.state[2]]
                     vel0 = [self.quad.state[6], self.quad.state[7], self.quad.state[8]]
                     ang_vel0 = [self.quad.state[9], self.quad.state[10], self.quad.state[11]]
-                    acc0 = [0., 0., 0.]
+                    #acc0 = [0., 0., 0.]
                     yaw0 = self.quad.state[5]
 
                     yaw_diff = pose_gate_body[3][0]
                     posf = [waypoint_world[0], waypoint_world[1], waypoint_world[2]]
                     yawf = (self.quad.state[5]+yaw_diff) + np.pi/2
 
+                    time_list = np.hstack((0., self.Tf)).astype(float)
+                    waypoint_list = np.vstack((pos0, posf)).astype(float)
+                    yaw_list = np.hstack((yaw0, yawf)).astype(float)
+
+                    newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list, v_average=v_average) 
+                    self.Tf = newTraj.t_wps[1]
 
                     print "\nCurrent index: {0}".format(self.curr_idx)
                     print "Predicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum)
                     #print "Brightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation)
                     print "MP algorithm: " + method 
-                    print "Estimated time of arrival: {0:.3} s.".format(self.Tf)                       
-                    print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)            
+                    print "V_average: {0:.3} m/s, Estimated time of arrival: {1:.3} s.".format(v_average, self.Tf)                       
+                    #print "Gate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi)            
                     #print "Variance values, r: {0:.3}, phi: {1:.3}, theta: {2:.3}, psi: {3:.3}".format(prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3])
                     if self.flight_log:
                         f.write("\nCurrent index: {0}".format(self.curr_idx))
                         f.write("\nPredicted r: {0:.3}, Noise coeff: {1:.4}, Covariance sum: {2:.3}".format(pose_gate_body[0][0], sign_coeff*noise_coeff, covariance_sum))
                         #f.write("\nBrightness: {0:.3}, Contast: {1:.3}, Saturation: {2:.3}".format(self.brightness, self.contrast, self.saturation))
                         f.write("\nMP algorithm: " + method)
-                        f.write("\nEstimated time of arrival: {0:.3} s.".format(self.Tf))
-                        f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
+                        f.write("\nV_average: {0:.3}, Estimated time of arrival: {0:.3} s.".format(v_average, self.Tf))
+                        #f.write("\nGate Predicted, x: {0:.3}, y: {1:.3}, z: {2:.3}, psi: {3:.3} deg".format(waypoint_world[0], waypoint_world[1], waypoint_world[2], yawf*180/np.pi))
                         
-
-                    time_list = np.hstack((0., self.Tf)).astype(float)
-                    waypoint_list = np.vstack((pos0, posf)).astype(float)
-                    yaw_list = np.hstack((yaw0, yawf)).astype(float)
-
-                    newTraj = Trajectory(self.trajSelect, self.quad.state, time_list, waypoint_list, yaw_list) 
 
                     flight_period = self.Tf / self.period_denum
                     Waypoint_length = flight_period // self.dtau
@@ -1042,7 +1046,10 @@ class PoseSampler:
                         t_list = linspace(0, flight_period, num = Waypoint_length)
                         init_start = False
                     else:
-                        t_list = linspace(0.75*flight_period, 1.75*flight_period, num = Waypoint_length)
+                        if self.trajSelect[0] == 3:
+                            t_list = linspace(0.*flight_period, 1.*flight_period, num = Waypoint_length)
+                        else:
+                            t_list = linspace(0.75*flight_period, 1.75*flight_period, num = 1*Waypoint_length)
 
 
                     #self.vel_sum = 0.
@@ -1052,7 +1059,7 @@ class PoseSampler:
                     for ind, t_current in enumerate(t_list): 
                         pos_des, vel_des, acc_des, euler_des = newTraj.desiredState(t_current, self.dtau, self.quad.state)
 
-                        self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
+                        # self.vel_sum += (self.quad.state[6]**2+self.quad.state[7]**2+self.quad.state[8]**2)
 
                         xd, yd, zd = pos_des[0], pos_des[1], pos_des[2]
                         xd_dot, yd_dot, zd_dot = vel_des[0], vel_des[1], vel_des[2]
@@ -1121,7 +1128,7 @@ class PoseSampler:
                             track_completed = True
                             #self.vel_sum = self.vel_sum / (ind + 1)
                             #print "Velocity Sum (Normalized): ", self.vel_sum
-                            self.test_cost = (self.Tf / self.period_denum)**2 * self.quad.costValue  # time * cost
+                            self.test_cost = self.quad.costValue / (v_average**2) / 1e3 
                             print "Drone has finished the lap. Current cost: {0:.6}".format(self.test_cost) 
                             if self.flight_log:
                                 f.write("\nDrone has finished the lap. Current cost: {0:.6}".format(self.test_cost))
@@ -1131,7 +1138,7 @@ class PoseSampler:
                     if (not track_completed) and (not fail_check) and (not collision_check) and anyGate: # drone didn't arrive or crash or collide
                         #self.vel_sum = self.vel_sum / Waypoint_length
                         #print "Velocity Sum (Normalized): ", self.vel_sum
-                        self.test_cost = (self.Tf / self.period_denum)**2 * self.quad.costValue / 1e3 # time * cost 
+                        self.test_cost = self.quad.costValue / (v_average**2) / 1e3 
                         print "Drone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost)
                         if self.flight_log:
                             f.write("\nDrone hasn't reached the gate yet. Current cost: {0:.6}".format(self.test_cost))
@@ -1144,7 +1151,7 @@ class PoseSampler:
                     self.write_stats(flight_columns,
                         [pos0[0], pos0[1], pos0[2], noise_coeff, covariance_sum, posf[0]-pos0[0], posf[1]-pos0[1], posf[2]-pos0[2], 
                         vel0[0], vel0[1], vel0[2], -phi_start, -theta_start, yawf-yaw0, ang_vel0[0], ang_vel0[1], ang_vel0[2],
-                        prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf / self.period_denum, method, self.test_cost, self.drone_status, self.curr_idx], flight_filename)
+                        prediction_std[0], prediction_std[1], prediction_std[2], prediction_std[3], self.Tf / self.period_denum, v_average, method, self.test_cost, self.drone_status, self.curr_idx], flight_filename)
 
                     if track_completed or fail_check or collision_check or not anyGate: # drone arrived to the gate or crashed or collided                      
                         break
@@ -1170,6 +1177,7 @@ class PoseSampler:
         for method in MP_list:
             #self.time_coeff = random.uniform(t_coeff_lower, t_coeff_upper)
             self.time_coeff = 1.5
+            v_average = np.random.uniform(0.75, 2.5)
             x_offset = pos_range*random.uniform(-1.0, 1.0)
             y_offset = pos_range*random.uniform(-1.0, 1.0)
             z_offset = pos_range*random.uniform(-1.0, 1.0)
@@ -1182,7 +1190,7 @@ class PoseSampler:
 
             pos_offset = [x_offset, y_offset, z_offset]
             angle_start = [phi_start, theta_start, gate_psi, psi_start]
-            self.fly_drone(f, method, pos_offset, angle_start)
+            self.fly_drone(f, method, pos_offset, angle_start, v_average=v_average)
             
         if self.flight_log:
             f.close()
@@ -1209,7 +1217,7 @@ class PoseSampler:
         #p_o_g, r, theta, psi, phi_rel = racing_utils.geom_utils.randomGatePose(p_o_b, phi_base, R_RANGE, CAM_FOV, correction)
         #self.client.simSetObjectPose(self.tgt_name, p_o_g_new, True)
         #min_vel, min_acc, min_jerk, pos_waypoint_interp, min_acc_stop, min_jerk_full_stop
-        MP_list = ["min_vel", "min_acc", "min_jerk", "min_jerk_full_stop"]
+        MP_list = ["min_acc", "min_jerk", "min_jerk_full_stop", "min_vel"]
         #MP_list = ["min_vel"]
 
         if self.with_gate:
@@ -1240,14 +1248,14 @@ class PoseSampler:
             self.time_coeff = 1.5
             #self.mp_scaler = load(self.base_path + 'classifier_files/mp_scaler.bin')
             #self.time_scaler = load(self.base_path + 'classifier_files/time_scaler.bin')
-            print "\n>>> PREDICTION MODE: DICE, SAFE MODE: ON"
-            self.test_algorithm(use_model=True, method="DICE_SAFE", safe_mode = True)
-            print "\n>>> PREDICTION MODE: DICE, SAFE MODE: OFF"
-            self.test_algorithm(use_model=True, method="DICE_NO_SAFE", safe_mode = False)
-            print "\n>>> PREDICTION MODE: MAX, SAFE MODE: ON"
-            self.test_algorithm(use_model=True, method="MAX_SAFE", safe_mode = True)
-            print "\n>>> PREDICTION MODE: MAX, SAFE MODE: OFF"
-            self.test_algorithm(use_model=True, method="MAX_NO_SAFE", safe_mode = False)
+            # print "\n>>> PREDICTION MODE: DICE, SAFE MODE: ON"
+            # self.test_algorithm(use_model=True, method="DICE_SAFE", safe_mode = True)
+            # print "\n>>> PREDICTION MODE: DICE, SAFE MODE: OFF"
+            # self.test_algorithm(use_model=True, method="DICE_NO_SAFE", safe_mode = False)
+            # print "\n>>> PREDICTION MODE: MAX, SAFE MODE: ON"
+            # self.test_algorithm(use_model=True, method="MAX_SAFE", safe_mode = True)
+            # print "\n>>> PREDICTION MODE: MAX, SAFE MODE: OFF"
+            # self.test_algorithm(use_model=True, method="MAX_NO_SAFE", safe_mode = False)
             
             for method in MP_list:
                 print "\n>>> TEST MODE: " + method
