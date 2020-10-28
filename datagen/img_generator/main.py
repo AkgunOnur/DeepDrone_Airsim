@@ -3,11 +3,11 @@ import os
 
 base_path = '/home/merkez/Downloads/DeepDrone_Airsim/'
 num_iterations = 100
-mode = "DATA_COLLECTION"
+mode = "SUMMARY"
 flight_log = True
 
 def summarize_results(list_all = True):
-	result_file = os.path.join(base_path, "files/results_102.pkl")
+	result_file = os.path.join(base_path, "files/results_0_0.pkl")
 	cost_list, time_list = pickle.load(open(result_file, "rb"))
 
 	method_counter = []
