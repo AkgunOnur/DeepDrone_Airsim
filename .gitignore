@@ -1,2 +1,4 @@
 *.log
 *.pyc
+*.tar
+.ipynb_checkpoints/
