@@ -16,7 +16,6 @@ import time
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 import_path = os.path.join(curr_dir, '..')
 sys.path.insert(0, import_path)
-import trajectory_utils
 
 # Extras for Perception
 import torch
@@ -193,14 +192,6 @@ class PoseSampler:
         self.gate_edge_list = []
         self.gate_edge_distances = []
         self.collision_check_interval = 15
-
-        self.circle_track = trajectory_utils.generate_gate_poses(num_gates=6,
-                                                                 race_course_radius=self.race_course_radius,
-                                                                 radius_noise=self.radius_noise,
-                                                                 height_range=self.height_range,
-                                                                 direction=self.direction,
-                                                                 type_of_segment="circle")
-        self.drone_init_circle = Pose(Vector3r(10.,13.,-0.1), Quaternionr(0., 0., 0.98480775, 0.17364818))
 
 
         self.track = self.gate # for circle trajectory change this with circle_track
@@ -593,7 +584,7 @@ class PoseSampler:
                     if gate_completed or fail_check or collision_check: # drone arrived to the gate or crashed or collided                      
                         break
 
-                if index == len(self.gate):
+                if index == len(self.track):
                     track_completed = True
                     print "Drone has completed the track!"
                     break
