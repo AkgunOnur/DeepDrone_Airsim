@@ -1,0 +1,4 @@
+sudo docker run --network host -it -v $(pwd):/root/ deep-drone /bin/bash
+sudo docker build -t deep-drone .
+sudo docker rmi -f cd(id 2 karakteri)
+sudo docker save -o deep-drone.tar deep-drone
